@@ -54,7 +54,7 @@ const SettingsManager = () => {
           linkedin: settings.socialLinks?.linkedin || '',
           twitter: settings.socialLinks?.twitter || '',
           instagram: settings.socialLinks?.instagram || '',
-          instagram: settings.socialLinks?.facebook || ''
+          facebook: settings.socialLinks?.facebook || ''
         },
         seoSettings: {
           ogImage: settings.seoSettings?.ogImage || '',

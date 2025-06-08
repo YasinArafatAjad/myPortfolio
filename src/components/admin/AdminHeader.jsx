@@ -1,17 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNotification } from '../../contexts/NotificationContext';
-import { FaBars, FaUser, FaSignOutAlt, FaCog } from 'react-icons/fa';
+import { FaBars, FaBell, FaUser, FaSignOutAlt, FaCog } from 'react-icons/fa';
 
 /**
- * Admin header component with user menu
+ * Admin header component with user menu and notifications
  */
 const AdminHeader = ({ onMenuClick, user }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   
   const { logout } = useAuth();
   const { showSuccess } = useNotification();
+
+  /**
+   * Fetch unread notifications count
+   */
+  const fetchUnreadNotifications = async () => {
+    try {
+      const q = query(
+        collection(db, 'notifications'),
+        where('read', '==', false)
+      );
+      const querySnapshot = await getDocs(q);
+      setUnreadNotifications(querySnapshot.size);
+    } catch (error) {
+      console.error('Error fetching unread notifications:', error);
+    }
+  };
 
   /**
    * Handle logout
@@ -24,6 +44,16 @@ const AdminHeader = ({ onMenuClick, user }) => {
       console.error('Logout error:', error);
     }
   };
+
+  // Fetch unread notifications on component mount and periodically
+  useEffect(() => {
+    fetchUnreadNotifications();
+
+    // Refresh unread count every 30 seconds
+    const interval = setInterval(fetchUnreadNotifications, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
@@ -51,6 +81,23 @@ const AdminHeader = ({ onMenuClick, user }) => {
 
         {/* Right side */}
         <div className="flex items-center space-x-4">
+          {/* Notifications Bell */}
+          <Link
+            to="/admin/dashboard/notifications"
+            className="relative p-2 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-lg transition-colors"
+          >
+            <FaBell className="h-5 w-5" />
+            {unreadNotifications > 0 && (
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium"
+              >
+                {unreadNotifications > 99 ? '99+' : unreadNotifications}
+              </motion.span>
+            )}
+          </Link>
+
           {/* User menu */}
           <div className="relative">
             <button
@@ -83,16 +130,14 @@ const AdminHeader = ({ onMenuClick, user }) => {
                     </p>
                   </div>
                   <div className="py-2">
-                    <button
-                      onClick={() => {
-                        setUserMenuOpen(false);
-                        // Navigate to settings
-                      }}
+                    <Link
+                      to="/admin/dashboard/settings"
+                      onClick={() => setUserMenuOpen(false)}
                       className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     >
                       <FaCog className="mr-3 h-4 w-4" />
                       Settings
-                    </button>
+                    </Link>
                     <button
                       onClick={() => {
                         setUserMenuOpen(false);

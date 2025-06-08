@@ -59,7 +59,13 @@ export const SettingsProvider = ({ children }) => {
       const settingsDoc = await getDoc(doc(db, 'settings', 'site'));
       if (settingsDoc.exists()) {
         const data = settingsDoc.data();
-        setSettings({ ...defaultSettings, ...data });
+        const mergedSettings = { ...defaultSettings, ...data };
+        setSettings(mergedSettings);
+        
+        // Update favicon if logo exists
+        if (mergedSettings.logo) {
+          updateFavicon(mergedSettings.logo);
+        }
       }
       setLoading(false);
     } catch (error) {
@@ -101,21 +107,35 @@ export const SettingsProvider = ({ children }) => {
    */
   const updateFavicon = (logoUrl) => {
     try {
-      // Remove existing favicon
-      const existingFavicon = document.querySelector('link[rel="icon"]');
-      if (existingFavicon) {
-        existingFavicon.remove();
-      }
+      // Remove all existing favicon links
+      const existingFavicons = document.querySelectorAll('link[rel*="icon"]');
+      existingFavicons.forEach(favicon => favicon.remove());
       
-      // Create new favicon
-      const newFavicon = document.createElement('link');
-      newFavicon.rel = 'icon';
-      newFavicon.type = 'image/x-icon';
-      newFavicon.href = logoUrl;
-      document.head.appendChild(newFavicon);
+      // Create new favicon link elements
+      const createFaviconLink = (rel, type, href) => {
+        const link = document.createElement('link');
+        link.rel = rel;
+        if (type) link.type = type;
+        link.href = href;
+        return link;
+      };
+
+      // Add multiple favicon formats for better browser support
+      const head = document.head;
       
-      // Update settings
-      setSettings(prev => ({ ...prev, favicon: logoUrl }));
+      // Standard favicon
+      head.appendChild(createFaviconLink('icon', 'image/x-icon', logoUrl));
+      
+      // PNG favicon for modern browsers
+      head.appendChild(createFaviconLink('icon', 'image/png', logoUrl));
+      
+      // Apple touch icon for iOS devices
+      head.appendChild(createFaviconLink('apple-touch-icon', null, logoUrl));
+      
+      // Shortcut icon for older browsers
+      head.appendChild(createFaviconLink('shortcut icon', 'image/x-icon', logoUrl));
+      
+      console.log('Favicon updated successfully to:', logoUrl);
     } catch (error) {
       console.error('Error updating favicon:', error);
     }
@@ -151,12 +171,25 @@ export const SettingsProvider = ({ children }) => {
     const unsubscribe = onSnapshot(doc(db, 'settings', 'site'), (doc) => {
       if (doc.exists()) {
         const data = doc.data();
-        setSettings({ ...defaultSettings, ...data });
+        const mergedSettings = { ...defaultSettings, ...data };
+        setSettings(mergedSettings);
+        
+        // Update favicon when settings change in real-time
+        if (mergedSettings.logo) {
+          updateFavicon(mergedSettings.logo);
+        }
       }
     });
 
     return unsubscribe;
   }, []);
+
+  // Update document title when site name changes
+  useEffect(() => {
+    if (settings.siteName) {
+      document.title = settings.siteName;
+    }
+  }, [settings.siteName]);
 
   // Context value
   const value = {

@@ -35,6 +35,9 @@ const SEOHead = ({
   // Generate OG image
   const ogImage = image || settings.seoSettings?.ogImage || `${window.location.origin}/og-image.jpg`;
 
+  // Use logo as favicon if available, otherwise use default
+  const faviconUrl = settings.logo || '/favicon.ico';
+
   // Generate structured data for portfolio
   const structuredData = {
     "@context": "https://schema.org",
@@ -55,10 +58,11 @@ const SEOHead = ({
       <meta name="author" content={settings.siteName} />
       <link rel="canonical" href={canonicalUrl} />
       
-      {/* Favicon */}
-      {settings.favicon && (
-        <link rel="icon\" type="image/x-icon\" href={settings.favicon} />
-      )}
+      {/* Favicon - Multiple formats for better browser support */}
+      <link rel="icon" type="image/x-icon" href={faviconUrl} />
+      <link rel="icon" type="image/png" href={faviconUrl} />
+      <link rel="apple-touch-icon" href={faviconUrl} />
+      <link rel="shortcut icon" type="image/x-icon" href={faviconUrl} />
       
       {/* Open Graph tags */}
       <meta property="og:title" content={pageTitle} />
@@ -75,7 +79,7 @@ const SEOHead = ({
       <meta name="twitter:image" content={ogImage} />
       
       {/* Robots meta tag */}
-      {noIndex && <meta name="robots\" content="noindex, nofollow" />}
+      {noIndex && <meta name="robots" content="noindex, nofollow" />}
       
       {/* Viewport and mobile optimization */}
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />

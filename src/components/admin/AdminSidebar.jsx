@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useSettings } from '../../contexts/SettingsContext';
 import {
@@ -9,7 +9,7 @@ import {
   FaProjectDiagram,
   FaEnvelope,
   FaCog,
-  FaChartBar,
+  FaBell,
   FaTimes
 } from 'react-icons/fa';
 
@@ -22,6 +22,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
   const [stats, setStats] = useState({
     activeProjects: 0,
     unreadMessages: 0,
+    unreadNotifications: 0,
     totalViews: 0
   });
 
@@ -41,7 +42,14 @@ const AdminSidebar = ({ isOpen, onClose }) => {
     {
       path: '/admin/dashboard/messages',
       label: 'Messages',
-      icon: FaEnvelope
+      icon: FaEnvelope,
+      badge: stats.unreadMessages
+    },
+    {
+      path: '/admin/dashboard/notifications',
+      label: 'Notifications',
+      icon: FaBell,
+      badge: stats.unreadNotifications
     },
     {
       path: '/admin/dashboard/settings',
@@ -63,14 +71,20 @@ const AdminSidebar = ({ isOpen, onClose }) => {
       const messagesSnapshot = await getDocs(collection(db, 'messages'));
       const messages = messagesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
+      // Fetch notifications
+      const notificationsSnapshot = await getDocs(collection(db, 'notifications'));
+      const notifications = notificationsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
       // Calculate stats
       const activeProjects = projects.filter(p => p.published === true).length;
       const unreadMessages = messages.filter(m => m.read !== true).length;
+      const unreadNotifications = notifications.filter(n => n.read !== true).length;
       const totalViews = projects.reduce((sum, p) => sum + (parseInt(p.views) || 0), 0);
 
       setStats({
         activeProjects,
         unreadMessages,
+        unreadNotifications,
         totalViews
       });
     } catch (error) {
@@ -120,7 +134,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         className="fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-xl lg:translate-x-0 lg:static lg:inset-0"
       >
-        <div className="flex items-center justify-between gap-3 h-16 px-6 border-b  border-gray-200">
+        <div className="flex items-center justify-between gap-3 h-16 px-6 border-b border-gray-200">
           {/* Logo */}
           <div className="flex items-center space-x-2">
             {settings.logo ? (
@@ -161,7 +175,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                 <NavLink
                   key={item.path}
                   to={item.path}
-                  className={`group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${active
+                  className={`group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors ${active
                       ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-500'
                       : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
                     }`}
@@ -172,11 +186,18 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                     }
                   }}
                 >
-                  <IconComponent
-                    className={`mr-3 h-5 w-5 flex-shrink-0 ${active ? 'text-primary-500' : 'text-gray-400 group-hover:text-gray-500'
-                      }`}
-                  />
-                  {item.label}
+                  <div className="flex items-center">
+                    <IconComponent
+                      className={`mr-3 h-5 w-5 flex-shrink-0 ${active ? 'text-primary-500' : 'text-gray-400 group-hover:text-gray-500'
+                        }`}
+                    />
+                    {item.label}
+                  </div>
+                  {item.badge > 0 && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                      {item.badge}
+                    </span>
+                  )}
                 </NavLink>
               );
             })}
@@ -201,12 +222,19 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                 </span>
               </div>
               <div className="flex justify-between">
+                <span>Notifications</span>
+                <span className={`font-medium ${stats.unreadNotifications > 0 ? 'text-blue-600' : ''}`}>
+                  {stats.unreadNotifications}
+                </span>
+              </div>
+              <div className="flex justify-between">
                 <span>Total Views</span>
                 <span className="font-medium">{stats.totalViews.toLocaleString()}</span>
               </div>
             </div>
           </div>
         </div>
+
         {/* Back to Site Link */}
         <div className="mt-8 px-6">
           <a

@@ -7,6 +7,7 @@ import AdminHeader from '../components/admin/AdminHeader';
 import Dashboard from '../components/admin/Dashboard';
 import ProjectsManager from '../components/admin/ProjectsManager';
 import MessagesManager from '../components/admin/MessagesManager';
+import NotificationManager from '../components/admin/NotificationManager';
 import SettingsManager from '../components/admin/SettingsManager';
 import SEOHead from '../components/SEOHead';
 
@@ -51,6 +52,7 @@ const AdminDashboard = () => {
               <Route index element={<Dashboard />} />
               <Route path="projects/*" element={<ProjectsManager />} />
               <Route path="messages/*" element={<MessagesManager />} />
+              <Route path="notifications" element={<NotificationManager />} />
               <Route path="settings" element={<SettingsManager />} />
               <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
             </Routes>

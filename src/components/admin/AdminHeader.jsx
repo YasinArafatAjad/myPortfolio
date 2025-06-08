@@ -2,14 +2,13 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNotification } from '../../contexts/NotificationContext';
-import { FaBars, FaBell, FaUser, FaSignOutAlt, FaCog } from 'react-icons/fa';
+import { FaBars, FaUser, FaSignOutAlt, FaCog } from 'react-icons/fa';
 
 /**
- * Admin header component with user menu and notifications
+ * Admin header component with user menu
  */
 const AdminHeader = ({ onMenuClick, user }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
   
   const { logout } = useAuth();
   const { showSuccess } = useNotification();
@@ -25,33 +24,6 @@ const AdminHeader = ({ onMenuClick, user }) => {
       console.error('Logout error:', error);
     }
   };
-
-  // Mock notifications (in a real app, these would come from a context or API)
-  const notifications = [
-    {
-      id: 1,
-      title: 'New message received',
-      message: 'John Doe sent you a message',
-      time: '5 minutes ago',
-      unread: true
-    },
-    {
-      id: 2,
-      title: 'Project updated',
-      message: 'Portfolio website project was updated',
-      time: '1 hour ago',
-      unread: true
-    },
-    {
-      id: 3,
-      title: 'Backup completed',
-      message: 'Daily backup completed successfully',
-      time: '2 hours ago',
-      unread: false
-    }
-  ];
-
-  const unreadCount = notifications.filter(n => n.unread).length;
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
@@ -79,71 +51,6 @@ const AdminHeader = ({ onMenuClick, user }) => {
 
         {/* Right side */}
         <div className="flex items-center space-x-4">
-          {/* Notifications */}
-          <div className="relative">
-            <button
-              onClick={() => setNotificationsOpen(!notificationsOpen)}
-              className="relative text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-lg p-2"
-            >
-              <FaBell className="h-5 w-5" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                  {unreadCount}
-                </span>
-              )}
-            </button>
-
-            {/* Notifications dropdown */}
-            <AnimatePresence>
-              {notificationsOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
-                >
-                  <div className="p-4 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Notifications
-                    </h3>
-                  </div>
-                  <div className="max-h-64 overflow-y-auto">
-                    {notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={`p-4 border-b border-gray-100 hover:bg-gray-50 ${
-                          notification.unread ? 'bg-blue-50' : ''
-                        }`}
-                      >
-                        <div className="flex items-start">
-                          <div className="flex-1">
-                            <h4 className="text-sm font-medium text-gray-900">
-                              {notification.title}
-                            </h4>
-                            <p className="text-sm text-gray-600 mt-1">
-                              {notification.message}
-                            </p>
-                            <p className="text-xs text-gray-500 mt-2">
-                              {notification.time}
-                            </p>
-                          </div>
-                          {notification.unread && (
-                            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="p-4 border-t border-gray-200">
-                    <button className="text-sm text-primary-600 hover:text-primary-700 font-medium">
-                      View all notifications
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
           {/* User menu */}
           <div className="relative">
             <button
@@ -204,14 +111,11 @@ const AdminHeader = ({ onMenuClick, user }) => {
         </div>
       </div>
 
-      {/* Click outside to close dropdowns */}
-      {(userMenuOpen || notificationsOpen) && (
+      {/* Click outside to close dropdown */}
+      {userMenuOpen && (
         <div
           className="fixed inset-0 z-40"
-          onClick={() => {
-            setUserMenuOpen(false);
-            setNotificationsOpen(false);
-          }}
+          onClick={() => setUserMenuOpen(false)}
         />
       )}
     </header>

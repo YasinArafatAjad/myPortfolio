@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useNotification } from '../../contexts/NotificationContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { uploadToCloudinary } from '../../config/cloudinary';
-import { FaSave, FaUpload, FaGlobe, FaPalette, FaSearch, FaImage } from 'react-icons/fa';
+import { FaSave, FaUpload, FaGlobe, FaPalette, FaSearch, FaImage, FaShieldAlt, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 /**
  * Settings manager component for website configuration
@@ -11,6 +13,7 @@ import { FaSave, FaUpload, FaGlobe, FaPalette, FaSearch, FaImage } from 'react-i
 const SettingsManager = () => {
   const { settings, updateSettings, loading } = useSettings();
   const { showSuccess, showError } = useNotification();
+  const { currentUser } = useAuth();
   
   const [formData, setFormData] = useState({
     siteName: '',
@@ -33,10 +36,23 @@ const SettingsManager = () => {
     }
   });
   
+  // Security form state
+  const [securityData, setSecurityData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  
   const [logoFile, setLogoFile] = useState(null);
   const [ogImageFile, setOgImageFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [activeTab, setActiveTab] = useState('general');
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
 
   /**
    * Initialize form data with current settings
@@ -87,6 +103,27 @@ const SettingsManager = () => {
         [name]: value
       }));
     }
+  };
+
+  /**
+   * Handle security form input changes
+   */
+  const handleSecurityInputChange = (e) => {
+    const { name, value } = e.target;
+    setSecurityData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  /**
+   * Toggle password visibility
+   */
+  const togglePasswordVisibility = (field) => {
+    setShowPasswords(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }));
   };
 
   /**
@@ -158,6 +195,81 @@ const SettingsManager = () => {
       console.error('Error uploading images:', error);
       // Provide more specific error message
       throw new Error(`Image upload failed: ${error.message}`);
+    }
+  };
+
+  /**
+   * Handle password change
+   */
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    
+    // Validation
+    if (!securityData.currentPassword || !securityData.newPassword || !securityData.confirmPassword) {
+      showError('Please fill in all password fields');
+      return;
+    }
+
+    if (securityData.newPassword !== securityData.confirmPassword) {
+      showError('New passwords do not match');
+      return;
+    }
+
+    if (securityData.newPassword.length < 6) {
+      showError('New password must be at least 6 characters long');
+      return;
+    }
+
+    if (securityData.currentPassword === securityData.newPassword) {
+      showError('New password must be different from current password');
+      return;
+    }
+
+    try {
+      setChangingPassword(true);
+
+      // Re-authenticate user with current password
+      const credential = EmailAuthProvider.credential(
+        currentUser.email,
+        securityData.currentPassword
+      );
+      
+      await reauthenticateWithCredential(currentUser, credential);
+      
+      // Update password
+      await updatePassword(currentUser, securityData.newPassword);
+      
+      showSuccess('Password updated successfully');
+      
+      // Clear form
+      setSecurityData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+      
+      // Hide passwords
+      setShowPasswords({
+        current: false,
+        new: false,
+        confirm: false
+      });
+      
+    } catch (error) {
+      console.error('Error changing password:', error);
+      
+      let errorMessage = 'Failed to change password';
+      if (error.code === 'auth/wrong-password') {
+        errorMessage = 'Current password is incorrect';
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = 'New password is too weak';
+      } else if (error.code === 'auth/requires-recent-login') {
+        errorMessage = 'Please log out and log back in before changing your password';
+      }
+      
+      showError(errorMessage);
+    } finally {
+      setChangingPassword(false);
     }
   };
 
@@ -248,6 +360,7 @@ const SettingsManager = () => {
           <TabButton id="general" label="General" icon={FaGlobe} />
           <TabButton id="branding" label="Branding" icon={FaPalette} />
           <TabButton id="seo" label="SEO" icon={FaSearch} />
+          <TabButton id="security" label="Security" icon={FaShieldAlt} />
         </div>
       </div>
 
@@ -490,26 +603,188 @@ const SettingsManager = () => {
           </motion.div>
         )}
 
-        {/* Save Button */}
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            disabled={uploading}
-            className={`btn-primary ${uploading ? 'opacity-75 cursor-not-allowed' : ''}`}
+        {/* Security Settings */}
+        {activeTab === 'security' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
           >
-            {uploading ? (
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Saving...</span>
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">Security Settings</h2>
+            
+            {/* Account Information */}
+            <div className="mb-8 p-4 bg-gray-50 rounded-lg">
+              <h3 className="text-md font-semibold text-gray-900 mb-3">Account Information</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Email:</span>
+                  <span className="text-sm font-medium text-gray-900">{currentUser?.email}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Account Type:</span>
+                  <span className="text-sm font-medium text-green-600">Administrator</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Last Sign In:</span>
+                  <span className="text-sm font-medium text-gray-900">
+                    {currentUser?.metadata?.lastSignInTime 
+                      ? new Date(currentUser.metadata.lastSignInTime).toLocaleDateString()
+                      : 'Unknown'
+                    }
+                  </span>
+                </div>
               </div>
-            ) : (
-              <div className="flex items-center space-x-2">
-                <FaSave />
-                <span>Save Settings</span>
-              </div>
-            )}
-          </button>
-        </div>
+            </div>
+
+            {/* Password Change Form */}
+            <div className="border-t border-gray-200 pt-6">
+              <h3 className="text-md font-semibold text-gray-900 mb-4 flex items-center">
+                <FaLock className="w-4 h-4 mr-2" />
+                Change Password
+              </h3>
+              
+              <form onSubmit={handlePasswordChange} className="space-y-4">
+                <div>
+                  <label className="form-label">Current Password *</label>
+                  <div className="relative">
+                    <input
+                      type={showPasswords.current ? 'text' : 'password'}
+                      name="currentPassword"
+                      value={securityData.currentPassword}
+                      onChange={handleSecurityInputChange}
+                      className="form-input focus:outline-none focus:ring-0 pr-10"
+                      required
+                      disabled={changingPassword}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => togglePasswordVisibility('current')}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                    >
+                      {showPasswords.current ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="form-label">New Password *</label>
+                  <div className="relative">
+                    <input
+                      type={showPasswords.new ? 'text' : 'password'}
+                      name="newPassword"
+                      value={securityData.newPassword}
+                      onChange={handleSecurityInputChange}
+                      className="form-input focus:outline-none focus:ring-0 pr-10"
+                      required
+                      minLength={6}
+                      disabled={changingPassword}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => togglePasswordVisibility('new')}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                    >
+                      {showPasswords.new ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Password must be at least 6 characters long
+                  </p>
+                </div>
+
+                <div>
+                  <label className="form-label">Confirm New Password *</label>
+                  <div className="relative">
+                    <input
+                      type={showPasswords.confirm ? 'text' : 'password'}
+                      name="confirmPassword"
+                      value={securityData.confirmPassword}
+                      onChange={handleSecurityInputChange}
+                      className="form-input focus:outline-none focus:ring-0 pr-10"
+                      required
+                      disabled={changingPassword}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => togglePasswordVisibility('confirm')}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                    >
+                      {showPasswords.confirm ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                  {securityData.newPassword && securityData.confirmPassword && 
+                   securityData.newPassword !== securityData.confirmPassword && (
+                    <p className="text-xs text-red-500 mt-1">
+                      Passwords do not match
+                    </p>
+                  )}
+                </div>
+
+                <div className="pt-4">
+                  <button
+                    type="submit"
+                    disabled={changingPassword || !securityData.currentPassword || 
+                             !securityData.newPassword || !securityData.confirmPassword ||
+                             securityData.newPassword !== securityData.confirmPassword}
+                    className={`btn-primary ${
+                      (changingPassword || !securityData.currentPassword || 
+                       !securityData.newPassword || !securityData.confirmPassword ||
+                       securityData.newPassword !== securityData.confirmPassword) 
+                        ? 'opacity-75 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    {changingPassword ? (
+                      <div className="flex items-center space-x-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Changing Password...</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center space-x-2">
+                        <FaLock />
+                        <span>Change Password</span>
+                      </div>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* Security Tips */}
+            <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h4 className="text-sm font-semibold text-blue-900 mb-2">Security Tips</h4>
+              <ul className="text-xs text-blue-800 space-y-1">
+                <li>• Use a strong password with at least 8 characters</li>
+                <li>• Include uppercase, lowercase, numbers, and special characters</li>
+                <li>• Don't reuse passwords from other accounts</li>
+                <li>• Change your password regularly</li>
+                <li>• Never share your admin credentials</li>
+              </ul>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Save Button - Only show for non-security tabs */}
+        {activeTab !== 'security' && (
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={uploading}
+              className={`btn-primary ${uploading ? 'opacity-75 cursor-not-allowed' : ''}`}
+            >
+              {uploading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Saving...</span>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <FaSave />
+                  <span>Save Settings</span>
+                </div>
+              )}
+            </button>
+          </div>
+        )}
       </form>
     </div>
   );

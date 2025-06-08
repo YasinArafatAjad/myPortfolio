@@ -54,7 +54,7 @@ const AdminDashboard = () => {
               <Route path="messages/*" element={<MessagesManager />} />
               <Route path="notifications" element={<NotificationManager />} />
               <Route path="settings" element={<SettingsManager />} />
-              <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+              <Route path="*" element={<Navigate to="/admin/dashboard\" replace />} />
             </Routes>
           </motion.main>
         </div>

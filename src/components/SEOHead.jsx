@@ -79,7 +79,7 @@ const SEOHead = ({
       <meta name="twitter:image" content={ogImage} />
       
       {/* Robots meta tag */}
-      {noIndex && <meta name="robots" content="noindex, nofollow" />}
+      {noIndex && <meta name="robots\" content="noindex, nofollow" />}
       
       {/* Viewport and mobile optimization */}
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />

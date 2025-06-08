@@ -27,43 +27,79 @@ const Home = () => {
   const fetchFeaturedProjects = async () => {
     try {
       setLoadingProjects(true);
-      const q = query(
-        collection(db, 'projects'),
-        where('published', '==', true),
-        where('featured', '==', true),
-        orderBy('createdAt', 'desc'),
-        limit(3)
-      );
       
-      const querySnapshot = await getDocs(q);
-      const projectsData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      
-      setFeaturedProjects(projectsData);
-    } catch (error) {
-      console.error('Error fetching featured projects:', error);
-      // If the composite index doesn't exist, fall back to fetching all projects and filtering
+      // Try the optimized query first (requires composite index)
       try {
-        const fallbackQuery = query(
+        const q = query(
           collection(db, 'projects'),
-          orderBy('createdAt', 'desc')
+          where('published', '==', true),
+          where('featured', '==', true),
+          orderBy('createdAt', 'desc'),
+          limit(3)
         );
-        const fallbackSnapshot = await getDocs(fallbackQuery);
-        const allProjects = fallbackSnapshot.docs.map(doc => ({
+        
+        const querySnapshot = await getDocs(q);
+        const projectsData = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
         
-        const filteredProjects = allProjects
-          .filter(project => project.published === true && project.featured === true)
-          .slice(0, 3);
+        setFeaturedProjects(projectsData);
+        return; // Success, exit early
+      } catch (indexError) {
+        console.warn('Composite index not available, using fallback query:', indexError.message);
         
-        setFeaturedProjects(filteredProjects);
-      } catch (fallbackError) {
-        console.error('Error with fallback query:', fallbackError);
+        // Fallback: Try simpler queries
+        try {
+          // First try with just published filter and order by createdAt
+          const publishedQuery = query(
+            collection(db, 'projects'),
+            where('published', '==', true),
+            orderBy('createdAt', 'desc')
+          );
+          
+          const publishedSnapshot = await getDocs(publishedQuery);
+          const publishedProjects = publishedSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          
+          // Filter for featured projects client-side
+          const featuredOnly = publishedProjects
+            .filter(project => project.featured === true)
+            .slice(0, 3);
+          
+          setFeaturedProjects(featuredOnly);
+          return; // Success with fallback
+        } catch (publishedError) {
+          console.warn('Published query failed, trying basic query:', publishedError.message);
+          
+          // Final fallback: Get all projects and filter client-side
+          const basicQuery = query(collection(db, 'projects'));
+          const basicSnapshot = await getDocs(basicQuery);
+          const allProjects = basicSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          
+          // Filter client-side for published and featured projects
+          const filteredProjects = allProjects
+            .filter(project => project.published === true && project.featured === true)
+            .sort((a, b) => {
+              // Sort by createdAt descending
+              const aDate = a.createdAt?.toDate?.() || new Date(a.createdAt) || new Date(0);
+              const bDate = b.createdAt?.toDate?.() || new Date(b.createdAt) || new Date(0);
+              return bDate - aDate;
+            })
+            .slice(0, 3);
+          
+          setFeaturedProjects(filteredProjects);
+        }
       }
+    } catch (error) {
+      console.error('Error fetching featured projects:', error);
+      // Set empty array on complete failure
+      setFeaturedProjects([]);
     } finally {
       setLoadingProjects(false);
     }

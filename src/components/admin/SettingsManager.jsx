@@ -225,8 +225,16 @@ const SettingsManager = () => {
       return;
     }
 
+    if (!currentUser) {
+      showError('User not authenticated. Please log in again.');
+      return;
+    }
+
     try {
       setChangingPassword(true);
+
+      console.log('Starting password change process...');
+      console.log('Current user:', currentUser.email);
 
       // Re-authenticate user with current password
       const credential = EmailAuthProvider.credential(
@@ -234,10 +242,14 @@ const SettingsManager = () => {
         securityData.currentPassword
       );
       
+      console.log('Re-authenticating user...');
       await reauthenticateWithCredential(currentUser, credential);
+      console.log('Re-authentication successful');
       
       // Update password
+      console.log('Updating password...');
       await updatePassword(currentUser, securityData.newPassword);
+      console.log('Password updated successfully');
       
       showSuccess('Password updated successfully');
       
@@ -257,14 +269,32 @@ const SettingsManager = () => {
       
     } catch (error) {
       console.error('Error changing password:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
       
       let errorMessage = 'Failed to change password';
-      if (error.code === 'auth/wrong-password') {
-        errorMessage = 'Current password is incorrect';
-      } else if (error.code === 'auth/weak-password') {
-        errorMessage = 'New password is too weak';
-      } else if (error.code === 'auth/requires-recent-login') {
-        errorMessage = 'Please log out and log back in before changing your password';
+      
+      switch (error.code) {
+        case 'auth/wrong-password':
+          errorMessage = 'Current password is incorrect';
+          break;
+        case 'auth/weak-password':
+          errorMessage = 'New password is too weak. Please use a stronger password.';
+          break;
+        case 'auth/requires-recent-login':
+          errorMessage = 'Please log out and log back in before changing your password';
+          break;
+        case 'auth/invalid-credential':
+          errorMessage = 'Current password is incorrect';
+          break;
+        case 'auth/too-many-requests':
+          errorMessage = 'Too many failed attempts. Please try again later.';
+          break;
+        case 'auth/network-request-failed':
+          errorMessage = 'Network error. Please check your connection and try again.';
+          break;
+        default:
+          errorMessage = `Failed to change password: ${error.message}`;
       }
       
       showError(errorMessage);
@@ -655,11 +685,13 @@ const SettingsManager = () => {
                       className="form-input focus:outline-none focus:ring-0 pr-10"
                       required
                       disabled={changingPassword}
+                      autoComplete="current-password"
                     />
                     <button
                       type="button"
                       onClick={() => togglePasswordVisibility('current')}
                       className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                      disabled={changingPassword}
                     >
                       {showPasswords.current ? <FaEyeSlash /> : <FaEye />}
                     </button>
@@ -678,11 +710,13 @@ const SettingsManager = () => {
                       required
                       minLength={6}
                       disabled={changingPassword}
+                      autoComplete="new-password"
                     />
                     <button
                       type="button"
                       onClick={() => togglePasswordVisibility('new')}
                       className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                      disabled={changingPassword}
                     >
                       {showPasswords.new ? <FaEyeSlash /> : <FaEye />}
                     </button>
@@ -703,11 +737,13 @@ const SettingsManager = () => {
                       className="form-input focus:outline-none focus:ring-0 pr-10"
                       required
                       disabled={changingPassword}
+                      autoComplete="new-password"
                     />
                     <button
                       type="button"
                       onClick={() => togglePasswordVisibility('confirm')}
                       className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                      disabled={changingPassword}
                     >
                       {showPasswords.confirm ? <FaEyeSlash /> : <FaEye />}
                     </button>

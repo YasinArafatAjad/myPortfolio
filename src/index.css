@@ -88,6 +88,10 @@ img {
 .card {
   @apply bg-white rounded-xl shadow-lg p-6 transition-shadow duration-300 hover:shadow-xl;
 }
+.ProjectCard {
+  @apply bg-white rounded-xl shadow-lg transition-shadow duration-300 hover:shadow-xl;
+}
+
 
 /* Form styles */
 .form-input {

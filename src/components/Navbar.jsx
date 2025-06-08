@@ -69,13 +69,13 @@ const Navbar = () => {
               <img
                 src={settings.logo}
                 alt={settings.siteName}
-                className="h-8 w-8 object-contain"
+                className="h-16 w-16 object-contain"
                 loading="eager"
               />
             ) : (
               <div className="h-8 w-8 bg-primary-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">
-                  {settings.siteName?.charAt(0) || 'P'}
+                  {settings.siteName?.charAt(0) || 'AJAD'}
                 </span>
               </div>
             )}

@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Routes, Route, useNavigate, Link, useParams } from 'react-router-dom';
-import { 
-  collection, 
-  getDocs, 
-  updateDoc, 
-  deleteDoc, 
-  doc, 
-  query, 
+import {
+  collection,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+  doc,
+  query,
   orderBy,
-  getDoc 
+  getDoc
 } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useNotification } from '../../contexts/NotificationContext';
@@ -24,7 +24,7 @@ const MessagesList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
-  
+
   const { showSuccess, showError } = useNotification();
   const navigate = useNavigate();
 
@@ -101,7 +101,7 @@ const MessagesList = () => {
 
     // Apply status filter
     if (filterStatus !== 'all') {
-      filtered = filtered.filter(message => 
+      filtered = filtered.filter(message =>
         filterStatus === 'read' ? message.read : !message.read
       );
     }
@@ -148,7 +148,7 @@ const MessagesList = () => {
   const handleMessageClick = (message) => {
     // Navigate to message detail
     navigate(`/admin/dashboard/messages/${message.id}`);
-    
+
     // Mark as read if unread
     if (!message.read) {
       toggleMessageRead(message.id, false);
@@ -168,18 +168,18 @@ const MessagesList = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 w-full">
+        <div className="grid  grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="form-label">Search</label>
             <div className="relative">
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              {/* <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" /> */}
               <input
                 type="text"
                 placeholder="Search messages..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="form-input pl-10"
+                className="form-input pl-10 focus:outline-none focus:ring-0"
               />
             </div>
           </div>
@@ -188,7 +188,7 @@ const MessagesList = () => {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="form-input"
+              className="form-input focus:outline-none focus:ring-0"
             >
               <option value="all">All Messages</option>
               <option value="unread">Unread</option>
@@ -200,7 +200,7 @@ const MessagesList = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="form-input"
+              className="form-input focus:outline-none focus:ring-0"
             >
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
@@ -211,13 +211,13 @@ const MessagesList = () => {
       </div>
 
       {/* Messages List */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="spinner"></div>
-          </div>
+          </div> 
         ) : getFilteredMessages().length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-12 overflow-x-auto ">
             <FaEnvelope className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No messages found</h3>
             <p className="text-gray-600">
@@ -231,12 +231,11 @@ const MessagesList = () => {
                 key={message.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`p-6 hover:bg-gray-50 cursor-pointer transition-colors ${
-                  !message.read ? 'bg-blue-50' : ''
-                }`}
+                className={`p-6 border-b hover:bg-gray-50 cursor-pointer transition-colors ${!message.read ? 'bg-blue-50' : ''
+                  }`}
                 onClick={() => handleMessageClick(message)}
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between ">
                   <div className="flex items-center space-x-4 flex-1 min-w-0">
                     <div className="flex-shrink-0">
                       {message.read ? (
@@ -247,30 +246,29 @@ const MessagesList = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-2">
-                        <p className={`text-sm font-medium truncate ${
-                          !message.read ? 'text-gray-900' : 'text-gray-700'
-                        }`}>
+                        <p className={`text-sm font-medium truncate ${!message.read ? 'text-gray-900' : 'text-gray-700'
+                          }`}>
                           {message.name}
                         </p>
-                        <span className="text-sm text-gray-500">
-                          ({message.email})
-                        </span>
                         {!message.read && (
                           <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600 truncate">
-                        {message.subject || 'No subject'}
+                      <p className="text-sm text-gray-500">
+                        ({message.email})
                       </p>
-                      <p className="text-sm text-gray-500 truncate mt-1">
+                      <b className="text-sm text-gray-600 truncate">
+                        {message.subject || 'No subject'}
+                      </b>
+                      <p className="text-sm text-gray-500 w-full mt-1 mb-3">
                         {message.message}
                       </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <span className="text-sm text-gray-500 whitespace-nowrap">
+                      <span className="text-sm text-gray-500 whitespace-nowrap">
                       {formatDate(message.createdAt)}
                     </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">                    
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={(e) => {
@@ -298,6 +296,7 @@ const MessagesList = () => {
               </motion.div>
             ))}
           </div>
+
         )}
       </div>
     </div>

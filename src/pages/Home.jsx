@@ -11,6 +11,7 @@ const Home = () => {
   const { settings } = useSettings();
   const [heroRef, heroInView] = useInView({ triggerOnce: true, threshold: 0.1 });
   const [aboutRef, aboutInView] = useInView({ triggerOnce: true, threshold: 0.1 });
+  const [cardRef, cardInView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
   return (
     <>
@@ -129,10 +130,15 @@ const Home = () => {
               initial={{ opacity: 0, y: 50 }}
               animate={aboutInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="grid grid-cols-1 md:grid-cols-3 gap-8"
+              ref={cardRef}
+              className="grid grid-cols-1 md:grid-cols-2 justify-items-center gap-8"
             >
               {/* Skills preview */}
-              <div className="card text-center">
+              <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={cardInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.2 }} 
+              className="card text-center">
                 <div className="w-16 h-16 bg-primary-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                   <svg className="w-8 h-8 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
@@ -142,9 +148,13 @@ const Home = () => {
                 <p className="text-gray-600">
                   Creating responsive and interactive user interfaces with modern frameworks.
                 </p>
-              </div>
+              </motion.div>
 
-              <div className="card text-center">
+              <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={cardInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.2 }}
+                className="card text-center">
                 <div className="w-16 h-16 bg-secondary-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                   <svg className="w-8 h-8 text-secondary-600" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clipRule="evenodd" />
@@ -154,19 +164,7 @@ const Home = () => {
                 <p className="text-gray-600">
                   Building robust server-side applications and APIs with scalable architectures.
                 </p>
-              </div>
-
-              <div className="card text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm6 2a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold mb-2">UI/UX Design</h3>
-                <p className="text-gray-600">
-                  Designing intuitive and beautiful user experiences with attention to detail.
-                </p>
-              </div>
+              </motion.div>
             </motion.div>
 
             <motion.div

@@ -25,7 +25,7 @@ const AdminDashboard = () => {
         noIndex={true}
       />
       
-      <div className="min-h-screen bg-gray-50 flex">
+      <div className="min-h-[100vh] bg-gray-50 flex">
         {/* Sidebar */}
         <AdminSidebar 
           isOpen={sidebarOpen}
@@ -33,9 +33,7 @@ const AdminDashboard = () => {
         />
 
         {/* Main Content */}
-        <div className={`flex-1 transition-all duration-300 ${
-          sidebarOpen ? 'lg:ml-64' : 'lg:ml-0'
-        }`}>
+        <div className={`flex-1 transition-all duration-300 ${'lg:ml-0'}`}>
           {/* Header */}
           <AdminHeader 
             onMenuClick={() => setSidebarOpen(!sidebarOpen)}

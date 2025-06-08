@@ -148,14 +148,11 @@ const AdminHeader = ({ onMenuClick, user }) => {
           <div className="relative">
             <button
               onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-lg p-2"
+              className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-0 rounded-lg p-2"
             >
               <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center">
                 <FaUser className="h-4 w-4 text-white" />
               </div>
-              <span className="hidden md:block text-sm font-medium">
-                {user?.email?.split('@')[0] || 'Admin'}
-              </span>
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>

@@ -111,10 +111,10 @@ const Portfolio = () => {
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: index * 0.1 }}
-        className="card group overflow-hidden"
+        className="group ProjectCard overflow-hidden"
       >
         {/* Project Image */}
-        <div className="relative overflow-hidden rounded-lg mb-4">
+        <div className="relative overflow-hidden rounded-t-lg mb-4">
           <img
             src={getOptimizedImageUrl(project.imageUrl, { width: 400, height: 250 })}
             alt={project.title}
@@ -132,8 +132,8 @@ const Portfolio = () => {
         </div>
 
         {/* Project Info */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
+        <div className='p-6'>
+          <div className="flex items-center justify-between mb-2 ">
             <span className="text-sm text-primary-600 font-medium">
               {project.category}
             </span>
@@ -288,7 +288,7 @@ const Portfolio = () => {
         </section>
 
         {/* Projects Section */}
-        <section className="py-20">
+        <section className="py-20 bg-gray-100">
           <div className="container-custom">
             {loading ? (
               <div className="flex justify-center items-center py-20">
@@ -306,7 +306,7 @@ const Portfolio = () => {
                 </p>
               </div>
             ) : (
-              <div className="portfolio-grid">
+              <div className="portfolio-grid ">
                 {filteredProjects.map((project, index) => (
                   <ProjectCard
                     key={project.id}

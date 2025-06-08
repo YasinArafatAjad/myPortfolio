@@ -32,7 +32,7 @@ function App() {
   }, []);
 
   return (
-    <div className="App min-h-screen flex flex-col">
+    <div className="App min-h-[100vh] flex flex-col">
       {/* Global context providers */}
       <NotificationProvider>
         <SettingsProvider>

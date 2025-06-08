@@ -4,13 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useSettings } from '../../contexts/SettingsContext';
-import { 
-  FaHome, 
-  FaProjectDiagram, 
-  FaEnvelope, 
-  FaCog, 
+import {
+  FaHome,
+  FaProjectDiagram,
+  FaEnvelope,
+  FaCog,
   FaChartBar,
-  FaTimes 
+  FaTimes
 } from 'react-icons/fa';
 
 /**
@@ -58,11 +58,11 @@ const AdminSidebar = ({ isOpen, onClose }) => {
       // Fetch projects
       const projectsSnapshot = await getDocs(collection(db, 'projects'));
       const projects = projectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      
+
       // Fetch messages
       const messagesSnapshot = await getDocs(collection(db, 'messages'));
       const messages = messagesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      
+
       // Calculate stats
       const activeProjects = projects.filter(p => p.published === true).length;
       const unreadMessages = messages.filter(m => m.read !== true).length;
@@ -81,10 +81,10 @@ const AdminSidebar = ({ isOpen, onClose }) => {
   // Fetch stats on component mount and periodically
   useEffect(() => {
     fetchStats();
-    
+
     // Refresh stats every 30 seconds
     const interval = setInterval(fetchStats, 30000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -120,7 +120,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         className="fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-xl lg:translate-x-0 lg:static lg:inset-0"
       >
-        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
+        <div className="flex items-center justify-between gap-3 h-16 px-6 border-b  border-gray-200">
           {/* Logo */}
           <div className="flex items-center space-x-2">
             {settings.logo ? (
@@ -156,16 +156,15 @@ const AdminSidebar = ({ isOpen, onClose }) => {
             {navItems.map((item) => {
               const IconComponent = item.icon;
               const active = isActive(item.path, item.exact);
-              
+
               return (
                 <NavLink
                   key={item.path}
                   to={item.path}
-                  className={`group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                    active
+                  className={`group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${active
                       ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-500'
                       : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
-                  }`}
+                    }`}
                   onClick={() => {
                     // Close mobile sidebar when navigating
                     if (window.innerWidth < 1024) {
@@ -174,9 +173,8 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                   }}
                 >
                   <IconComponent
-                    className={`mr-3 h-5 w-5 flex-shrink-0 ${
-                      active ? 'text-primary-500' : 'text-gray-400 group-hover:text-gray-500'
-                    }`}
+                    className={`mr-3 h-5 w-5 flex-shrink-0 ${active ? 'text-primary-500' : 'text-gray-400 group-hover:text-gray-500'
+                      }`}
                   />
                   {item.label}
                 </NavLink>
@@ -209,12 +207,10 @@ const AdminSidebar = ({ isOpen, onClose }) => {
             </div>
           </div>
         </div>
-
         {/* Back to Site Link */}
-        <div className="absolute bottom-6 left-6 right-6">
+        <div className="mt-8 px-6">
           <a
             href="/"
-            target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
           >

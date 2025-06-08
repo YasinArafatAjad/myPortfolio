@@ -22,7 +22,8 @@ const SettingsManager = () => {
       github: '',
       linkedin: '',
       twitter: '',
-      instagram: ''
+      instagram: '',
+      facebook: ''
     },
     seoSettings: {
       ogImage: '',
@@ -52,7 +53,8 @@ const SettingsManager = () => {
           github: settings.socialLinks?.github || '',
           linkedin: settings.socialLinks?.linkedin || '',
           twitter: settings.socialLinks?.twitter || '',
-          instagram: settings.socialLinks?.instagram || ''
+          instagram: settings.socialLinks?.instagram || '',
+          instagram: settings.socialLinks?.facebook || ''
         },
         seoSettings: {
           ogImage: settings.seoSettings?.ogImage || '',
@@ -268,7 +270,7 @@ const SettingsManager = () => {
                   name="siteName"
                   value={formData.siteName}
                   onChange={handleInputChange}
-                  className="form-input"
+                  className="form-input focus:outline-none focus:ring-0"
                   required
                 />
               </div>
@@ -280,7 +282,7 @@ const SettingsManager = () => {
                   name="contactEmail"
                   value={formData.contactEmail}
                   onChange={handleInputChange}
-                  className="form-input"
+                  className="form-input focus:outline-none focus:ring-0"
                   required
                 />
               </div>
@@ -293,7 +295,7 @@ const SettingsManager = () => {
                 value={formData.siteDescription}
                 onChange={handleInputChange}
                 rows={3}
-                className="form-input resize-none"
+                className="form-input focus:outline-none focus:ring-0 resize-none"
                 required
               />
             </div>
@@ -305,8 +307,8 @@ const SettingsManager = () => {
                 name="siteKeywords"
                 value={formData.siteKeywords}
                 onChange={handleInputChange}
-                className="form-input"
-                placeholder="portfolio, web developer, designer, etc."
+                className="form-input focus:outline-none focus:ring-0"
+                placeholder="..."
               />
             </div>
 
@@ -321,7 +323,7 @@ const SettingsManager = () => {
                     name="socialLinks.github"
                     value={formData.socialLinks.github}
                     onChange={handleInputChange}
-                    className="form-input"
+                    className="form-input focus:outline-none focus:ring-0"
                     placeholder="https://github.com/username"
                   />
                 </div>
@@ -332,7 +334,7 @@ const SettingsManager = () => {
                     name="socialLinks.linkedin"
                     value={formData.socialLinks.linkedin}
                     onChange={handleInputChange}
-                    className="form-input"
+                    className="form-input focus:outline-none focus:ring-0"
                     placeholder="https://linkedin.com/in/username"
                   />
                 </div>
@@ -343,7 +345,7 @@ const SettingsManager = () => {
                     name="socialLinks.twitter"
                     value={formData.socialLinks.twitter}
                     onChange={handleInputChange}
-                    className="form-input"
+                    className="form-input focus:outline-none focus:ring-0"
                     placeholder="https://twitter.com/username"
                   />
                 </div>
@@ -354,8 +356,19 @@ const SettingsManager = () => {
                     name="socialLinks.instagram"
                     value={formData.socialLinks.instagram}
                     onChange={handleInputChange}
-                    className="form-input"
+                    className="form-input focus:outline-none focus:ring-0"
                     placeholder="https://instagram.com/username"
+                  />
+                </div>
+                <div>
+                  <label className="form-label">Facebook URL</label>
+                  <input
+                    type="url"
+                    name="socialLinks.facebook"
+                    value={formData.socialLinks.facebook}
+                    onChange={handleInputChange}
+                    className="form-input focus:outline-none focus:ring-0"
+                    placeholder="https://facebook.com/username"
                   />
                 </div>
               </div>
@@ -380,7 +393,7 @@ const SettingsManager = () => {
                   type="file"
                   accept="image/*"
                   onChange={handleLogoChange}
-                  className="form-input"
+                  className="form-input focus:outline-none focus:ring-0"
                 />
                 {formData.logo && (
                   <div className="flex items-center space-x-4">
@@ -419,7 +432,7 @@ const SettingsManager = () => {
                   type="file"
                   accept="image/*"
                   onChange={handleOgImageChange}
-                  className="form-input"
+                  className="form-input focus:outline-none focus:ring-0"
                 />
                 <p className="text-sm text-gray-500">
                   Recommended size: 1200x630px. This image will be shown when your site is shared on social media.
@@ -443,7 +456,7 @@ const SettingsManager = () => {
                   name="seoSettings.twitterCard"
                   value={formData.seoSettings.twitterCard}
                   onChange={handleInputChange}
-                  className="form-input"
+                  className="form-input focus:outline-none focus:ring-0"
                 >
                   <option value="summary">Summary</option>
                   <option value="summary_large_image">Summary Large Image</option>
@@ -457,7 +470,7 @@ const SettingsManager = () => {
                   name="seoSettings.googleAnalytics"
                   value={formData.seoSettings.googleAnalytics}
                   onChange={handleInputChange}
-                  className="form-input"
+                  className="form-input focus:outline-none focus:ring-0"
                   placeholder="G-XXXXXXXXXX"
                 />
               </div>
@@ -470,7 +483,7 @@ const SettingsManager = () => {
                 name="seoSettings.googleSiteVerification"
                 value={formData.seoSettings.googleSiteVerification}
                 onChange={handleInputChange}
-                className="form-input"
+                className="form-input focus:outline-none focus:ring-0"
                 placeholder="Verification meta tag content"
               />
             </div>

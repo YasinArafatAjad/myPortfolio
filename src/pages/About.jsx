@@ -15,30 +15,29 @@ const About = () => {
     { name: 'JavaScript', level: 85 },
     { name: 'Node.js', level: 80 },
     { name: 'Firebase', level: 75 },
-    { name: 'CSS/Tailwind', level: 85 },
-    { name: 'UI/UX Design', level: 70 }
+    { name: 'CSS/Tailwind', level: 95 }
   ];
 
   // Experience/Timeline data
   const timeline = [
-    {
-      year: '2023',
-      title: 'Senior Full Stack Developer',
-      company: 'Tech Company',
-      description: 'Led development of multiple web applications using React and Node.js'
-    },
-    {
-      year: '2022',
-      title: 'Frontend Developer',
-      company: 'Digital Agency',
-      description: 'Created responsive web applications and improved user experiences'
-    },
-    {
-      year: '2021',
-      title: 'Junior Developer',
-      company: 'Startup',
-      description: 'Learned modern web development practices and contributed to team projects'
-    }
+    // {
+    //   year: '2023',
+    //   title: 'Senior Full Stack Developer',
+    //   company: 'Tech Company',
+    //   description: 'Led development of multiple web applications using React and Node.js'
+    // },
+    // {
+    //   year: '2022',
+    //   title: 'Frontend Developer',
+    //   company: 'Digital Agency',
+    //   description: 'Created responsive web applications and improved user experiences'
+    // },
+    // {
+    //   year: '2021',
+    //   title: 'Junior Developer',
+    //   company: 'Startup',
+    //   description: 'Learned modern web development practices and contributed to team projects'
+    // }
   ];
 
   return (
@@ -102,7 +101,6 @@ const About = () => {
                   </p>
                 </div>
               </motion.div>
-
               <motion.div
                 initial={{ opacity: 0, x: 50 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -114,7 +112,8 @@ const About = () => {
                   <div className="w-full h-full bg-white/10 rounded-xl backdrop-blur-sm flex items-center justify-center">
                     <span className="text-white text-6xl font-bold">
                       {/* You can replace this with an actual image */}
-                      👨‍💻
+                      {/* 👨‍💻 */}
+                      <img src="../../public/A.png" alt="A" />
                     </span>
                   </div>
                 </div>
@@ -122,7 +121,6 @@ const About = () => {
             </div>
           </div>
         </section>
-
         {/* Skills Section */}
         <section ref={skillsRef} className="py-20 bg-gray-50">
           <div className="container-custom">
@@ -139,7 +137,6 @@ const About = () => {
                 Here are the technologies and tools I work with to bring ideas to life.
               </p>
             </motion.div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {skills.map((skill, index) => (
                 <motion.div
@@ -147,7 +144,7 @@ const About = () => {
                   initial={{ opacity: 0, y: 30 }}
                   animate={skillsInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.8, delay: index * 0.1 }}
-                  className="card"
+                  className="card w-full"
                 >
                   <div className="flex justify-between items-center mb-3">
                     <h3 className="text-lg font-semibold text-gray-900">
@@ -170,7 +167,6 @@ const About = () => {
             </div>
           </div>
         </section>
-
         {/* Experience Timeline */}
         <section ref={experienceRef} className="py-20">
           <div className="container-custom">
@@ -187,14 +183,13 @@ const About = () => {
                 My professional journey and key milestones.
               </p>
             </motion.div>
-
             <div className="max-w-4xl mx-auto">
               {timeline.map((item, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
                   animate={experienceInView ? { opacity: 1, x: 0 } : {}}
-                  transition={{ duration: 0.8, delay: index * 0.2 }}
+                  transition={{ duration: 0.8, delay: index * 0.8 }}
                   className={`flex items-center mb-12 ${
                     index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'
                   }`}
@@ -215,16 +210,13 @@ const About = () => {
                       </p>
                     </div>
                   </div>
-                  
                   <div className="flex-shrink-0 w-4 h-4 bg-primary-600 rounded-full border-4 border-white shadow-lg"></div>
-                  
                   <div className="flex-1"></div>
                 </motion.div>
               ))}
             </div>
           </div>
         </section>
-
         {/* Call to Action */}
         <section className="py-20 bg-gradient-to-br from-primary-600 to-secondary-600 text-white">
           <div className="container-custom text-center">

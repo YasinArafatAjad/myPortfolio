@@ -5,6 +5,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { useNotification } from '../contexts/NotificationContext';
 import { useSettings } from '../contexts/SettingsContext';
+import { useBusinessNotifications } from '../hooks/useBusinessNotifications';
 import SEOHead from '../components/SEOHead';
 
 /**
@@ -21,6 +22,7 @@ const Contact = () => {
   
   const { showSuccess, showError } = useNotification();
   const { settings } = useSettings();
+  const { notifyContactSubmission } = useBusinessNotifications();
   const [headerRef, headerInView] = useInView({ triggerOnce: true, threshold: 0.1 });
   const [formRef, formInView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
@@ -58,10 +60,16 @@ const Contact = () => {
       setLoading(true);
       
       // Save message to Firestore
-      await addDoc(collection(db, 'messages'), {
+      const messageRef = await addDoc(collection(db, 'messages'), {
         ...formData,
         createdAt: serverTimestamp(),
         read: false
+      });
+
+      // Create business notification for contact form submission
+      await notifyContactSubmission({
+        id: messageRef.id,
+        ...formData
       });
 
       showSuccess('Thank you for your message! I\'ll get back to you soon.');
@@ -137,7 +145,7 @@ const Contact = () => {
                     {settings.contactEmail && (
                       <div className="flex items-center space-x-4">
                         <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                          <svg className="w-6 h-6 text-primary-600\" fill="currentColor\" viewBox="0 0 20 20">
+                          <svg className="w-6 h-6 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                             <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                           </svg>

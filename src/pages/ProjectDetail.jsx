@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { doc, getDoc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { getOptimizedImageUrl } from '../config/cloudinary';
+import { useBusinessNotifications } from '../hooks/useBusinessNotifications';
 import SEOHead from '../components/SEOHead';
 import { FaArrowLeft, FaExternalLinkAlt, FaGithub, FaEye } from 'react-icons/fa';
 
@@ -15,6 +16,7 @@ const ProjectDetail = () => {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const { notifyProjectMilestone } = useBusinessNotifications();
 
   /**
    * Fetch project details and increment view count
@@ -35,11 +37,19 @@ const ProjectDetail = () => {
         
         setProject(projectData);
         
-        // Increment view count
+        // Increment view count and check for milestones
         try {
+          const newViewCount = (projectData.views || 0) + 1;
+          
           await updateDoc(doc(db, 'projects', id), {
             views: increment(1)
           });
+
+          // Check for view milestones and create notifications
+          await notifyProjectMilestone(projectData, newViewCount);
+          
+          // Update local state
+          setProject(prev => ({ ...prev, views: newViewCount }));
         } catch (error) {
           console.error('Error updating view count:', error);
         }

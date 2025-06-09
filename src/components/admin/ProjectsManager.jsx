@@ -16,6 +16,7 @@ import {
 import { db } from '../../config/firebase';
 import { uploadToCloudinary } from '../../config/cloudinary';
 import { useNotification } from '../../contexts/NotificationContext';
+import { useBusinessNotifications } from '../../hooks/useBusinessNotifications';
 import { FaPlus, FaEdit, FaTrash, FaEye, FaEyeSlash, FaImage, FaExternalLinkAlt, FaArrowLeft, FaTimes } from 'react-icons/fa';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -30,6 +31,7 @@ const ProjectsList = () => {
   const [sortBy, setSortBy] = useState('newest');
   
   const { showSuccess, showError } = useNotification();
+  const { notifyProjectStatus } = useBusinessNotifications();
   const navigate = useNavigate();
 
   /**
@@ -76,11 +78,46 @@ const ProjectsList = () => {
    */
   const togglePublished = async (project) => {
     try {
+      const newStatus = !project.published;
       await updateDoc(doc(db, 'projects', project.id), {
-        published: !project.published,
+        published: newStatus,
         updatedAt: serverTimestamp()
       });
-      showSuccess(`Project ${!project.published ? 'published' : 'unpublished'} successfully`);
+
+      // Create business notification for status change
+      await notifyProjectStatus(
+        project,
+        project.published ? 'published' : 'unpublished',
+        newStatus ? 'published' : 'unpublished'
+      );
+
+      showSuccess(`Project ${newStatus ? 'published' : 'unpublished'} successfully`);
+      fetchProjects();
+    } catch (error) {
+      console.error('Error updating project:', error);
+      showError('Failed to update project');
+    }
+  };
+
+  /**
+   * Toggle project featured status
+   */
+  const toggleFeatured = async (project) => {
+    try {
+      const newFeaturedStatus = !project.featured;
+      await updateDoc(doc(db, 'projects', project.id), {
+        featured: newFeaturedStatus,
+        updatedAt: serverTimestamp()
+      });
+
+      // Create business notification for featured status change
+      await notifyProjectStatus(
+        project,
+        project.featured ? 'featured' : 'unfeatured',
+        newFeaturedStatus ? 'featured' : 'unfeatured'
+      );
+
+      showSuccess(`Project ${newFeaturedStatus ? 'featured' : 'unfeatured'} successfully`);
       fetchProjects();
     } catch (error) {
       console.error('Error updating project:', error);
@@ -196,6 +233,17 @@ const ProjectsList = () => {
             title={project.published ? 'Unpublish' : 'Publish'}
           >
             {project.published ? <FaEye className="w-4 h-4" /> : <FaEyeSlash className="w-4 h-4" />}
+          </button>
+          <button
+            onClick={() => toggleFeatured(project)}
+            className={`p-2 rounded-lg transition-colors ${
+              project.featured 
+                ? 'text-purple-600 hover:bg-purple-50' 
+                : 'text-gray-400 hover:bg-gray-50'
+            }`}
+            title={project.featured ? 'Unfeature' : 'Feature'}
+          >
+            ⭐
           </button>
           <Link
             to={`/admin/dashboard/projects/edit/${project.id}`}
@@ -386,6 +434,17 @@ const ProjectsList = () => {
                           >
                             {project.published ? <FaEye /> : <FaEyeSlash />}
                           </button>
+                          <button
+                            onClick={() => toggleFeatured(project)}
+                            className={`p-2 rounded-lg transition-colors ${
+                              project.featured 
+                                ? 'text-purple-600 hover:bg-purple-50' 
+                                : 'text-gray-400 hover:bg-gray-50'
+                            }`}
+                            title={project.featured ? 'Unfeature' : 'Feature'}
+                          >
+                            ⭐
+                          </button>
                           <Link
                             to={`/admin/dashboard/projects/edit/${project.id}`}
                             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -455,6 +514,7 @@ const ProjectForm = ({ isEdit = false }) => {
   const [techInput, setTechInput] = useState('');
   
   const { showSuccess, showError } = useNotification();
+  const { notifyProjectStatus } = useBusinessNotifications();
   const navigate = useNavigate();
 
   /**
@@ -610,15 +670,47 @@ const ProjectForm = ({ isEdit = false }) => {
       };
 
       if (isEdit && id) {
+        // Get old project data for comparison
+        const oldProjectDoc = await getDoc(doc(db, 'projects', id));
+        const oldProjectData = oldProjectDoc.data();
+
         // Update existing project
         await updateDoc(doc(db, 'projects', id), projectData);
+
+        // Check for status changes and create notifications
+        if (oldProjectData.published !== formData.published) {
+          await notifyProjectStatus(
+            { id, title: formData.title },
+            oldProjectData.published ? 'published' : 'unpublished',
+            formData.published ? 'published' : 'unpublished'
+          );
+        }
+
+        if (oldProjectData.featured !== formData.featured) {
+          await notifyProjectStatus(
+            { id, title: formData.title },
+            oldProjectData.featured ? 'featured' : 'unfeatured',
+            formData.featured ? 'featured' : 'unfeatured'
+          );
+        }
+
         showSuccess('Project updated successfully');
       } else {
         // Create new project
         projectData.titleUID = generateTitleUID(formData.title);
         projectData.createdAt = serverTimestamp();
         projectData.views = 0;
-        await addDoc(collection(db, 'projects'), projectData);
+        const newProjectRef = await addDoc(collection(db, 'projects'), projectData);
+
+        // Create notification for new project
+        if (formData.published) {
+          await notifyProjectStatus(
+            { id: newProjectRef.id, title: formData.title },
+            'draft',
+            'published'
+          );
+        }
+
         showSuccess('Project created successfully');
       }
 

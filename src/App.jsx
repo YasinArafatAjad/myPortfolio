@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
 import { SettingsProvider } from './contexts/SettingsContext'
 import { NotificationProvider } from './contexts/NotificationContext'
+import { useBusinessNotifications } from './hooks/useBusinessNotifications'
 import ProtectedRoute from './components/ProtectedRoute'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
@@ -16,6 +17,14 @@ import AdminDashboard from './pages/AdminDashboard'
 import NotFound from './pages/NotFound'
 import SEOHead from './components/SEOHead'
 import './App.css'
+
+/**
+ * Business notifications wrapper component
+ */
+const BusinessNotificationsWrapper = ({ children }) => {
+  useBusinessNotifications(); // Initialize business notifications
+  return children;
+};
 
 /**
  * Main App component that handles routing and provides global context
@@ -37,74 +46,76 @@ function App() {
       <NotificationProvider>
         <SettingsProvider>
           <AuthProvider>
-            {/* Global SEO component */}
-            <SEOHead />
-            
-            {/* Main application routes */}
-            <Routes>
-              {/* Public routes with navbar */}
-              <Route path="/" element={
-                <>
-                  <Navbar />
-                  <main className="flex-grow">
-                    <Home />
-                  </main>
-                  <Footer />
-                </>
-              } />
+            <BusinessNotificationsWrapper>
+              {/* Global SEO component */}
+              <SEOHead />
               
-              <Route path="/about" element={
-                <>
-                  <Navbar />
-                  <main className="flex-grow">
-                    <About />
-                  </main>
-                  <Footer />
-                </>
-              } />
-              
-              <Route path="/portfolio" element={
-                <>
-                  <Navbar />
-                  <main className="flex-grow">
-                    <Portfolio />
-                  </main>
-                  <Footer />
-                </>
-              } />
-              
-              <Route path="/portfolio/:id" element={
-                <>
-                  <Navbar />
-                  <main className="flex-grow">
-                    <ProjectDetail />
-                  </main>
-                  <Footer />
-                </>
-              } />
-              
-              <Route path="/contact" element={
-                <>
-                  <Navbar />
-                  <main className="flex-grow">
-                    <Contact />
-                  </main>
-                  <Footer />
-                </>
-              } />
-              
-              {/* Admin routes */}
-              <Route path="/login" element={<AdminLogin />} />
-              
-              <Route path="/admin/dashboard/*" element={
-                <ProtectedRoute>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } />
-              
-              {/* 404 page */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+              {/* Main application routes */}
+              <Routes>
+                {/* Public routes with navbar */}
+                <Route path="/" element={
+                  <>
+                    <Navbar />
+                    <main className="flex-grow">
+                      <Home />
+                    </main>
+                    <Footer />
+                  </>
+                } />
+                
+                <Route path="/about" element={
+                  <>
+                    <Navbar />
+                    <main className="flex-grow">
+                      <About />
+                    </main>
+                    <Footer />
+                  </>
+                } />
+                
+                <Route path="/portfolio" element={
+                  <>
+                    <Navbar />
+                    <main className="flex-grow">
+                      <Portfolio />
+                    </main>
+                    <Footer />
+                  </>
+                } />
+                
+                <Route path="/portfolio/:id" element={
+                  <>
+                    <Navbar />
+                    <main className="flex-grow">
+                      <ProjectDetail />
+                    </main>
+                    <Footer />
+                  </>
+                } />
+                
+                <Route path="/contact" element={
+                  <>
+                    <Navbar />
+                    <main className="flex-grow">
+                      <Contact />
+                    </main>
+                    <Footer />
+                  </>
+                } />
+                
+                {/* Admin routes */}
+                <Route path="/login" element={<AdminLogin />} />
+                
+                <Route path="/admin/dashboard/*" element={
+                  <ProtectedRoute>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } />
+                
+                {/* 404 page */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BusinessNotificationsWrapper>
           </AuthProvider>
         </SettingsProvider>
       </NotificationProvider>

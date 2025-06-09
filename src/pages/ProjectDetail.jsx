@@ -136,8 +136,7 @@ const ProjectDetail = () => {
               <div className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
                 <p className="whitespace-pre-line">
                   {project.description}
-                </p>
-              </div>             
+                </p>           
               </div>
             </motion.div>
           </div>

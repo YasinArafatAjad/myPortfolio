@@ -41,6 +41,13 @@ const NotificationManager = () => {
    * Mark notification as read/unread
    */
   const toggleNotificationRead = async (notificationId, currentStatus) => {
+    // Validate notificationId
+    if (!notificationId || typeof notificationId !== 'string' || notificationId.trim() === '') {
+      console.error('Invalid notification ID:', notificationId);
+      showError('Invalid notification ID');
+      return;
+    }
+
     try {
       await updateDoc(doc(db, 'notifications', notificationId), {
         read: !currentStatus
@@ -57,6 +64,13 @@ const NotificationManager = () => {
    * Delete notification
    */
   const deleteNotification = async (notificationId) => {
+    // Validate notificationId
+    if (!notificationId || typeof notificationId !== 'string' || notificationId.trim() === '') {
+      console.error('Invalid notification ID:', notificationId);
+      showError('Invalid notification ID');
+      return;
+    }
+
     if (!window.confirm('Are you sure you want to delete this notification?')) {
       return;
     }

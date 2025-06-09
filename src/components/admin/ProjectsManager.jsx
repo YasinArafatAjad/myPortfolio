@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Routes, Route, useNavigate, Link } from 'react-router-dom';
+import { Routes, Route, useNavigate, Link, useParams } from 'react-router-dom';
 import { 
   collection, 
   getDocs, 
@@ -8,6 +8,7 @@ import {
   updateDoc, 
   deleteDoc, 
   doc, 
+  getDoc,
   serverTimestamp,
   query,
   orderBy 
@@ -435,6 +436,7 @@ const ProjectsList = () => {
  * Project form component (for both new and edit)
  */
 const ProjectForm = ({ isEdit = false }) => {
+  const { id } = useParams(); // Get project ID from URL params for edit mode
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -449,10 +451,47 @@ const ProjectForm = ({ isEdit = false }) => {
   const [imageFile, setImageFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [fetchingProject, setFetchingProject] = useState(isEdit);
   const [techInput, setTechInput] = useState('');
   
   const { showSuccess, showError } = useNotification();
   const navigate = useNavigate();
+
+  /**
+   * Fetch project data for editing
+   */
+  const fetchProject = async () => {
+    if (!isEdit || !id) return;
+
+    try {
+      setFetchingProject(true);
+      const projectDoc = await getDoc(doc(db, 'projects', id));
+      
+      if (projectDoc.exists()) {
+        const projectData = projectDoc.data();
+        setFormData({
+          title: projectData.title || '',
+          description: projectData.description || '',
+          category: projectData.category || '',
+          technologies: projectData.technologies || [],
+          imageUrl: projectData.imageUrl || '',
+          liveUrl: projectData.liveUrl || '',
+          githubUrl: projectData.githubUrl || '',
+          featured: projectData.featured || false,
+          published: projectData.published || false
+        });
+      } else {
+        showError('Project not found');
+        navigate('/admin/dashboard/projects');
+      }
+    } catch (error) {
+      console.error('Error fetching project:', error);
+      showError('Failed to fetch project data');
+      navigate('/admin/dashboard/projects');
+    } finally {
+      setFetchingProject(false);
+    }
+  };
 
   /**
    * Generate title-based UID
@@ -567,12 +606,16 @@ const ProjectForm = ({ isEdit = false }) => {
       const projectData = {
         ...formData,
         imageUrl,
-        titleUID: generateTitleUID(formData.title),
         updatedAt: serverTimestamp()
       };
 
-      if (!isEdit) {
+      if (isEdit && id) {
+        // Update existing project
+        await updateDoc(doc(db, 'projects', id), projectData);
+        showSuccess('Project updated successfully');
+      } else {
         // Create new project
+        projectData.titleUID = generateTitleUID(formData.title);
         projectData.createdAt = serverTimestamp();
         projectData.views = 0;
         await addDoc(collection(db, 'projects'), projectData);
@@ -587,6 +630,20 @@ const ProjectForm = ({ isEdit = false }) => {
       setLoading(false);
     }
   };
+
+  // Fetch project data when component mounts in edit mode
+  useEffect(() => {
+    fetchProject();
+  }, [isEdit, id]);
+
+  // Show loading spinner while fetching project data
+  if (fetchingProject) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="spinner"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

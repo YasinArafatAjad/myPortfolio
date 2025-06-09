@@ -150,10 +150,15 @@ const NotificationCenter = ({ isOpen, onClose, maxNotifications = 10 }) => {
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const notificationsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const notificationsData = snapshot.docs.map(doc => {
+        const data = doc.data();
+        // Exclude any numeric 'id' field from the document data and use the actual document ID
+        const { id: _, ...cleanData } = data;
+        return {
+          id: doc.id, // Use the actual Firestore document ID
+          ...cleanData
+        };
+      });
       
       setNotifications(notificationsData);
       setLoading(false);

@@ -24,10 +24,15 @@ const NotificationManager = () => {
       setLoading(true);
       const q = query(collection(db, 'notifications'), orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
-      const notificationsData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const notificationsData = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        // Exclude any numeric 'id' field from the document data and use the actual document ID
+        const { id: _, ...cleanData } = data;
+        return {
+          id: doc.id, // Use the actual Firestore document ID
+          ...cleanData
+        };
+      });
       setNotifications(notificationsData);
     } catch (error) {
       console.error('Error fetching notifications:', error);

@@ -14,12 +14,14 @@ class NotificationService {
       const notificationData = {
         ...notification,
         createdAt: serverTimestamp(),
-        read: false,
-        id: Date.now() + Math.random() // Temporary ID for immediate use
+        read: false
       };
 
-      await addDoc(collection(db, 'notifications'), notificationData);
-      return notificationData;
+      const docRef = await addDoc(collection(db, 'notifications'), notificationData);
+      return {
+        id: docRef.id,
+        ...notificationData
+      };
     } catch (error) {
       console.error('Error creating notification:', error);
       throw error;

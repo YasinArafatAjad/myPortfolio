@@ -133,17 +133,110 @@ const ProjectsList = () => {
     fetchProjects();
   }, []);
 
+  /**
+   * Project card component for mobile view
+   */
+  const ProjectCard = ({ project }) => (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 space-y-4">
+      <div className="flex items-start space-x-4">
+        <div className="flex-shrink-0 h-16 w-16">
+          {project.imageUrl ? (
+            <img
+              className="h-16 w-16 rounded-lg object-cover"
+              src={project.imageUrl}
+              alt={project.title}
+            />
+          ) : (
+            <div className="h-16 w-16 rounded-lg bg-gray-200 flex items-center justify-center">
+              <FaImage className="h-8 w-8 text-gray-400" />
+            </div>
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-lg font-medium text-gray-900 truncate">
+            {project.title}
+          </h3>
+          <p className="text-sm text-gray-500 line-clamp-2">
+            {project.description}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+          {project.category}
+        </span>
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+          project.published 
+            ? 'bg-green-100 text-green-800' 
+            : 'bg-yellow-100 text-yellow-800'
+        }`}>
+          {project.published ? 'Published' : 'Draft'}
+        </span>
+        {project.featured && (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+            Featured
+          </span>
+        )}
+      </div>
+
+      <div className="flex items-center justify-between pt-2 border-t border-gray-200">
+        <span className="text-sm text-gray-500">
+          Views: {project.views || 0}
+        </span>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => togglePublished(project)}
+            className={`p-2 rounded-lg transition-colors ${
+              project.published 
+                ? 'text-green-600 hover:bg-green-50' 
+                : 'text-gray-400 hover:bg-gray-50'
+            }`}
+            title={project.published ? 'Unpublish' : 'Publish'}
+          >
+            {project.published ? <FaEye className="w-4 h-4" /> : <FaEyeSlash className="w-4 h-4" />}
+          </button>
+          <Link
+            to={`/admin/dashboard/projects/edit/${project.id}`}
+            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            title="Edit"
+          >
+            <FaEdit className="w-4 h-4" />
+          </Link>
+          {project.liveUrl && (
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+              title="View Live"
+            >
+              <FaExternalLinkAlt className="w-4 h-4" />
+            </a>
+          )}
+          <button
+            onClick={() => handleDelete(project.id)}
+            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            title="Delete"
+          >
+            <FaTrash className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="inline-flex flex-col md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
           <p className="text-gray-600 mt-1">Manage your portfolio projects</p>
         </div>
         <Link
           to="/admin/dashboard/projects/new"
-          className="btn-primary mt-4 md:mt-0"
+          className="btn-primary w-full md:w-auto text-center"
         >
           <FaPlus className="mr-2" />
           Add Project
@@ -160,7 +253,7 @@ const ProjectsList = () => {
               placeholder="Search projects..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="form-input"
+              className="form-input focus:outline-none focus:ring-0"
             />
           </div>
           <div>
@@ -168,7 +261,7 @@ const ProjectsList = () => {
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
-              className="form-input"
+              className="form-input focus:outline-none focus:ring-0"
             >
               <option value="all">All Categories</option>
               {categories.map(category => (
@@ -181,7 +274,7 @@ const ProjectsList = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="form-input"
+              className="form-input focus:outline-none focus:ring-0"
             >
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
@@ -193,8 +286,7 @@ const ProjectsList = () => {
       </div>
 
       {/* Projects List */}
-      <div className="overflow-hidden">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="spinner"></div>
@@ -208,126 +300,132 @@ const ProjectsList = () => {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-hidden">
-            <table className="w-full ">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Project
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Category
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Views
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {getFilteredProjects().map((project) => (
-                  <tr key={project.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-12 w-12">
-                          {project.imageUrl ? (
-                            <img
-                              className="h-12 w-12 rounded-lg object-cover"
-                              src={project.imageUrl}
-                              alt={project.title}
-                            />
-                          ) : (
-                            <div className="h-12 w-12 rounded-lg bg-gray-200 flex items-center justify-center">
-                              <FaImage className="h-6 w-6 text-gray-400" />
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden lg:block overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Project
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Category
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Views
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {getFilteredProjects().map((project) => (
+                    <tr key={project.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-12 w-12">
+                            {project.imageUrl ? (
+                              <img
+                                className="h-12 w-12 rounded-lg object-cover"
+                                src={project.imageUrl}
+                                alt={project.title}
+                              />
+                            ) : (
+                              <div className="h-12 w-12 rounded-lg bg-gray-200 flex items-center justify-center">
+                                <FaImage className="h-6 w-6 text-gray-400" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">
+                              {project.title}
                             </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {project.category}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex flex-col justify-center items-center space-y-2">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            project.published 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {project.published ? 'Published' : 'Draft'}
+                          </span>
+                          {project.featured && (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                              Featured
+                            </span>
                           )}
                         </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {project.title}
-                          </div>
-                          {/* <div className="text-sm text-gray-500 truncate max-w-xs">
-                            {project.description}
-                          </div> */}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px- 6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {project.category}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex flex-col justify-center items-center space-y-2">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          project.published 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {project.published ? 'Published' : 'Draft'}
-                        </span>
-                        {project.featured && (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                            Featured
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-900">
-                      {project.views || 0}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => togglePublished(project)}
-                          className={`p-2 rounded-lg transition-colors ${
-                            project.published 
-                              ? 'text-green-600 hover:bg-green-50' 
-                              : 'text-gray-400 hover:bg-gray-50'
-                          }`}
-                          title={project.published ? 'Unpublish' : 'Publish'}
-                        >
-                          {project.published ? <FaEye /> : <FaEyeSlash />}
-                        </button>
-                        <Link
-                          to={`/admin/dashboard/projects/edit/${project.id}`}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="Edit"
-                        >
-                          <FaEdit />
-                        </Link>
-                        {project.liveUrl && (
-                          <a
-                            href={project.liveUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-                            title="View Live"
+                      </td>
+                      <td className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-900">
+                        {project.views || 0}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => togglePublished(project)}
+                            className={`p-2 rounded-lg transition-colors ${
+                              project.published 
+                                ? 'text-green-600 hover:bg-green-50' 
+                                : 'text-gray-400 hover:bg-gray-50'
+                            }`}
+                            title={project.published ? 'Unpublish' : 'Publish'}
                           >
-                            <FaExternalLinkAlt />
-                          </a>
-                        )}
-                        <button
-                          onClick={() => handleDelete(project.id)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Delete"
-                        >
-                          <FaTrash />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                            {project.published ? <FaEye /> : <FaEyeSlash />}
+                          </button>
+                          <Link
+                            to={`/admin/dashboard/projects/edit/${project.id}`}
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="Edit"
+                          >
+                            <FaEdit />
+                          </Link>
+                          {project.liveUrl && (
+                            <a
+                              href={project.liveUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                              title="View Live"
+                            >
+                              <FaExternalLinkAlt />
+                            </a>
+                          )}
+                          <button
+                            onClick={() => handleDelete(project.id)}
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Delete"
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="lg:hidden p-4 space-y-4">
+              {getFilteredProjects().map((project) => (
+                <ProjectCard key={project.id} project={project} />
+              ))}
+            </div>
+          </>
         )}
-      </div>
       </div>
     </div>
   );
@@ -491,7 +589,7 @@ const ProjectForm = ({ isEdit = false }) => {
               name="title"
               value={formData.title}
               onChange={handleInputChange}
-              className="form-input"
+              className="form-input focus:outline-none focus:ring-0"
               required
             />
           </div>
@@ -504,7 +602,7 @@ const ProjectForm = ({ isEdit = false }) => {
               value={formData.description}
               onChange={handleInputChange}
               rows={4}
-              className="form-input resize-none"
+              className="form-input resize-none focus:outline-none focus:ring-0"
               required
             />
           </div>
@@ -517,7 +615,7 @@ const ProjectForm = ({ isEdit = false }) => {
               name="category"
               value={formData.category}
               onChange={handleInputChange}
-              className="form-input"
+              className="form-input focus:outline-none focus:ring-0"
               placeholder="e.g., Web Development, Mobile App, Design"
               required
             />
@@ -530,7 +628,7 @@ const ProjectForm = ({ isEdit = false }) => {
               type="text"
               value={formData.technologies.join(', ')}
               onChange={handleTechnologiesChange}
-              className="form-input"
+              className="form-input focus:outline-none focus:ring-0"
               placeholder="React, Node.js, MongoDB, etc."
             />
           </div>
@@ -543,7 +641,7 @@ const ProjectForm = ({ isEdit = false }) => {
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
-                className="form-input"
+                className="form-input focus:outline-none focus:ring-0"
               />
               {formData.imageUrl && (
                 <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden">
@@ -566,7 +664,7 @@ const ProjectForm = ({ isEdit = false }) => {
                 name="liveUrl"
                 value={formData.liveUrl}
                 onChange={handleInputChange}
-                className="form-input"
+                className="form-input focus:outline-none focus:ring-0"
                 placeholder="https://example.com"
               />
             </div>
@@ -577,14 +675,14 @@ const ProjectForm = ({ isEdit = false }) => {
                 name="githubUrl"
                 value={formData.githubUrl}
                 onChange={handleInputChange}
-                className="form-input"
+                className="form-input focus:outline-none focus:ring-0"
                 placeholder="https://github.com/username/repo"
               />
             </div>
           </div>
 
           {/* Checkboxes */}
-          <div className="flex space-x-6">
+          <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-6">
             <label className="flex items-center">
               <input
                 type="checkbox"
@@ -608,10 +706,10 @@ const ProjectForm = ({ isEdit = false }) => {
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+          <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4 sm:justify-end pt-6 border-t border-gray-200">
             <Link
               to="/admin/dashboard/projects"
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-center"
             >
               Cancel
             </Link>

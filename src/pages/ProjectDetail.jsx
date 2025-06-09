@@ -137,32 +137,7 @@ const ProjectDetail = () => {
                 <p className="whitespace-pre-line">
                   {project.description}
                 </p>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                {project.liveUrl && (
-                  <a
-                    href={project.liveUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-primary inline-flex items-center space-x-2"
-                  >
-                    <FaExternalLinkAlt className="w-4 h-4" />
-                    <span>View Live Demo</span>
-                  </a>
-                )}
-                {project.githubUrl && (
-                  <a
-                    href={project.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="border-2 border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:border-gray-400 hover:text-gray-800 transition-colors duration-200 inline-flex items-center space-x-2"
-                  >
-                    <FaGithub className="w-4 h-4" />
-                    <span>View Source Code</span>
-                  </a>
-                )}
+              </div>             
               </div>
             </motion.div>
           </div>

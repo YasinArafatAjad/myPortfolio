@@ -15,7 +15,7 @@ import {
 import { db } from '../../config/firebase';
 import { uploadToCloudinary } from '../../config/cloudinary';
 import { useNotification } from '../../contexts/NotificationContext';
-import { FaPlus, FaEdit, FaTrash, FaEye, FaEyeSlash, FaImage, FaExternalLinkAlt, FaArrowLeft } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaEye, FaEyeSlash, FaImage, FaExternalLinkAlt, FaArrowLeft, FaTimes } from 'react-icons/fa';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -449,6 +449,7 @@ const ProjectForm = ({ isEdit = false }) => {
   const [imageFile, setImageFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [techInput, setTechInput] = useState('');
   
   const { showSuccess, showError } = useNotification();
   const navigate = useNavigate();
@@ -476,11 +477,40 @@ const ProjectForm = ({ isEdit = false }) => {
   };
 
   /**
-   * Handle technologies input (comma-separated)
+   * Add technology to the list
    */
-  const handleTechnologiesChange = (e) => {
-    const technologies = e.target.value.split(',').map(tech => tech.trim()).filter(Boolean);
-    setFormData(prev => ({ ...prev, technologies }));
+  const addTechnology = () => {
+    const trimmedTech = techInput.trim();
+    if (trimmedTech && !formData.technologies.includes(trimmedTech)) {
+      setFormData(prev => ({
+        ...prev,
+        technologies: [...prev.technologies, trimmedTech]
+      }));
+      setTechInput('');
+    }
+  };
+
+  /**
+   * Remove technology from the list
+   */
+  const removeTechnology = (techToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      technologies: prev.technologies.filter(tech => tech !== techToRemove)
+    }));
+  };
+
+  /**
+   * Handle technology input key press
+   */
+  const handleTechKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addTechnology();
+    } else if (e.key === ',' || e.key === 'Tab') {
+      e.preventDefault();
+      addTechnology();
+    }
   };
 
   /**
@@ -623,14 +653,52 @@ const ProjectForm = ({ isEdit = false }) => {
 
           {/* Technologies */}
           <div>
-            <label className="form-label">Technologies (comma-separated)</label>
-            <input
-              type="text"
-              value={formData.technologies.join(', ')}
-              onChange={handleTechnologiesChange}
-              className="form-input focus:outline-none focus:ring-0"
-              placeholder="React, Node.js, MongoDB, etc."
-            />
+            <label className="form-label">Technologies</label>
+            <div className="space-y-3">
+              {/* Technology Input */}
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  value={techInput}
+                  onChange={(e) => setTechInput(e.target.value)}
+                  onKeyDown={handleTechKeyPress}
+                  className="form-input focus:outline-none focus:ring-0 flex-1"
+                  placeholder="Type a technology and press Enter or comma to add"
+                />
+                <button
+                  type="button"
+                  onClick={addTechnology}
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                >
+                  Add
+                </button>
+              </div>
+              
+              {/* Technology Tags */}
+              {formData.technologies.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {formData.technologies.map((tech, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center space-x-1 bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm"
+                    >
+                      <span>{tech}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeTechnology(tech)}
+                        className="text-primary-500 hover:text-primary-700"
+                      >
+                        <FaTimes className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              
+              <p className="text-sm text-gray-500">
+                Add technologies one by one. Press Enter, comma, or Tab to add each technology.
+              </p>
+            </div>
           </div>
 
           {/* Image Upload */}

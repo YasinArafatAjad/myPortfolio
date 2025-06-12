@@ -74,16 +74,6 @@ const NotificationManager = () => {
       console.error('Invalid notification ID:', notificationId);
       showError('Invalid notification ID');
       return;
-    }
-
-    if (!window.confirm('Are you sure you want to delete this notification?')) {
-      return;
-    }
-
-    try {
-      await deleteDoc(doc(db, 'notifications', notificationId));
-      showSuccess('Notification deleted successfully');
-      fetchNotifications();
     } catch (error) {
       console.error('Error deleting notification:', error);
       showError('Failed to delete notification');

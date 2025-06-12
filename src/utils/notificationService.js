@@ -192,7 +192,8 @@ class NotificationService {
         topProject: topProject,
         totalProjects: totalProjects,
         publishedProjects: publishedProjects,
-        date: new Date().toISOString()
+        date: new Date().toISOString(),
+        scheduledTime: '19:00' // 7:00 PM
       }
     });
   }
@@ -301,7 +302,7 @@ class NotificationService {
   }
 
   /**
-   * Generate daily activity summary
+   * Generate daily activity summary (scheduled for 7:00 PM)
    */
   async generateDailyActivitySummary() {
     try {
@@ -311,6 +312,9 @@ class NotificationService {
         console.log('Daily summary already exists for today, skipping...');
         return;
       }
+
+      const now = new Date();
+      console.log(`Generating daily activity summary at ${now.toLocaleTimeString()}`);
 
       const today = new Date();
       const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -346,7 +350,7 @@ class NotificationService {
         publishedProjects
       }, 'daily');
 
-      console.log('Daily activity summary created successfully');
+      console.log('Daily activity summary created successfully at 7:00 PM');
 
     } catch (error) {
       console.error('Error generating daily activity summary:', error);

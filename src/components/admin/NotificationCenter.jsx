@@ -80,7 +80,6 @@ const NotificationCenter = ({ isOpen, onClose, maxNotifications = 10 }) => {
   const deleteNotification = async (notificationId) => {
     try {
       await deleteDoc(doc(db, 'notifications', notificationId));
-      showSuccess('Notification deleted');
     } catch (error) {
       console.error('Error deleting notification:', error);
       showError('Failed to delete notification');

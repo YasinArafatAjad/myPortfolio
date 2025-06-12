@@ -122,6 +122,46 @@ const NotificationManager = () => {
   };
 
   /**
+   * Format notification message for better display
+   */
+  const formatNotificationMessage = (message) => {
+    if (!message) return '';
+    
+    // Split by line breaks and filter out empty lines
+    const lines = message.split('\n').filter(line => line.trim() !== '');
+    
+    return lines.map((line, index) => {
+      const trimmedLine = line.trim();
+      
+      // Check if line starts with bullet point
+      if (trimmedLine.startsWith('•')) {
+        return (
+          <div key={index} className="flex items-start space-x-2 ml-4">
+            <span className="text-primary-500 font-bold mt-0.5">•</span>
+            <span className="flex-1">{trimmedLine.substring(1).trim()}</span>
+          </div>
+        );
+      }
+      
+      // Check if line contains a colon (like "Today's Summary:")
+      if (trimmedLine.includes(':') && index === 0) {
+        return (
+          <div key={index} className="font-semibold text-gray-900 mb-2">
+            {trimmedLine}
+          </div>
+        );
+      }
+      
+      // Regular line
+      return (
+        <div key={index} className={index > 0 ? 'mt-1' : ''}>
+          {trimmedLine}
+        </div>
+      );
+    });
+  };
+
+  /**
    * Filter notifications based on current filters
    */
   const getFilteredNotifications = () => {
@@ -258,9 +298,9 @@ const NotificationManager = () => {
                           <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600 mb-2">
-                        {notification.message}
-                      </p>
+                      <div className="text-sm text-gray-600 mb-2">
+                        {formatNotificationMessage(notification.message)}
+                      </div>
                       <p className="text-xs text-gray-500">
                         {formatDate(notification.createdAt)}
                       </p>

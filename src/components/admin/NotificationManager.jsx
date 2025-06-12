@@ -78,7 +78,7 @@ const NotificationManager = () => {
 
     if (!window.confirm('Are you sure you want to delete this notification?')) {
       return;
-    }
+    };
 
     try {
       await deleteDoc(doc(db, 'notifications', notificationId));
@@ -87,7 +87,7 @@ const NotificationManager = () => {
     } catch (error) {
       console.error('Error deleting notification:', error);
       showError('Failed to delete notification');
-    
+    }
   };
 
   /**

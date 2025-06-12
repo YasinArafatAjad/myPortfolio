@@ -29,6 +29,33 @@ class NotificationService {
   }
 
   /**
+   * Check if a daily summary has already been created today
+   * @returns {Promise<boolean>} - True if summary exists for today
+   */
+  async hasDailySummaryForToday() {
+    try {
+      const today = new Date();
+      const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+
+      const summaryQuery = query(
+        collection(db, 'notifications'),
+        where('category', '==', 'summary'),
+        where('metadata.period', '==', 'daily'),
+        where('createdAt', '>=', startOfDay),
+        where('createdAt', '<', endOfDay)
+      );
+
+      const summarySnapshot = await getDocs(summaryQuery);
+      return !summarySnapshot.empty;
+    } catch (error) {
+      console.error('Error checking for existing daily summary:', error);
+      // If there's an error checking, assume it doesn't exist to avoid blocking
+      return false;
+    }
+  }
+
+  /**
    * Contact Form Submission Notification
    * @param {Object} messageData - Contact form data
    */
@@ -56,18 +83,33 @@ class NotificationService {
     const milestones = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000];
     
     if (milestones.includes(viewCount)) {
-      return this.createNotification({
-        type: 'success',
-        title: 'Project Milestone Reached!',
-        message: `"${projectData.title}" has reached ${viewCount} views! 🎉`,
-        category: 'milestone',
-        metadata: {
-          projectId: projectData.id,
-          projectTitle: projectData.title,
-          viewCount: viewCount,
-          milestone: viewCount
+      // Check if we already notified about this milestone for this project
+      try {
+        const existingQuery = query(
+          collection(db, 'notifications'),
+          where('category', '==', 'milestone'),
+          where('metadata.projectId', '==', projectData.id),
+          where('metadata.milestone', '==', viewCount)
+        );
+        const existingSnapshot = await getDocs(existingQuery);
+        
+        if (existingSnapshot.empty) {
+          return this.createNotification({
+            type: 'success',
+            title: 'Project Milestone Reached!',
+            message: `"${projectData.title}" has reached ${viewCount} views! 🎉`,
+            category: 'milestone',
+            metadata: {
+              projectId: projectData.id,
+              projectTitle: projectData.title,
+              viewCount: viewCount,
+              milestone: viewCount
+            }
+          });
         }
-      });
+      } catch (error) {
+        console.error('Error checking existing milestone notifications:', error);
+      }
     }
     return null;
   }
@@ -263,6 +305,13 @@ class NotificationService {
    */
   async generateDailyActivitySummary() {
     try {
+      // Double-check that we haven't already created a summary today
+      const hasExisting = await this.hasDailySummaryForToday();
+      if (hasExisting) {
+        console.log('Daily summary already exists for today, skipping...');
+        return;
+      }
+
       const today = new Date();
       const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
       
@@ -296,6 +345,8 @@ class NotificationService {
         totalProjects,
         publishedProjects
       }, 'daily');
+
+      console.log('Daily activity summary created successfully');
 
     } catch (error) {
       console.error('Error generating daily activity summary:', error);

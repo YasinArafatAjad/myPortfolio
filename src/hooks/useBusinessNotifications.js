@@ -11,42 +11,61 @@ export const useBusinessNotifications = () => {
    */
   useEffect(() => {
     // Set up daily activity summary (runs once per day)
-    const checkDailySummary = () => {
+    const checkDailySummary = async () => {
       const lastSummary = localStorage.getItem('lastDailySummary');
       const today = new Date().toDateString();
       
       if (lastSummary !== today) {
-        // Generate daily summary
-        notificationService.generateDailyActivitySummary();
-        localStorage.setItem('lastDailySummary', today);
+        try {
+          // Check if we already created a summary today by querying the database
+          const hasCreatedToday = await notificationService.hasDailySummaryForToday();
+          
+          if (!hasCreatedToday) {
+            // Generate daily summary
+            await notificationService.generateDailyActivitySummary();
+            localStorage.setItem('lastDailySummary', today);
+          } else {
+            // Update localStorage to prevent further checks today
+            localStorage.setItem('lastDailySummary', today);
+          }
+        } catch (error) {
+          console.error('Error checking/creating daily summary:', error);
+        }
       }
     };
 
     // Set up performance milestone checks (runs every hour)
-    const checkPerformance = () => {
+    const checkPerformance = async () => {
       const lastCheck = localStorage.getItem('lastPerformanceCheck');
       const now = Date.now();
       const oneHour = 60 * 60 * 1000;
       
       if (!lastCheck || (now - parseInt(lastCheck)) > oneHour) {
-        notificationService.checkPerformanceMilestones();
-        localStorage.setItem('lastPerformanceCheck', now.toString());
+        try {
+          await notificationService.checkPerformanceMilestones();
+          localStorage.setItem('lastPerformanceCheck', now.toString());
+        } catch (error) {
+          console.error('Error checking performance milestones:', error);
+        }
       }
     };
 
-    // Run checks on mount
-    checkDailySummary();
-    checkPerformance();
+    // Run checks on mount with a small delay to avoid multiple rapid calls
+    const timeoutId = setTimeout(() => {
+      checkDailySummary();
+      checkPerformance();
+    }, 1000);
 
     // Set up intervals
     const dailyInterval = setInterval(checkDailySummary, 24 * 60 * 60 * 1000); // Daily
     const performanceInterval = setInterval(checkPerformance, 60 * 60 * 1000); // Hourly
 
     return () => {
+      clearTimeout(timeoutId);
       clearInterval(dailyInterval);
       clearInterval(performanceInterval);
     };
-  }, []);
+  }, []); // Empty dependency array to run only once
 
   return {
     // Notification methods

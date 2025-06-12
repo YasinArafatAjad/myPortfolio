@@ -78,7 +78,6 @@ const NotificationManager = () => {
 
     try {
       await deleteDoc(doc(db, 'notifications', notificationId));
-      showSuccess('Notification deleted successfully');
       fetchNotifications();
     } catch (error) {
       console.error('Error deleting notification:', error);

@@ -146,7 +146,7 @@ const ProjectDetail = () => {
               className="relative rounded-2xl overflow-hidden shadow-2xl"
             >
               <img
-                src={getOptimizedImageUrl(project.imageUrl, { width: 1200 })}
+                src={getOptimizedImageUrl(project.imageUrl, { width: 1200, height : 600})}
                 alt={project.title}
                 className="w-full h-auto object-cover"
               />

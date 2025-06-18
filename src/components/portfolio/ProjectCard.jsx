@@ -2,7 +2,49 @@ import { useState, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { getOptimizedImageUrl } from '../../config/cloudinary';
-import { FaImage, FaTools, FaExternalLinkAlt, FaGithub, FaEye } from 'react-icons/fa';
+import { FaImage, FaTools, FaExternalLinkAlt, FaGithub, FaEye, FaStar, FaStarHalfAlt } from 'react-icons/fa';
+
+/**
+ * Star Rating Component
+ */
+const StarRating = ({ rating, size = 'sm', showValue = true }) => {
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 !== 0;
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+  const sizeClasses = {
+    sm: 'w-3 h-3',
+    md: 'w-4 h-4',
+    lg: 'w-5 h-5'
+  };
+
+  return (
+    <div className="flex items-center space-x-1">
+      <div className="flex items-center">
+        {/* Full stars */}
+        {[...Array(fullStars)].map((_, i) => (
+          <FaStar key={`full-${i}`} className={`${sizeClasses[size]} text-yellow-400`} />
+        ))}
+        
+        {/* Half star */}
+        {hasHalfStar && (
+          <FaStarHalfAlt className={`${sizeClasses[size]} text-yellow-400`} />
+        )}
+        
+        {/* Empty stars */}
+        {[...Array(emptyStars)].map((_, i) => (
+          <FaStar key={`empty-${i}`} className={`${sizeClasses[size]} text-gray-300`} />
+        ))}
+      </div>
+      
+      {showValue && (
+        <span className="text-sm text-gray-600 ml-1">
+          {rating.toFixed(1)}
+        </span>
+      )}
+    </div>
+  );
+};
 
 /**
  * Animated SVG Background Lines
@@ -85,6 +127,12 @@ const ProjectCard = ({ project, index = 0 }) => {
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const controls = useAnimation();
+  
+  // Mock review data (in real app, this would come from the project data)
+  const mockReviews = {
+    rating: 4.5 + Math.random() * 0.5, // Random rating between 4.5-5.0
+    count: Math.floor(Math.random() * 50) + 10 // Random count between 10-60
+  };
 
   const imageUrl = getOptimizedImageUrl(project.imageUrl, { width: 400, height: 250 });
 
@@ -273,7 +321,7 @@ const ProjectCard = ({ project, index = 0 }) => {
 
         {/* Project Info */}
         <div className="p-6 relative z-10">
-          {/* Category */}
+          {/* Category and Rating */}
           <div className="flex items-center justify-between mb-3">
             <motion.span
               initial={{ opacity: 0 }}
@@ -283,6 +331,14 @@ const ProjectCard = ({ project, index = 0 }) => {
             >
               {project.category}
             </motion.span>
+            
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+            >
+              <StarRating rating={mockReviews.rating} size="sm" showValue={false} />
+            </motion.div>
           </div>
           
           {/* Title */}
@@ -334,13 +390,20 @@ const ProjectCard = ({ project, index = 0 }) => {
             </motion.div>
           )}
 
-          {/* Learn More Link */}
+          {/* Reviews and Rating */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 1.1 }}
-            className="flex items-center justify-end pt-4 border-t border-gray-100"
+            className="flex items-center justify-between pt-4 border-t border-gray-100"
           >
+            <div className="flex items-center space-x-2">
+              <StarRating rating={mockReviews.rating} size="sm" />
+              <span className="text-sm text-gray-500">
+                ({mockReviews.count} reviews)
+              </span>
+            </div>
+            
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

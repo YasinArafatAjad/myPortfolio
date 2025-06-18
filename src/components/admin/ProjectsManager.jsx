@@ -17,7 +17,7 @@ import { db } from '../../config/firebase';
 import { uploadToCloudinary } from '../../config/cloudinary';
 import { useNotification } from '../../contexts/NotificationContext';
 import { useBusinessNotifications } from '../../hooks/useBusinessNotifications';
-import { FaPlus, FaEdit, FaTrash, FaEye, FaEyeSlash, FaImage, FaExternalLinkAlt, FaArrowLeft, FaTimes } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaEye, FaEyeSlash, FaImage, FaExternalLinkAlt, FaArrowLeft, FaTimes, FaTools } from 'react-icons/fa';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -126,6 +126,25 @@ const ProjectsList = () => {
   };
 
   /**
+   * Toggle project under construction status
+   */
+  const toggleUnderConstruction = async (project) => {
+    try {
+      const newConstructionStatus = !project.underConstruction;
+      await updateDoc(doc(db, 'projects', project.id), {
+        underConstruction: newConstructionStatus,
+        updatedAt: serverTimestamp()
+      });
+
+      showSuccess(`Project marked as ${newConstructionStatus ? 'under construction' : 'completed'}`);
+      fetchProjects();
+    } catch (error) {
+      console.error('Error updating project:', error);
+      showError('Failed to update project');
+    }
+  };
+
+  /**
    * Filter and sort projects
    */
   const getFilteredProjects = () => {
@@ -216,6 +235,12 @@ const ProjectsList = () => {
             Featured
           </span>
         )}
+        {project.underConstruction && (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+            <FaTools className="w-3 h-3 mr-1" />
+            Under Construction
+          </span>
+        )}
       </div>
 
       <div className="flex items-center justify-between pt-2 border-t border-gray-200">
@@ -244,6 +269,17 @@ const ProjectsList = () => {
             title={project.featured ? 'Unfeature' : 'Feature'}
           >
             ⭐
+          </button>
+          <button
+            onClick={() => toggleUnderConstruction(project)}
+            className={`p-2 rounded-lg transition-colors ${
+              project.underConstruction 
+                ? 'text-orange-600 hover:bg-orange-50' 
+                : 'text-gray-400 hover:bg-gray-50'
+            }`}
+            title={project.underConstruction ? 'Mark as Complete' : 'Mark as Under Construction'}
+          >
+            <FaTools className="w-4 h-4" />
           </button>
           <Link
             to={`/admin/dashboard/projects/edit/${project.id}`}
@@ -416,6 +452,12 @@ const ProjectsList = () => {
                               Featured
                             </span>
                           )}
+                          {project.underConstruction && (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                              <FaTools className="w-3 h-3 mr-1" />
+                              Under Construction
+                            </span>
+                          )}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-900">
@@ -444,6 +486,17 @@ const ProjectsList = () => {
                             title={project.featured ? 'Unfeature' : 'Feature'}
                           >
                             ⭐
+                          </button>
+                          <button
+                            onClick={() => toggleUnderConstruction(project)}
+                            className={`p-2 rounded-lg transition-colors ${
+                              project.underConstruction 
+                                ? 'text-orange-600 hover:bg-orange-50' 
+                                : 'text-gray-400 hover:bg-gray-50'
+                            }`}
+                            title={project.underConstruction ? 'Mark as Complete' : 'Mark as Under Construction'}
+                          >
+                            <FaTools />
                           </button>
                           <Link
                             to={`/admin/dashboard/projects/edit/${project.id}`}
@@ -505,17 +558,36 @@ const ProjectForm = ({ isEdit = false }) => {
     liveUrl: '',
     githubUrl: '',
     featured: false,
-    published: false
+    published: false,
+    underConstruction: false
   });
   const [imageFile, setImageFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fetchingProject, setFetchingProject] = useState(isEdit);
   const [techInput, setTechInput] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [newCategoryInput, setNewCategoryInput] = useState('');
+  const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
   
   const { showSuccess, showError } = useNotification();
   const { notifyProjectStatus } = useBusinessNotifications();
   const navigate = useNavigate();
+
+  /**
+   * Fetch existing categories
+   */
+  const fetchCategories = async () => {
+    try {
+      const q = query(collection(db, 'projects'));
+      const querySnapshot = await getDocs(q);
+      const projects = querySnapshot.docs.map(doc => doc.data());
+      const uniqueCategories = [...new Set(projects.map(p => p.category).filter(Boolean))];
+      setCategories(uniqueCategories.sort());
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   /**
    * Fetch project data for editing
@@ -538,7 +610,8 @@ const ProjectForm = ({ isEdit = false }) => {
           liveUrl: projectData.liveUrl || '',
           githubUrl: projectData.githubUrl || '',
           featured: projectData.featured || false,
-          published: projectData.published || false
+          published: projectData.published || false,
+          underConstruction: projectData.underConstruction || false
         });
       } else {
         showError('Project not found');
@@ -573,6 +646,34 @@ const ProjectForm = ({ isEdit = false }) => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+  };
+
+  /**
+   * Handle category selection
+   */
+  const handleCategoryChange = (e) => {
+    const value = e.target.value;
+    if (value === 'new') {
+      setShowNewCategoryInput(true);
+      setFormData(prev => ({ ...prev, category: '' }));
+    } else {
+      setShowNewCategoryInput(false);
+      setFormData(prev => ({ ...prev, category: value }));
+    }
+  };
+
+  /**
+   * Add new category
+   */
+  const addNewCategory = () => {
+    const trimmedCategory = newCategoryInput.trim();
+    if (trimmedCategory && !categories.includes(trimmedCategory)) {
+      setCategories(prev => [...prev, trimmedCategory].sort());
+      setFormData(prev => ({ ...prev, category: trimmedCategory }));
+      setNewCategoryInput('');
+      setShowNewCategoryInput(false);
+      showSuccess('New category added successfully');
+    }
   };
 
   /**
@@ -723,8 +824,9 @@ const ProjectForm = ({ isEdit = false }) => {
     }
   };
 
-  // Fetch project data when component mounts in edit mode
+  // Fetch project data and categories when component mounts
   useEffect(() => {
+    fetchCategories();
     fetchProject();
   }, [isEdit, id]);
 
@@ -789,15 +891,50 @@ const ProjectForm = ({ isEdit = false }) => {
           {/* Category */}
           <div>
             <label className="form-label">Category *</label>
-            <input
-              type="text"
-              name="category"
-              value={formData.category}
-              onChange={handleInputChange}
-              className="form-input focus:outline-none focus:ring-0"
-              placeholder="e.g., Web Development, Mobile App, Design"
-              required
-            />
+            <div className="space-y-3">
+              <select
+                value={showNewCategoryInput ? 'new' : formData.category}
+                onChange={handleCategoryChange}
+                className="form-input focus:outline-none focus:ring-0"
+                required={!showNewCategoryInput}
+              >
+                <option value="">Select a category</option>
+                {categories.map(category => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+                <option value="new">+ Add New Category</option>
+              </select>
+              
+              {showNewCategoryInput && (
+                <div className="flex space-x-2">
+                  <input
+                    type="text"
+                    value={newCategoryInput}
+                    onChange={(e) => setNewCategoryInput(e.target.value)}
+                    placeholder="Enter new category name"
+                    className="form-input focus:outline-none focus:ring-0 flex-1"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={addNewCategory}
+                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                  >
+                    Add
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowNewCategoryInput(false);
+                      setNewCategoryInput('');
+                    }}
+                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Technologies */}
@@ -919,6 +1056,17 @@ const ProjectForm = ({ isEdit = false }) => {
                 className="mr-2"
               />
               Published
+            </label>
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                name="underConstruction"
+                checked={formData.underConstruction}
+                onChange={handleInputChange}
+                className="mr-2"
+              />
+              <FaTools className="w-4 h-4 mr-1" />
+              Under Construction
             </label>
           </div>
 

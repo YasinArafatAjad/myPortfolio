@@ -6,7 +6,7 @@ import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { getOptimizedImageUrl } from '../config/cloudinary';
 import SEOHead from '../components/SEOHead';
-import { FaImage } from 'react-icons/fa';
+import { FaImage, FaTools } from 'react-icons/fa';
 
 /**
  * Portfolio page component with filtering and search functionality
@@ -197,11 +197,19 @@ const Portfolio = () => {
             <span className="text-sm text-primary-600 font-medium">
               {project.category}
             </span>
-            {project.featured && (
-              <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
-                Featured
-              </span>
-            )}
+            <div className="flex items-center space-x-2">
+              {project.featured && (
+                <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+                  Featured
+                </span>
+              )}
+              {project.underConstruction && (
+                <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full flex items-center">
+                  <FaTools className="w-3 h-3 mr-1" />
+                  Under Construction
+                </span>
+              )}
+            </div>
           </div>
           
           <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">

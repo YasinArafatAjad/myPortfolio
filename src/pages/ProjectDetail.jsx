@@ -5,7 +5,7 @@ import { doc, getDoc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { useBusinessNotifications } from '../hooks/useBusinessNotifications';
 import SEOHead from '../components/SEOHead';
-import { FaArrowLeft, FaExternalLinkAlt, FaGithub, FaEye, FaImage } from 'react-icons/fa';
+import { FaArrowLeft, FaExternalLinkAlt, FaGithub, FaEye, FaImage, FaTools } from 'react-icons/fa';
 
 /**
  * Project Image Component with fallback handling
@@ -190,6 +190,12 @@ const ProjectDetail = () => {
                     Featured Project
                   </span>
                 )}
+                {project.underConstruction && (
+                  <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm flex items-center">
+                    <FaTools className="w-3 h-3 mr-1" />
+                    Under Construction
+                  </span>
+                )}
                 <div className="flex items-center space-x-1 text-gray-500">
                   <FaEye className="w-4 h-4" />
                   <span className="text-sm">{project.views || 0} views</span>
@@ -331,9 +337,18 @@ const ProjectDetail = () => {
                     </div>
                     <div className="flex justify-between items-center py-2">
                       <span className="text-sm font-medium text-gray-500">Status</span>
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-                        Live
-                      </span>
+                      <div className="flex items-center space-x-2">
+                        {project.underConstruction ? (
+                          <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium flex items-center">
+                            <FaTools className="w-3 h-3 mr-1" />
+                            Under Construction
+                          </span>
+                        ) : (
+                          <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                            Live
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </motion.div>

@@ -6,6 +6,7 @@ import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { getOptimizedImageUrl } from '../config/cloudinary';
 import SEOHead from '../components/SEOHead';
+import { FaImage } from 'react-icons/fa';
 
 /**
  * Portfolio page component with filtering and search functionality
@@ -103,9 +104,43 @@ const Portfolio = () => {
   }, [projects, selectedCategory, searchTerm, sortBy]);
 
   /**
+   * Get image URL with proper fallback handling
+   */
+  const getImageUrl = (imageUrl) => {
+    if (!imageUrl) return null;
+    
+    // If it's already a full URL (Cloudinary or other CDN)
+    if (imageUrl.startsWith('http')) {
+      try {
+        return getOptimizedImageUrl(imageUrl, { width: 400, height: 250 });
+      } catch (error) {
+        console.error('Error optimizing image URL:', error);
+        return imageUrl; // Return original URL if optimization fails
+      }
+    }
+    
+    // If it's a relative path, make it absolute
+    return imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+  };
+
+  /**
    * Project card component
    */
   const ProjectCard = ({ project, index }) => {
+    const [imageLoaded, setImageLoaded] = useState(false);
+    const [imageError, setImageError] = useState(false);
+    const imageUrl = getImageUrl(project.imageUrl);
+
+    const handleImageLoad = () => {
+      setImageError(false);
+      setImageLoaded(true);
+    };
+
+    const handleImageError = () => {
+      setImageError(true);
+      setImageLoaded(true);
+    };
+
     return (
       <motion.div
         initial={{ opacity: 0, y: 50 }}
@@ -114,13 +149,38 @@ const Portfolio = () => {
         className="group ProjectCard overflow-hidden"
       >
         {/* Project Image */}
-        <div className="relative overflow-hidden rounded-t-lg mb-4">
-          <img
-            src={getOptimizedImageUrl(project.imageUrl, { width: 400, height: 250 })}
-            alt={project.title}
-            className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
-            loading="lazy"
-          />
+        <div className="relative overflow-hidden rounded-t-lg mb-4 h-48 bg-gray-100">
+          {/* Loading state */}
+          {!imageLoaded && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-200 animate-pulse">
+              <div className="w-6 h-6 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
+
+          {/* Error/No image state */}
+          {(imageError || !imageUrl) && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 text-gray-500">
+              <FaImage className="w-12 h-12 mb-2" />
+              <span className="text-sm font-medium">{project.title}</span>
+              <span className="text-xs text-gray-400">{project.category}</span>
+            </div>
+          )}
+
+          {/* Actual image */}
+          {imageUrl && (
+            <img
+              src={imageUrl}
+              alt={project.title}
+              className={`w-full h-48 object-cover transition-all duration-300 group-hover:scale-110 ${
+                imageLoaded && !imageError ? 'opacity-100' : 'opacity-0'
+              }`}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+              loading="lazy"
+            />
+          )}
+
+          {/* Hover overlay */}
           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
             <Link
               to={`/portfolio/${project.id}`}
@@ -296,6 +356,7 @@ const Portfolio = () => {
               </div>
             ) : filteredProjects.length === 0 ? (
               <div className="text-center py-20">
+                <FaImage className="mx-auto h-16 w-16 text-gray-400 mb-4" />
                 <h3 className="text-2xl font-semibold text-gray-900 mb-4">
                   No projects found
                 </h3>

@@ -104,24 +104,48 @@ export const deleteFromCloudinary = async (publicId) => {
 };
 
 /**
- * Generate optimized image URL
+ * Generate optimized image URL with better error handling
  * @param {string} url - Original image URL
  * @param {object} options - Optimization options
  * @returns {string} - Optimized image URL
  */
 export const getOptimizedImageUrl = (url, options = {}) => {
-  if (!url || !url.includes('cloudinary.com')) {
+  // Return original URL if no URL provided
+  if (!url) return url;
+  
+  // Return original URL if it's not a Cloudinary URL
+  if (!url.includes('cloudinary.com')) {
     return url;
   }
   
-  const {
-    width = 'auto',
-    height = 'auto',
-    quality = 'auto',
-    format = 'auto'
-  } = options;
-  
-  // Insert transformation parameters into Cloudinary URL
-  const transformations = `w_${width},h_${height},q_${quality},f_${format}`;
-  return url.replace('/upload/', `/upload/${transformations}/`);
+  try {
+    const {
+      width = 'auto',
+      height = 'auto',
+      quality = 'auto',
+      format = 'auto'
+    } = options;
+    
+    // Insert transformation parameters into Cloudinary URL
+    const transformations = `w_${width},h_${height},q_${quality},f_${format}`;
+    
+    // Check if URL already has transformations
+    if (url.includes('/upload/')) {
+      // Replace existing transformations or add new ones
+      if (url.match(/\/upload\/[^\/]+\//)) {
+        // URL already has transformations, replace them
+        return url.replace(/\/upload\/[^\/]+\//, `/upload/${transformations}/`);
+      } else {
+        // URL has no transformations, add them
+        return url.replace('/upload/', `/upload/${transformations}/`);
+      }
+    }
+    
+    // If URL structure is unexpected, return original
+    return url;
+  } catch (error) {
+    console.error('Error optimizing Cloudinary URL:', error);
+    // Return original URL if optimization fails
+    return url;
+  }
 };

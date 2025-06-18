@@ -378,40 +378,6 @@ const ProjectDetail = () => {
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     Project Links
                   </h3>
-                  <div className="space-y-3">
-                    {project.liveUrl && (
-                      <a
-                        href={project.liveUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between p-3 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors group"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <FaExternalLinkAlt className="w-4 h-4 text-primary-600" />
-                          <span className="font-medium text-primary-700">Live Demo</span>
-                        </div>
-                        <svg className="w-4 h-4 text-primary-600 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                        </svg>
-                      </a>
-                    )}
-                    {project.githubUrl && (
-                      <a
-                        href={project.githubUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <FaGithub className="w-4 h-4 text-gray-600" />
-                          <span className="font-medium text-gray-700">Source Code</span>
-                        </div>
-                        <svg className="w-4 h-4 text-gray-600 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                        </svg>
-                      </a>
-                    )}
-                  </div>
                 </motion.div>
 
                 {/* Share Project */}

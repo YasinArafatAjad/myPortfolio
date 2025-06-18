@@ -18,6 +18,7 @@ const ProjectDetail = () => {
   const [notFound, setNotFound] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [imageRetryCount, setImageRetryCount] = useState(0);
   const { notifyProjectMilestone } = useBusinessNotifications();
 
   /**
@@ -69,12 +70,24 @@ const ProjectDetail = () => {
   /**
    * Get image URL with proper fallback handling
    */
-  const getImageUrl = (imageUrl) => {
+  const getImageUrl = (imageUrl, retryCount = 0) => {
     if (!imageUrl) return null;
     
     // If it's already a full URL (Cloudinary or other CDN)
     if (imageUrl.startsWith('http')) {
       try {
+        // For retry attempts, try different optimization settings
+        if (retryCount === 1) {
+          // Try without format optimization
+          return getOptimizedImageUrl(imageUrl, { width: 1200, quality: 90, format: 'jpg' });
+        } else if (retryCount === 2) {
+          // Try with minimal optimization
+          return getOptimizedImageUrl(imageUrl, { quality: 'auto' });
+        } else if (retryCount >= 3) {
+          // Return original URL as last resort
+          return imageUrl;
+        }
+        
         return getOptimizedImageUrl(imageUrl, { width: 1200, quality: 90 });
       } catch (error) {
         console.error('Error optimizing image URL:', error);
@@ -87,12 +100,33 @@ const ProjectDetail = () => {
   };
 
   /**
-   * Handle image load error
+   * Handle image load error with retry logic
    */
   const handleImageError = (e) => {
-    console.error('Image failed to load:', e.target.src);
-    setImageError(true);
-    setImageLoaded(true);
+    const failedUrl = e.target.src;
+    console.error('Image failed to load:', failedUrl);
+    
+    // Try to retry with different URL configurations
+    if (imageRetryCount < 3) {
+      console.log(`Retrying image load (attempt ${imageRetryCount + 1})`);
+      setImageRetryCount(prev => prev + 1);
+      setImageLoaded(false);
+      
+      // Small delay before retry
+      setTimeout(() => {
+        const retryUrl = getImageUrl(project.imageUrl, imageRetryCount + 1);
+        if (retryUrl && retryUrl !== failedUrl) {
+          e.target.src = retryUrl;
+        } else {
+          setImageError(true);
+          setImageLoaded(true);
+        }
+      }, 1000);
+    } else {
+      console.error('Max retry attempts reached for image:', failedUrl);
+      setImageError(true);
+      setImageLoaded(true);
+    }
   };
 
   /**
@@ -101,22 +135,39 @@ const ProjectDetail = () => {
   const handleImageLoad = () => {
     setImageError(false);
     setImageLoaded(true);
+    setImageRetryCount(0); // Reset retry count on successful load
+  };
+
+  /**
+   * Check if image URL is accessible
+   */
+  const checkImageUrl = async (url) => {
+    try {
+      const response = await fetch(url, { method: 'HEAD' });
+      return response.ok;
+    } catch (error) {
+      console.error('Error checking image URL:', error);
+      return false;
+    }
   };
 
   /**
    * Render project image with fallback
    */
   const renderProjectImage = () => {
-    const imageUrl = getImageUrl(project.imageUrl);
+    const imageUrl = getImageUrl(project.imageUrl, imageRetryCount);
     
     return (
       <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-gray-100" style={{ minHeight: '400px' }}>
         {/* Loading placeholder */}
-        {!imageLoaded && (
+        {!imageLoaded && !imageError && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-200 animate-pulse">
             <div className="text-gray-400 flex flex-col items-center">
               <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mb-2"></div>
               <span>Loading image...</span>
+              {imageRetryCount > 0 && (
+                <span className="text-sm mt-1">Retry attempt {imageRetryCount}</span>
+              )}
             </div>
           </div>
         )}
@@ -127,7 +178,7 @@ const ProjectDetail = () => {
             <FaImage className="w-20 h-20 mb-4 text-gray-400" />
             <h3 className="text-2xl font-bold mb-2">{project.title}</h3>
             <p className="text-lg text-gray-500 mb-4">{project.category}</p>
-            <div className="flex flex-wrap gap-2 justify-center max-w-md">
+            <div className="flex flex-wrap gap-2 justify-center max-w-md mb-4">
               {project.technologies?.slice(0, 4).map((tech, index) => (
                 <span
                   key={index}
@@ -137,11 +188,31 @@ const ProjectDetail = () => {
                 </span>
               ))}
             </div>
+            {imageError && (
+              <div className="text-center">
+                <p className="text-sm text-gray-500 mb-2">Image could not be loaded</p>
+                <button
+                  onClick={() => {
+                    setImageError(false);
+                    setImageLoaded(false);
+                    setImageRetryCount(0);
+                    // Force reload by updating the image src
+                    const img = document.querySelector(`img[alt="${project.title}"]`);
+                    if (img) {
+                      img.src = getImageUrl(project.imageUrl, 0);
+                    }
+                  }}
+                  className="text-primary-600 hover:text-primary-700 text-sm underline"
+                >
+                  Try again
+                </button>
+              </div>
+            )}
           </div>
         )}
         
         {/* Main project image */}
-        {imageUrl && (
+        {imageUrl && !imageError && (
           <img
             src={imageUrl}
             alt={project.title}
@@ -195,6 +266,15 @@ const ProjectDetail = () => {
       fetchProject();
     }
   }, [id]);
+
+  // Reset image state when project changes
+  useEffect(() => {
+    if (project) {
+      setImageLoaded(false);
+      setImageError(false);
+      setImageRetryCount(0);
+    }
+  }, [project?.id]);
 
   if (loading) {
     return (

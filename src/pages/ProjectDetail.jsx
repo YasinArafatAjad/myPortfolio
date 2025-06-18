@@ -210,35 +210,7 @@ const ProjectDetail = () => {
                   minHeight: '400px',
                   maxHeight: '70vh'
                 }}
-              />
-              
-              {/* Image overlay with project links for quick access */}
-              <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-colors duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
-                <div className="flex space-x-4">
-                  {project.liveUrl && (
-                    <a
-                      href={project.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-white/90 backdrop-blur-sm text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-white transition-colors duration-200 flex items-center space-x-2"
-                    >
-                      <FaExternalLinkAlt className="w-4 h-4" />
-                      <span>Live Demo</span>
-                    </a>
-                  )}
-                  {project.githubUrl && (
-                    <a
-                      href={project.githubUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-gray-900/90 backdrop-blur-sm text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-900 transition-colors duration-200 flex items-center space-x-2"
-                    >
-                      <FaGithub className="w-4 h-4" />
-                      <span>Source Code</span>
-                    </a>
-                  )}
-                </div>
-              </div>
+              />              
             </motion.div>
           </div>
         </section>

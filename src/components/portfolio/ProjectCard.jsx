@@ -437,8 +437,8 @@ const ProjectCard = ({ project, index = 0 }) => {
               opacity: isHovered ? 0.8 : 0.3,
             }}
             transition={{ duration: 0.3 }}
-          >
-    </motion.div>
+          />
+        </div>
   );
 };
 

@@ -425,7 +425,7 @@ const ProjectCard = ({ project, index = 0 }) => {
                 </motion.svg>
               </Link>
             </motion.div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Decorative corner element */}
@@ -437,9 +437,10 @@ const ProjectCard = ({ project, index = 0 }) => {
               opacity: isHovered ? 0.8 : 0.3,
             }}
             transition={{ duration: 0.3 }}
-          >
-      </motion.div>
+          />
         </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

@@ -425,6 +425,7 @@ const ProjectCard = ({ project, index = 0 }) => {
                 </motion.svg>
               </Link>
             </motion.div>
+            </motion.div>
           </div>
         </div>
 

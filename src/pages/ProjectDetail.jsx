@@ -199,7 +199,7 @@ const ProjectDetail = () => {
                     // Force reload by updating the image src
                     const img = document.querySelector(`img[alt="${project.title}"]`);
                     if (img) {
-                      img.src = getImageUrl(project.imageUrl, 0);
+                      img.src = getImageUrl(project.imageUrl);
                     }
                   }}
                   className="text-primary-600 hover:text-primary-700 text-sm underline"

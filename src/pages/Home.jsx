@@ -241,7 +241,7 @@ const FeaturedProjectsCarousel = ({ projects }) => {
         setCurrentIndex((prevIndex) => 
           prevIndex === projects.length - 1 ? 0 : prevIndex + 1
         );
-      }, 2000);
+      }, 3000);
     }
 
     return () => {

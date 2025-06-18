@@ -378,6 +378,30 @@ const ProjectDetail = () => {
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     Project Links
                   </h3>
+                  <div className="space-y-3">
+                    {project.liveUrl && (
+                      <a
+                        href={project.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center space-x-2 text-primary-600 hover:text-primary-700 transition-colors"
+                      >
+                        <FaExternalLinkAlt className="w-4 h-4" />
+                        <span>Live Demo</span>
+                      </a>
+                    )}
+                    {project.githubUrl && (
+                      <a
+                        href={project.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center space-x-2 text-gray-600 hover:text-gray-700 transition-colors"
+                      >
+                        <FaGithub className="w-4 h-4" />
+                        <span>Source Code</span>
+                      </a>
+                    )}
+                  </div>
                 </motion.div>
 
                 {/* Share Project */}

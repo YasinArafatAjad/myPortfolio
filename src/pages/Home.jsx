@@ -241,7 +241,7 @@ const FeaturedProjectsCarousel = ({ projects }) => {
         setCurrentIndex((prevIndex) => 
           prevIndex === projects.length - 1 ? 0 : prevIndex + 1
         );
-      }, 5000);
+      }, 2000);
     }
 
     return () => {
@@ -375,14 +375,14 @@ const FeaturedProjectsCarousel = ({ projects }) => {
         <>
           <button
             onClick={prevSlide}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white p-3 rounded-full transition-colors duration-200 z-20"
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 text-zinc-800 backdrop-blur-sm hover:bg-white/30 text-white p-3 rounded-full transition-colors duration-200 z-20"
           >
             <FaChevronLeft className="w-5 h-5" />
           </button>
           
           <button
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white p-3 rounded-full transition-colors duration-200 z-20"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 text-zinc-800 backdrop-blur-sm hover:bg-white/30 text-white p-3 rounded-full transition-colors duration-200 z-20"
           >
             <FaChevronRight className="w-5 h-5" />
           </button>

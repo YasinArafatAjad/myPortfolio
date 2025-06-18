@@ -3,10 +3,107 @@ import { useParams, Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { doc, getDoc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { getOptimizedImageUrl } from '../config/cloudinary';
 import { useBusinessNotifications } from '../hooks/useBusinessNotifications';
 import SEOHead from '../components/SEOHead';
 import { FaArrowLeft, FaExternalLinkAlt, FaGithub, FaEye, FaImage } from 'react-icons/fa';
+
+/**
+ * Project Image Component with fallback handling
+ */
+const ProjectImage = ({ project }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  const handleImageLoad = () => {
+    setImageError(false);
+    setImageLoaded(true);
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+    setImageLoaded(true);
+  };
+
+  return (
+    <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-gray-100" style={{ minHeight: '400px' }}>
+      {/* Loading State */}
+      {!imageLoaded && !imageError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-200 animate-pulse">
+          <div className="text-gray-400 flex flex-col items-center">
+            <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mb-2"></div>
+            <span>Loading image...</span>
+          </div>
+        </div>
+      )}
+      
+      {/* Error/No Image Fallback */}
+      {(imageError || !project.imageUrl) && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 text-gray-600">
+          <FaImage className="w-20 h-20 mb-4 text-gray-400" />
+          <h3 className="text-2xl font-bold mb-2">{project.title}</h3>
+          <p className="text-lg text-gray-500 mb-4">{project.category}</p>
+          <div className="flex flex-wrap gap-2 justify-center max-w-md mb-4">
+            {project.technologies?.slice(0, 4).map((tech, index) => (
+              <span
+                key={index}
+                className="bg-gray-300 text-gray-700 px-3 py-1 rounded-full text-sm"
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* Main Project Image */}
+      {project.imageUrl && !imageError && (
+        <img
+          src={project.imageUrl}
+          alt={project.title}
+          className={`w-full h-auto max-h-[70vh] object-contain bg-white transition-opacity duration-300 ${
+            imageLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+          onLoad={handleImageLoad}
+          onError={handleImageError}
+          style={{
+            minHeight: '400px',
+            maxHeight: '70vh'
+          }}
+        />
+      )}
+      
+      {/* Image Overlay with Project Links */}
+      {imageLoaded && !imageError && (
+        <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-colors duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
+          <div className="flex space-x-4">
+            {project.liveUrl && (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white/90 backdrop-blur-sm text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-white transition-colors duration-200 flex items-center space-x-2"
+              >
+                <FaExternalLinkAlt className="w-4 h-4" />
+                <span>Live Demo</span>
+              </a>
+            )}
+            {project.githubUrl && (
+              <a
+                href={project.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-gray-900/90 backdrop-blur-sm text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-900 transition-colors duration-200 flex items-center space-x-2"
+              >
+                <FaGithub className="w-4 h-4" />
+                <span>Source Code</span>
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 /**
  * Project detail page component
@@ -16,9 +113,6 @@ const ProjectDetail = () => {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageError, setImageError] = useState(false);
-  const [imageRetryCount, setImageRetryCount] = useState(0);
   const { notifyProjectMilestone } = useBusinessNotifications();
 
   /**
@@ -67,214 +161,11 @@ const ProjectDetail = () => {
     }
   };
 
-  /**
-   * Get image URL with proper fallback handling
-   */
-  const getImageUrl = (imageUrl, retryCount = 0) => {
-    if (!imageUrl) return null;
-    
-    // If it's already a full URL (Cloudinary or other CDN)
-    if (imageUrl.startsWith('http')) {
-      try {
-        // For retry attempts, try different optimization settings
-        if (retryCount === 1) {
-          // Try without format optimization
-          return getOptimizedImageUrl(imageUrl, { width: 1200, quality: 90, format: 'jpg' });
-        } else if (retryCount === 2) {
-          // Try with minimal optimization
-          return getOptimizedImageUrl(imageUrl, { quality: 'auto' });
-        } else if (retryCount >= 3) {
-          // Return original URL as last resort
-          return imageUrl;
-        }
-        
-        return getOptimizedImageUrl(imageUrl, { width: 1200, quality: 90 });
-      } catch (error) {
-        console.error('Error optimizing image URL:', error);
-        return imageUrl; // Return original URL if optimization fails
-      }
-    }
-    
-    // If it's a relative path, make it absolute
-    return imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
-  };
-
-  /**
-   * Handle image load error with retry logic
-   */
-  const handleImageError = (e) => {
-    const failedUrl = e.target.src;
-    console.error('Image failed to load:', failedUrl);
-    
-    // Try to retry with different URL configurations
-    if (imageRetryCount < 3) {
-      console.log(`Retrying image load (attempt ${imageRetryCount + 1})`);
-      setImageRetryCount(prev => prev + 1);
-      setImageLoaded(false);
-      
-      // Small delay before retry
-      setTimeout(() => {
-        const retryUrl = getImageUrl(project.imageUrl, imageRetryCount + 1);
-        if (retryUrl && retryUrl !== failedUrl) {
-          e.target.src = retryUrl;
-        } else {
-          setImageError(true);
-          setImageLoaded(true);
-        }
-      }, 1000);
-    } else {
-      console.error('Max retry attempts reached for image:', failedUrl);
-      setImageError(true);
-      setImageLoaded(true);
-    }
-  };
-
-  /**
-   * Handle image load success
-   */
-  const handleImageLoad = () => {
-    setImageError(false);
-    setImageLoaded(true);
-    setImageRetryCount(0); // Reset retry count on successful load
-  };
-
-  /**
-   * Check if image URL is accessible
-   */
-  const checkImageUrl = async (url) => {
-    try {
-      const response = await fetch(url, { method: 'HEAD' });
-      return response.ok;
-    } catch (error) {
-      console.error('Error checking image URL:', error);
-      return false;
-    }
-  };
-
-  /**
-   * Render project image with fallback
-   */
-  const renderProjectImage = () => {
-    const imageUrl = getImageUrl(project.imageUrl, imageRetryCount);
-    
-    return (
-      <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-gray-100" style={{ minHeight: '400px' }}>
-        {/* Loading placeholder */}
-        {!imageLoaded && !imageError && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-200 animate-pulse">
-            <div className="text-gray-400 flex flex-col items-center">
-              <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mb-2"></div>
-              <span>Loading image...</span>
-              {imageRetryCount > 0 && (
-                <span className="text-sm mt-1">Retry attempt {imageRetryCount}</span>
-              )}
-            </div>
-          </div>
-        )}
-        
-        {/* Error/No Image placeholder */}
-        {(imageError || !imageUrl) && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 text-gray-600">
-            <FaImage className="w-20 h-20 mb-4 text-gray-400" />
-            <h3 className="text-2xl font-bold mb-2">{project.title}</h3>
-            <p className="text-lg text-gray-500 mb-4">{project.category}</p>
-            <div className="flex flex-wrap gap-2 justify-center max-w-md mb-4">
-              {project.technologies?.slice(0, 4).map((tech, index) => (
-                <span
-                  key={index}
-                  className="bg-gray-300 text-gray-700 px-3 py-1 rounded-full text-sm"
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
-            {imageError && (
-              <div className="text-center">
-                <p className="text-sm text-gray-500 mb-2">Image could not be loaded</p>
-                <button
-                  onClick={() => {
-                    setImageError(false);
-                    setImageLoaded(false);
-                    setImageRetryCount(0);
-                    // Force reload by updating the image src
-                    const img = document.querySelector(`img[alt="${project.title}"]`);
-                    if (img) {
-                      img.src = getImageUrl(project.imageUrl);
-                    }
-                  }}
-                  className="text-primary-600 hover:text-primary-700 text-sm underline"
-                >
-                  Try again
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-        
-        {/* Main project image */}
-        {imageUrl && !imageError && (
-          <img
-            src={imageUrl}
-            alt={project.title}
-            className={`w-full h-auto max-h-[70vh] object-contain bg-white transition-opacity duration-300 ${
-              imageLoaded && !imageError ? 'opacity-100' : 'opacity-0'
-            }`}
-            onLoad={handleImageLoad}
-            onError={handleImageError}
-            style={{
-              minHeight: '400px',
-              maxHeight: '70vh'
-            }}
-          />
-        )}
-        
-        {/* Image overlay with project links (only show if image loaded successfully) */}
-        {imageLoaded && !imageError && (
-          <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-colors duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
-            <div className="flex space-x-4">
-              {project.liveUrl && (
-                <a
-                  href={project.liveUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white/90 backdrop-blur-sm text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-white transition-colors duration-200 flex items-center space-x-2"
-                >
-                  <FaExternalLinkAlt className="w-4 h-4" />
-                  <span>Live Demo</span>
-                </a>
-              )}
-              {project.githubUrl && (
-                <a
-                  href={project.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-gray-900/90 backdrop-blur-sm text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-900 transition-colors duration-200 flex items-center space-x-2"
-                >
-                  <FaGithub className="w-4 h-4" />
-                  <span>Source Code</span>
-                </a>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-
   useEffect(() => {
     if (id) {
       fetchProject();
     }
   }, [id]);
-
-  // Reset image state when project changes
-  useEffect(() => {
-    if (project) {
-      setImageLoaded(false);
-      setImageError(false);
-      setImageRetryCount(0);
-    }
-  }, [project?.id]);
 
   if (loading) {
     return (
@@ -350,7 +241,7 @@ const ProjectDetail = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              {renderProjectImage()}
+              <ProjectImage project={project} />
             </motion.div>
           </div>
         </section>
@@ -375,7 +266,7 @@ const ProjectDetail = () => {
                       {project.description}
                     </p>
                     
-                    {/* Additional project details */}
+                    {/* Key Features */}
                     <div className="mt-8">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">
                         Key Features

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Link } from 'react-router-dom';
 import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
@@ -7,18 +7,295 @@ import { db } from '../config/firebase';
 import { getOptimizedImageUrl } from '../config/cloudinary';
 import { useSettings } from '../contexts/SettingsContext';
 import SEOHead from '../components/SEOHead';
+import { FaChevronLeft, FaChevronRight, FaExternalLinkAlt, FaGithub, FaEye } from 'react-icons/fa';
 
 /**
- * Home page component with hero section and introduction
+ * Modern Carousel Component for Featured Projects
+ */
+const FeaturedProjectsCarousel = ({ projects }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const intervalRef = useRef(null);
+
+  // Auto-play functionality
+  useEffect(() => {
+    if (isAutoPlaying && projects.length > 1) {
+      intervalRef.current = setInterval(() => {
+        setCurrentIndex((prevIndex) => 
+          prevIndex === projects.length - 1 ? 0 : prevIndex + 1
+        );
+      }, 5000);
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [isAutoPlaying, projects.length]);
+
+  const nextSlide = () => {
+    setCurrentIndex((prevIndex) => 
+      prevIndex === projects.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prevIndex) => 
+      prevIndex === 0 ? projects.length - 1 : prevIndex - 1
+    );
+  };
+
+  const goToSlide = (index) => {
+    setCurrentIndex(index);
+  };
+
+  if (projects.length === 0) return null;
+
+  return (
+    <div 
+      className="relative w-full h-[600px] overflow-hidden rounded-2xl shadow-2xl"
+      onMouseEnter={() => setIsAutoPlaying(false)}
+      onMouseLeave={() => setIsAutoPlaying(true)}
+    >
+      {/* Slides Container */}
+      <div 
+        className="flex transition-transform duration-700 ease-in-out h-full"
+        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+      >
+        {projects.map((project, index) => (
+          <div key={project.id} className="w-full h-full flex-shrink-0 relative">
+            {/* Background Image */}
+            <div className="absolute inset-0">
+              <img
+                src={getOptimizedImageUrl(project.imageUrl, { width: 1200, height: 600 })}
+                alt={project.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
+            </div>
+
+            {/* Content */}
+            <div className="relative z-10 h-full flex items-center">
+              <div className="container-custom">
+                <div className="max-w-2xl text-white">
+                  <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: index === currentIndex ? 1 : 0, y: index === currentIndex ? 0 : 50 }}
+                    transition={{ duration: 0.8, delay: 0.2 }}
+                  >
+                    <span className="inline-block bg-primary-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
+                      {project.category}
+                    </span>
+                    
+                    <h3 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+                      {project.title}
+                    </h3>
+                    
+                    <p className="text-xl text-gray-200 mb-6 line-clamp-3">
+                      {project.description}
+                    </p>
+
+                    {/* Technologies */}
+                    {project.technologies && (
+                      <div className="flex flex-wrap gap-2 mb-6">
+                        {project.technologies.slice(0, 4).map((tech, techIndex) => (
+                          <span
+                            key={techIndex}
+                            className="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-wrap gap-4">
+                      <Link
+                        to={`/portfolio/${project.id}`}
+                        className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
+                      >
+                        <FaEye className="w-4 h-4" />
+                        <span>View Project</span>
+                      </Link>
+                      
+                      {project.liveUrl && (
+                        <a
+                          href={project.liveUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
+                        >
+                          <FaExternalLinkAlt className="w-4 h-4" />
+                          <span>Live Demo</span>
+                        </a>
+                      )}
+                      
+                      {project.githubUrl && (
+                        <a
+                          href={project.githubUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
+                        >
+                          <FaGithub className="w-4 h-4" />
+                          <span>Source</span>
+                        </a>
+                      )}
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Navigation Arrows */}
+      {projects.length > 1 && (
+        <>
+          <button
+            onClick={prevSlide}
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white p-3 rounded-full transition-colors duration-200 z-20"
+          >
+            <FaChevronLeft className="w-5 h-5" />
+          </button>
+          
+          <button
+            onClick={nextSlide}
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white p-3 rounded-full transition-colors duration-200 z-20"
+          >
+            <FaChevronRight className="w-5 h-5" />
+          </button>
+        </>
+      )}
+
+      {/* Dots Indicator */}
+      {projects.length > 1 && (
+        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
+          {projects.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToSlide(index)}
+              className={`w-3 h-3 rounded-full transition-colors duration-200 ${
+                index === currentIndex 
+                  ? 'bg-white' 
+                  : 'bg-white/50 hover:bg-white/70'
+              }`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/**
+ * Parallax Background Component
+ */
+const ParallaxBackground = ({ children, offset = 0.5 }) => {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"]
+  });
+  
+  const y = useTransform(scrollYProgress, [0, 1], [0, offset * 100]);
+  const springY = useSpring(y, { stiffness: 100, damping: 30 });
+
+  return (
+    <div ref={ref} className="relative overflow-hidden">
+      <motion.div style={{ y: springY }}>
+        {children}
+      </motion.div>
+    </div>
+  );
+};
+
+/**
+ * Floating Elements Component
+ */
+const FloatingElements = () => {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <motion.div
+        animate={{
+          y: [0, -20, 0],
+          rotate: [0, 5, 0],
+        }}
+        transition={{
+          duration: 6,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-primary-400/20 to-secondary-400/20 rounded-full blur-xl"
+      />
+      
+      <motion.div
+        animate={{
+          y: [0, 30, 0],
+          rotate: [0, -5, 0],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 1
+        }}
+        className="absolute bottom-20 right-20 w-48 h-48 bg-gradient-to-br from-secondary-400/20 to-primary-400/20 rounded-full blur-xl"
+      />
+      
+      <motion.div
+        animate={{
+          y: [0, -15, 0],
+          x: [0, 10, 0],
+        }}
+        transition={{
+          duration: 7,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 2
+        }}
+        className="absolute top-1/2 left-10 w-24 h-24 bg-gradient-to-br from-yellow-400/20 to-orange-400/20 rounded-full blur-xl"
+      />
+      
+      <motion.div
+        animate={{
+          y: [0, 25, 0],
+          x: [0, -15, 0],
+        }}
+        transition={{
+          duration: 9,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 0.5
+        }}
+        className="absolute top-1/3 right-10 w-20 h-20 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-xl"
+      />
+    </div>
+  );
+};
+
+/**
+ * Home page component with parallax design and modern carousel
  */
 const Home = () => {
   const { settings } = useSettings();
   const [featuredProjects, setFeaturedProjects] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
   
-  const [heroRef, heroInView] = useInView({ triggerOnce: true, threshold: 0.1 });
+  const heroRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"]
+  });
+  
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 200]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
+  
   const [aboutRef, aboutInView] = useInView({ triggerOnce: true, threshold: 0.1 });
-  const [cardRef, cardInView] = useInView({ triggerOnce: true, threshold: 0.1 });
   const [projectsRef, projectsInView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
   /**
@@ -35,7 +312,7 @@ const Home = () => {
           where('published', '==', true),
           where('featured', '==', true),
           orderBy('createdAt', 'desc'),
-          limit(3)
+          limit(5) // Increased for carousel
         );
         
         const querySnapshot = await getDocs(q);
@@ -45,60 +322,32 @@ const Home = () => {
         }));
         
         setFeaturedProjects(projectsData);
-        return; // Success, exit early
+        return;
       } catch (indexError) {
         console.warn('Composite index not available, using fallback query:', indexError.message);
         
-        // Fallback: Try simpler queries
-        try {
-          // First try with just published filter and order by createdAt
-          const publishedQuery = query(
-            collection(db, 'projects'),
-            where('published', '==', true),
-            orderBy('createdAt', 'desc')
-          );
-          
-          const publishedSnapshot = await getDocs(publishedQuery);
-          const publishedProjects = publishedSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
-          
-          // Filter for featured projects client-side
-          const featuredOnly = publishedProjects
-            .filter(project => project.featured === true)
-            .slice(0, 3);
-          
-          setFeaturedProjects(featuredOnly);
-          return; // Success with fallback
-        } catch (publishedError) {
-          console.warn('Published query failed, trying basic query:', publishedError.message);
-          
-          // Final fallback: Get all projects and filter client-side
-          const basicQuery = query(collection(db, 'projects'));
-          const basicSnapshot = await getDocs(basicQuery);
-          const allProjects = basicSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
-          
-          // Filter client-side for published and featured projects
-          const filteredProjects = allProjects
-            .filter(project => project.published === true && project.featured === true)
-            .sort((a, b) => {
-              // Sort by createdAt descending
-              const aDate = a.createdAt?.toDate?.() || new Date(a.createdAt) || new Date(0);
-              const bDate = b.createdAt?.toDate?.() || new Date(b.createdAt) || new Date(0);
-              return bDate - aDate;
-            })
-            .slice(0, 3);
-          
-          setFeaturedProjects(filteredProjects);
-        }
+        // Fallback: Get all projects and filter client-side
+        const basicQuery = query(collection(db, 'projects'));
+        const basicSnapshot = await getDocs(basicQuery);
+        const allProjects = basicSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        
+        // Filter client-side for published and featured projects
+        const filteredProjects = allProjects
+          .filter(project => project.published === true && project.featured === true)
+          .sort((a, b) => {
+            const aDate = a.createdAt?.toDate?.() || new Date(a.createdAt) || new Date(0);
+            const bDate = b.createdAt?.toDate?.() || new Date(b.createdAt) || new Date(0);
+            return bDate - aDate;
+          })
+          .slice(0, 5);
+        
+        setFeaturedProjects(filteredProjects);
       }
     } catch (error) {
       console.error('Error fetching featured projects:', error);
-      // Set empty array on complete failure
       setFeaturedProjects([]);
     } finally {
       setLoadingProjects(false);
@@ -110,118 +359,6 @@ const Home = () => {
     fetchFeaturedProjects();
   }, []);
 
-  /**
-   * Featured project card component
-   */
-  const FeaturedProjectCard = ({ project, index }) => {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={projectsInView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.6, delay: index * 0.2 }}
-        className="group bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
-      >
-        {/* Project Image */}
-        <div className="relative overflow-hidden">
-          <img
-            src={getOptimizedImageUrl(project.imageUrl, { width: 400, height: 250 })}
-            alt={project.title}
-            className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
-            loading="lazy"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <div className="absolute bottom-4 left-4 right-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100">
-            <Link
-              to={`/portfolio/${project.id}`}
-              className="inline-flex items-center space-x-2 bg-white text-gray-900 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors"
-            >
-              <span>View Project</span>
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </Link>
-          </div>
-          {/* Featured badge */}
-          <div className="absolute top-4 right-4">
-            <span className="bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-medium">
-              Featured
-            </span>
-          </div>
-        </div>
-
-        {/* Project Info */}
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-primary-600 font-medium">
-              {project.category}
-            </span>
-          </div>
-          
-          <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
-            <Link to={`/portfolio/${project.id}`}>
-              {project.title}
-            </Link>
-          </h3>
-          
-          <p className="text-gray-600 mb-4 line-clamp-2">
-            {project.description}
-          </p>
-
-          {/* Technologies */}
-          {project.technologies && (
-            <div className="flex flex-wrap gap-2 mb-4">
-              {project.technologies.slice(0, 3).map((tech, techIndex) => (
-                <span
-                  key={techIndex}
-                  className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
-                >
-                  {tech}
-                </span>
-              ))}
-              {project.technologies.length > 3 && (
-                <span className="text-xs text-gray-500">
-                  +{project.technologies.length - 3} more
-                </span>
-              )}
-            </div>
-          )}
-
-          {/* Project Links */}
-          <div className="flex space-x-3">
-            {project.liveUrl && (
-              <a
-                href={project.liveUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary-600 hover:text-primary-700 font-medium text-sm flex items-center space-x-1"
-              >
-                <span>Live Demo</span>
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
-                  <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
-                </svg>
-              </a>
-            )}
-            {project.githubUrl && (
-              <a
-                href={project.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-600 hover:text-gray-700 font-medium text-sm flex items-center space-x-1"
-              >
-                <span>GitHub</span>
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
-                  <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
-                </svg>
-              </a>
-            )}
-          </div>
-        </div>
-      </motion.div>
-    );
-  };
-
   return (
     <>
       <SEOHead
@@ -231,77 +368,99 @@ const Home = () => {
       />
       
       <div className="min-h-screen">
-        {/* Hero Section */}
+        {/* Hero Section with Parallax */}
         <section
           ref={heroRef}
-          className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-600 via-primary-700 to-secondary-600 text-white relative overflow-hidden"
+          className="min-h-screen flex items-center justify-center relative overflow-hidden"
         >
-          {/* Animated background elements */}
-          <div className="absolute inset-0">
-            <div className="absolute top-20 left-20 w-72 h-72 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-20 right-20 w-96 h-96 bg-secondary-500/20 rounded-full blur-3xl animate-bounce-slow"></div>
-          </div>
-
-          <div className="container-custom relative z-10">
+          {/* Parallax Background */}
+          <motion.div 
+            style={{ y: heroY, scale: heroScale }}
+            className="absolute inset-0 bg-gradient-to-br from-primary-600 via-primary-700 to-secondary-600"
+          />
+          
+          {/* Floating Elements */}
+          <FloatingElements />
+          
+          {/* Hero Content */}
+          <motion.div 
+            style={{ opacity: heroOpacity }}
+            className="container-custom relative z-10 text-white text-center"
+          >
             <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={heroInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8 }}
-              className="text-center"
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, ease: "easeOut" }}
             >
               <motion.h1
-                initial={{ opacity: 0, y: 30 }}
-                animate={heroInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.2 }}
+                className="text-6xl md:text-8xl font-bold mb-8 leading-tight"
               >
-                Welcome to My
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
-                  Portfolio
+                <span className="block">Welcome to</span>
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500">
+                  My Portfolio
                 </span>
               </motion.h1>
 
               <motion.p
                 initial={{ opacity: 0, y: 30 }}
-                animate={heroInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.4 }}
-                className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto"
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.4 }}
+                className="text-xl md:text-2xl mb-12 text-white/90 max-w-4xl mx-auto leading-relaxed"
               >
                 {settings.siteDescription}
               </motion.p>
 
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
-                animate={heroInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.6 }}
-                className="flex flex-col sm:flex-row gap-4 justify-center"
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.6 }}
+                className="flex flex-col sm:flex-row gap-6 justify-center"
               >
-                <Link
-                  to="/portfolio"
-                  className="bg-white text-primary-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200 transform hover:scale-105"
+                <motion.div
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  View My Work
-                </Link>
-                <Link
-                  to="/contact"
-                  className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-primary-600 transition-all duration-200 transform hover:scale-105"
+                  <Link
+                    to="/portfolio"
+                    className="bg-white text-primary-600 px-10 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all duration-300 shadow-2xl"
+                  >
+                    Explore My Work
+                  </Link>
+                </motion.div>
+                
+                <motion.div
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  Get in Touch
-                </Link>
+                  <Link
+                    to="/contact"
+                    className="border-2 border-white text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-white hover:text-primary-600 transition-all duration-300 backdrop-blur-sm"
+                  >
+                    Let's Connect
+                  </Link>
+                </motion.div>
               </motion.div>
             </motion.div>
-          </div>
+          </motion.div>
 
-          {/* Scroll indicator */}
+          {/* Scroll Indicator */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={heroInView ? { opacity: 1 } : {}}
-            transition={{ duration: 1, delay: 1 }}
-            className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 1.2 }}
+            className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white"
           >
-            <div className="animate-bounce">
+            <motion.div
+              animate={{ y: [0, 10, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="flex flex-col items-center space-y-2"
+            >
+              <span className="text-sm font-medium">Scroll to explore</span>
               <svg
-                className="w-6 h-6 text-white"
+                className="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -313,55 +472,140 @@ const Home = () => {
                   d="M19 14l-7 7m0 0l-7-7m7 7V3"
                 />
               </svg>
-            </div>
+            </motion.div>
           </motion.div>
         </section>
 
-        {/* Featured Projects Section */}
+        {/* Featured Projects Carousel Section */}
         {featuredProjects.length > 0 && (
-          <section ref={projectsRef} className="py-20 bg-white">
+          <ParallaxBackground offset={0.3}>
+            <section ref={projectsRef} className="py-32 bg-white relative">
+              <div className="container-custom">
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={projectsInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.8 }}
+                  className="text-center mb-20"
+                >
+                  <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-8">
+                    Featured Projects
+                  </h2>
+                  <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                    Discover my most impactful and innovative work that showcases creativity, 
+                    technical expertise, and problem-solving abilities.
+                  </p>
+                </motion.div>
+
+                {loadingProjects ? (
+                  <div className="flex justify-center items-center py-32">
+                    <div className="spinner"></div>
+                  </div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={projectsInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.8, delay: 0.3 }}
+                  >
+                    <FeaturedProjectsCarousel projects={featuredProjects} />
+                  </motion.div>
+                )}
+
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={projectsInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.8, delay: 0.6 }}
+                  className="text-center mt-16"
+                >
+                  <Link
+                    to="/portfolio"
+                    className="inline-flex items-center space-x-3 bg-gradient-to-r from-primary-600 to-secondary-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+                  >
+                    <span>View All Projects</span>
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </Link>
+                </motion.div>
+              </div>
+            </section>
+          </ParallaxBackground>
+        )}
+
+        {/* About Preview Section with Parallax */}
+        <ParallaxBackground offset={0.2}>
+          <section ref={aboutRef} className="py-32 bg-gradient-to-br from-gray-50 to-gray-100 relative">
             <div className="container-custom">
               <motion.div
                 initial={{ opacity: 0, y: 50 }}
-                animate={projectsInView ? { opacity: 1, y: 0 } : {}}
+                animate={aboutInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.8 }}
-                className="text-center mb-16"
+                className="text-center mb-20"
               >
-                <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                  Featured Projects
+                <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-8">
+                  About Me
                 </h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                  Discover some of my most impactful and innovative work that showcases my skills and creativity.
+                <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+                  I'm a passionate developer dedicated to creating exceptional digital experiences.
+                  With expertise in modern web technologies, I bring ideas to life through clean code, 
+                  innovative solutions, and meticulous attention to detail.
                 </p>
               </motion.div>
 
-              {loadingProjects ? (
-                <div className="flex justify-center items-center py-20">
-                  <div className="spinner"></div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {featuredProjects.map((project, index) => (
-                    <FeaturedProjectCard
-                      key={project.id}
-                      project={project}
-                      index={index}
-                    />
-                  ))}
-                </div>
-              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+                {/* Frontend Development */}
+                <motion.div
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={aboutInView ? { opacity: 1, x: 0 } : {}}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                  className="group"
+                >
+                  <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 h-full">
+                    <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                      <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-bold mb-4 text-gray-900">Frontend Development</h3>
+                    <p className="text-gray-600 leading-relaxed">
+                      Creating responsive and interactive user interfaces with modern frameworks like React, 
+                      Vue, and Angular. Focused on performance, accessibility, and user experience.
+                    </p>
+                  </div>
+                </motion.div>
+
+                {/* Backend Development */}
+                <motion.div
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={aboutInView ? { opacity: 1, x: 0 } : {}}
+                  transition={{ duration: 0.8, delay: 0.4 }}
+                  className="group"
+                >
+                  <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 h-full">
+                    <div className="w-20 h-20 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                      <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-bold mb-4 text-gray-900">Backend Development</h3>
+                    <p className="text-gray-600 leading-relaxed">
+                      Building robust server-side applications and APIs with scalable architectures. 
+                      Experienced with Node.js, Python, databases, and cloud services.
+                    </p>
+                  </div>
+                </motion.div>
+              </div>
 
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
-                animate={projectsInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.8 }}
-                className="text-center mt-12"
+                animate={aboutInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.8, delay: 0.6 }}
+                className="text-center mt-16"
               >
                 <Link
-                  to="/portfolio"
-                  className="btn-primary inline-flex items-center space-x-2"
+                  to="/about"
+                  className="inline-flex items-center space-x-3 bg-gradient-to-r from-gray-900 to-gray-700 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
                 >
-                  <span>View All Projects</span>
+                  <span>Learn More About Me</span>
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
                   </svg>
@@ -369,85 +613,48 @@ const Home = () => {
               </motion.div>
             </div>
           </section>
-        )}
+        </ParallaxBackground>
 
-        {/* About Preview Section */}
-        <section ref={aboutRef} className="py-20 bg-gray-50">
-          <div className="container-custom">
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={aboutInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8 }}
-              className="text-center mb-16"
-            >
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                About Me
-              </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                I'm a passionate developer dedicated to creating exceptional digital experiences.
-                With expertise in modern web technologies, I bring ideas to life through clean code and innovative solutions.
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={aboutInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              ref={cardRef}
-              className="grid grid-cols-1 md:grid-cols-2 justify-items-center gap-8"
-            >
-              {/* Skills preview */}
+        {/* Call to Action Section */}
+        <ParallaxBackground offset={0.1}>
+          <section className="py-32 bg-gradient-to-br from-primary-600 via-primary-700 to-secondary-600 text-white relative overflow-hidden">
+            <FloatingElements />
+            
+            <div className="container-custom text-center relative z-10">
               <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={cardInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8, delay: 0.2 }} 
-              className="card text-center">
-                <div className="w-16 h-16 bg-primary-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Frontend Development</h3>
-                <p className="text-gray-600">
-                  Creating responsive and interactive user interfaces with modern frameworks.
-                </p>
-              </motion.div>
-
-              <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={cardInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8, delay: 0.2 }}
-                className="card text-center">
-                <div className="w-16 h-16 bg-secondary-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-secondary-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Backend Development</h3>
-                <p className="text-gray-600">
-                  Building robust server-side applications and APIs with scalable architectures.
-                </p>
-              </motion.div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={aboutInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-center mt-12"
-            >
-              <Link
-                to="/about"
-                className="btn-primary inline-flex items-center space-x-2"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
               >
-                <span>Learn More About Me</span>
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </Link>
-            </motion.div>
-          </div>
-        </section>
+                <h2 className="text-5xl md:text-6xl font-bold mb-8">
+                  Let's Create Something
+                  <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
+                    Amazing Together
+                  </span>
+                </h2>
+                <p className="text-xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
+                  Ready to bring your ideas to life? I'm here to help you create digital experiences 
+                  that not only look great but also deliver exceptional results.
+                </p>
+                <motion.div
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Link
+                    to="/contact"
+                    className="inline-flex items-center space-x-3 bg-white text-primary-600 px-10 py-5 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all duration-300 shadow-2xl"
+                  >
+                    <span>Start a Project</span>
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </Link>
+                </motion.div>
+              </motion.div>
+            </div>
+          </section>
+        </ParallaxBackground>
       </div>
     </>
   );

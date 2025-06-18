@@ -16,6 +16,7 @@ const ProjectDetail = () => {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const { notifyProjectMilestone } = useBusinessNotifications();
 
   /**
@@ -136,20 +137,61 @@ const ProjectDetail = () => {
           </div>
         </section>
 
-        {/* Project Image */}
+        {/* Project Image - Fixed Height Issue */}
         <section className="py-12">
           <div className="container-custom">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative rounded-2xl overflow-hidden shadow-2xl"
+              className="relative rounded-2xl overflow-hidden shadow-2xl bg-gray-100"
             >
+              {/* Loading placeholder */}
+              {!imageLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-200 animate-pulse">
+                  <div className="text-gray-400">Loading image...</div>
+                </div>
+              )}
+              
               <img
-                src={getOptimizedImageUrl(project.imageUrl, { width: 1200, height : 800})}
+                src={getOptimizedImageUrl(project.imageUrl, { width: 1200, quality: 90 })}
                 alt={project.title}
-                className="w-full h-auto object-cover"
+                className={`w-full h-auto max-h-[70vh] object-contain bg-white transition-opacity duration-300 ${
+                  imageLoaded ? 'opacity-100' : 'opacity-0'
+                }`}
+                onLoad={() => setImageLoaded(true)}
+                style={{
+                  minHeight: '400px', // Minimum height to prevent layout shift
+                }}
               />
+              
+              {/* Image overlay with project links for quick access */}
+              <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-colors duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
+                <div className="flex space-x-4">
+                  {project.liveUrl && (
+                    <a
+                      href={project.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-white/90 backdrop-blur-sm text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-white transition-colors duration-200 flex items-center space-x-2"
+                    >
+                      <FaExternalLinkAlt className="w-4 h-4" />
+                      <span>Live Demo</span>
+                    </a>
+                  )}
+                  {project.githubUrl && (
+                    <a
+                      href={project.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-gray-900/90 backdrop-blur-sm text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-900 transition-colors duration-200 flex items-center space-x-2"
+                    >
+                      <FaGithub className="w-4 h-4" />
+                      <span>Source Code</span>
+                    </a>
+                  )}
+                </div>
+              </div>
             </motion.div>
           </div>
         </section>
@@ -174,17 +216,43 @@ const ProjectDetail = () => {
                       {project.description}
                     </p>
                     
-                    {/* Additional project details can be added here */}
+                    {/* Additional project details */}
                     <div className="mt-8">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">
                         Key Features
                       </h3>
                       <ul className="list-disc list-inside space-y-2 text-gray-600">
-                        <li>Responsive design that works on all devices</li>
-                        <li>Modern and clean user interface</li>
-                        <li>Optimized for performance and accessibility</li>
-                        <li>Built with best practices and clean code</li>
+                        <li>Responsive design that works seamlessly across all devices</li>
+                        <li>Modern and intuitive user interface with smooth interactions</li>
+                        <li>Optimized for performance, accessibility, and SEO</li>
+                        <li>Built with industry best practices and clean, maintainable code</li>
+                        <li>Cross-browser compatibility and progressive enhancement</li>
                       </ul>
+                    </div>
+
+                    {/* Development Process */}
+                    <div className="mt-8">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                        Development Process
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <h4 className="font-semibold text-gray-900 mb-2">Planning & Design</h4>
+                          <p className="text-sm text-gray-600">User research, wireframing, and creating detailed mockups</p>
+                        </div>
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <h4 className="font-semibold text-gray-900 mb-2">Development</h4>
+                          <p className="text-sm text-gray-600">Clean code implementation with modern technologies</p>
+                        </div>
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <h4 className="font-semibold text-gray-900 mb-2">Testing</h4>
+                          <p className="text-sm text-gray-600">Comprehensive testing across devices and browsers</p>
+                        </div>
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <h4 className="font-semibold text-gray-900 mb-2">Deployment</h4>
+                          <p className="text-sm text-gray-600">Optimized deployment with performance monitoring</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -207,7 +275,7 @@ const ProjectDetail = () => {
                       {project.technologies.map((tech, index) => (
                         <span
                           key={index}
-                          className="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm font-medium"
+                          className="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm font-medium hover:bg-primary-200 transition-colors"
                         >
                           {tech}
                         </span>
@@ -226,20 +294,26 @@ const ProjectDetail = () => {
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     Project Info
                   </h3>
-                  <div className="space-y-3">
-                    <div>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
                       <span className="text-sm font-medium text-gray-500">Category</span>
-                      <p className="text-gray-900">{project.category}</p>
+                      <span className="text-gray-900 font-medium">{project.category}</span>
                     </div>
-                    <div>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
                       <span className="text-sm font-medium text-gray-500">Date</span>
-                      <p className="text-gray-900">
+                      <span className="text-gray-900 font-medium">
                         {project.createdAt?.toDate?.()?.toLocaleDateString() || 'Recently'}
-                      </p>
+                      </span>
                     </div>
-                    <div>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
                       <span className="text-sm font-medium text-gray-500">Views</span>
-                      <p className="text-gray-900">{project.views || 0}</p>
+                      <span className="text-gray-900 font-medium">{project.views || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-sm font-medium text-gray-500">Status</span>
+                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                        Live
+                      </span>
                     </div>
                   </div>
                 </motion.div>
@@ -260,10 +334,15 @@ const ProjectDetail = () => {
                         href={project.liveUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center space-x-2 text-primary-600 hover:text-primary-700 transition-colors"
+                        className="flex items-center justify-between p-3 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors group"
                       >
-                        <FaExternalLinkAlt className="w-4 h-4" />
-                        <span>Live Demo</span>
+                        <div className="flex items-center space-x-3">
+                          <FaExternalLinkAlt className="w-4 h-4 text-primary-600" />
+                          <span className="font-medium text-primary-700">Live Demo</span>
+                        </div>
+                        <svg className="w-4 h-4 text-primary-600 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
                       </a>
                     )}
                     {project.githubUrl && (
@@ -271,12 +350,57 @@ const ProjectDetail = () => {
                         href={project.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center space-x-2 text-gray-600 hover:text-gray-700 transition-colors"
+                        className="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
                       >
-                        <FaGithub className="w-4 h-4" />
-                        <span>Source Code</span>
+                        <div className="flex items-center space-x-3">
+                          <FaGithub className="w-4 h-4 text-gray-600" />
+                          <span className="font-medium text-gray-700">Source Code</span>
+                        </div>
+                        <svg className="w-4 h-4 text-gray-600 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
                       </a>
                     )}
+                  </div>
+                </motion.div>
+
+                {/* Share Project */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.7 }}
+                  className="card"
+                >
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Share Project
+                  </h3>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => {
+                        if (navigator.share) {
+                          navigator.share({
+                            title: project.title,
+                            text: project.description,
+                            url: window.location.href,
+                          });
+                        } else {
+                          navigator.clipboard.writeText(window.location.href);
+                          alert('Link copied to clipboard!');
+                        }
+                      }}
+                      className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                    >
+                      Share
+                    </button>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(window.location.href);
+                        alert('Link copied to clipboard!');
+                      }}
+                      className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                    >
+                      Copy Link
+                    </button>
                   </div>
                 </motion.div>
               </div>

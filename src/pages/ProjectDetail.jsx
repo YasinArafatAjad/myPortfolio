@@ -4,8 +4,9 @@ import { motion } from 'framer-motion';
 import { doc, getDoc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { useBusinessNotifications } from '../hooks/useBusinessNotifications';
+import ReviewSystem from '../components/portfolio/ReviewSystem';
 import SEOHead from '../components/SEOHead';
-import { FaArrowLeft, FaExternalLinkAlt, FaGithub, FaEye, FaImage, FaTools } from 'react-icons/fa';
+import { FaArrowLeft, FaExternalLinkAlt, FaGithub, FaEye, FaImage, FaTools, FaStar } from 'react-icons/fa';
 
 /**
  * Project Image Component with fallback handling
@@ -76,7 +77,7 @@ const ProjectImage = ({ project }) => {
 };
 
 /**
- * Project detail page component
+ * Project detail page component with reviews
  */
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -140,7 +141,11 @@ const ProjectDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-20">
-        <div className="spinner"></div>
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full"
+        />
       </div>
     );
   }
@@ -162,13 +167,19 @@ const ProjectDetail = () => {
         {/* Back Navigation */}
         <section className="py-6 bg-gray-50 border-b">
           <div className="container-custom">
-            <Link
-              to="/portfolio"
-              className="inline-flex items-center space-x-2 text-gray-600 hover:text-primary-600 transition-colors"
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
             >
-              <FaArrowLeft className="w-4 h-4" />
-              <span>Back to Portfolio</span>
-            </Link>
+              <Link
+                to="/portfolio"
+                className="inline-flex items-center space-x-2 text-gray-600 hover:text-primary-600 transition-colors group"
+              >
+                <FaArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                <span>Back to Portfolio</span>
+              </Link>
+            </motion.div>
           </div>
         </section>
 
@@ -181,12 +192,13 @@ const ProjectDetail = () => {
               transition={{ duration: 0.8 }}
               className="text-center mb-12"
             >
-              <div className="flex items-center justify-center space-x-4 mb-4">
-                <span className="text-primary-600 font-medium">
+              <div className="flex items-center justify-center space-x-4 mb-4 flex-wrap">
+                <span className="text-primary-600 font-medium bg-primary-50 px-3 py-1 rounded-full">
                   {project.category}
                 </span>
                 {project.featured && (
-                  <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">
+                  <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm flex items-center">
+                    <FaStar className="w-3 h-3 mr-1" />
                     Featured Project
                   </span>
                 )}
@@ -196,7 +208,7 @@ const ProjectDetail = () => {
                     Under Construction
                   </span>
                 )}
-                <div className="flex items-center space-x-1 text-gray-500">
+                <div className="flex items-center space-x-1 text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
                   <FaEye className="w-4 h-4" />
                   <span className="text-sm">{project.views || 0} views</span>
                 </div>
@@ -232,7 +244,7 @@ const ProjectDetail = () => {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.3 }}
-                  className="card"
+                  className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200"
                 >
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">
                     Project Overview
@@ -262,19 +274,19 @@ const ProjectDetail = () => {
                         Development Process
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
                           <h4 className="font-semibold text-gray-900 mb-2">Planning & Design</h4>
                           <p className="text-sm text-gray-600">User research, wireframing, and creating detailed mockups</p>
                         </div>
-                        <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
                           <h4 className="font-semibold text-gray-900 mb-2">Development</h4>
                           <p className="text-sm text-gray-600">Clean code implementation with modern technologies</p>
                         </div>
-                        <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-lg border border-yellow-200">
                           <h4 className="font-semibold text-gray-900 mb-2">Testing</h4>
                           <p className="text-sm text-gray-600">Comprehensive testing across devices and browsers</p>
                         </div>
-                        <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
                           <h4 className="font-semibold text-gray-900 mb-2">Deployment</h4>
                           <p className="text-sm text-gray-600">Optimized deployment with performance monitoring</p>
                         </div>
@@ -292,19 +304,22 @@ const ProjectDetail = () => {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.4 }}
-                    className="card"
+                    className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200"
                   >
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">
                       Technologies Used
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {project.technologies.map((tech, index) => (
-                        <span
+                        <motion.span
                           key={index}
-                          className="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm font-medium hover:bg-primary-200 transition-colors"
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ duration: 0.3, delay: 0.5 + index * 0.05 }}
+                          className="bg-gradient-to-r from-primary-100 to-primary-200 text-primary-700 px-3 py-1 rounded-full text-sm font-medium hover:from-primary-200 hover:to-primary-300 transition-all duration-200 cursor-default"
                         >
                           {tech}
-                        </span>
+                        </motion.span>
                       ))}
                     </div>
                   </motion.div>
@@ -315,7 +330,7 @@ const ProjectDetail = () => {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.5 }}
-                  className="card"
+                  className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200"
                 >
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     Project Info
@@ -358,33 +373,35 @@ const ProjectDetail = () => {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.6 }}
-                  className="card"
+                  className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200"
                 >
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     Project Links
                   </h3>
                   <div className="space-y-3">
                     {project.liveUrl && (
-                      <a
+                      <motion.a
                         href={project.liveUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center space-x-2 text-primary-600 hover:text-primary-700 transition-colors"
+                        className="flex items-center space-x-2 text-primary-600 hover:text-primary-700 transition-colors group"
+                        whileHover={{ x: 4 }}
                       >
                         <FaExternalLinkAlt className="w-4 h-4" />
                         <span>Live Demo</span>
-                      </a>
+                      </motion.a>
                     )}
                     {project.githubUrl && (
-                      <a
+                      <motion.a
                         href={project.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center space-x-2 text-gray-600 hover:text-gray-700 transition-colors"
+                        className="flex items-center space-x-2 text-gray-600 hover:text-gray-700 transition-colors group"
+                        whileHover={{ x: 4 }}
                       >
                         <FaGithub className="w-4 h-4" />
                         <span>Source Code</span>
-                      </a>
+                      </motion.a>
                     )}
                   </div>
                 </motion.div>
@@ -394,13 +411,13 @@ const ProjectDetail = () => {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.7 }}
-                  className="card"
+                  className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200"
                 >
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     Share Project
                   </h3>
                   <div className="flex space-x-2">
-                    <button
+                    <motion.button
                       onClick={() => {
                         if (navigator.share) {
                           navigator.share({
@@ -414,22 +431,39 @@ const ProjectDetail = () => {
                         }
                       }}
                       className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
                       Share
-                    </button>
-                    <button
+                    </motion.button>
+                    <motion.button
                       onClick={() => {
                         navigator.clipboard.writeText(window.location.href);
                         alert('Link copied to clipboard!');
                       }}
                       className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
                       Copy Link
-                    </button>
+                    </motion.button>
                   </div>
                 </motion.div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Reviews Section */}
+        <section className="py-20 bg-white">
+          <div className="container-custom">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+            >
+              <ReviewSystem projectId={project.id} />
+            </motion.div>
           </div>
         </section>
 
@@ -439,7 +473,7 @@ const ProjectDetail = () => {
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.7 }}
+              transition={{ duration: 0.8, delay: 0.9 }}
             >
               <h2 className="text-3xl font-bold mb-6">
                 Interested in Working Together?
@@ -449,18 +483,22 @@ const ProjectDetail = () => {
                 Let's create something amazing together.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  to="/contact"
-                  className="bg-white text-primary-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200"
-                >
-                  Get in Touch
-                </Link>
-                <Link
-                  to="/portfolio"
-                  className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-primary-600 transition-all duration-200"
-                >
-                  View More Projects
-                </Link>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link
+                    to="/contact"
+                    className="bg-white text-primary-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200 inline-block"
+                  >
+                    Get in Touch
+                  </Link>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link
+                    to="/portfolio"
+                    className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-primary-600 transition-all duration-200 inline-block"
+                  >
+                    View More Projects
+                  </Link>
+                </motion.div>
               </div>
             </motion.div>
           </div>

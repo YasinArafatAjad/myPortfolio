@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { Link } from 'react-router-dom';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { getOptimizedImageUrl } from '../config/cloudinary';
+import ProjectCard from '../components/portfolio/ProjectCard';
 import SEOHead from '../components/SEOHead';
-import { FaImage, FaTools } from 'react-icons/fa';
+import { FaImage, FaFilter, FaSearch, FaSort } from 'react-icons/fa';
 
 /**
- * Portfolio page component with filtering and search functionality
+ * Portfolio page component with modern filtering and search functionality
  */
 const Portfolio = () => {
   const [projects, setProjects] = useState([]);
@@ -85,6 +84,8 @@ const Portfolio = () => {
           return new Date(a.createdAt?.toDate?.() || a.createdAt) - new Date(b.createdAt?.toDate?.() || b.createdAt);
         case 'title':
           return a.title.localeCompare(b.title);
+        case 'popular':
+          return (b.views || 0) - (a.views || 0);
         default:
           return 0;
       }
@@ -103,172 +104,6 @@ const Portfolio = () => {
     applyFilters();
   }, [projects, selectedCategory, searchTerm, sortBy]);
 
-  /**
-   * Get image URL with proper fallback handling
-   */
-  const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return null;
-    
-    // If it's already a full URL (Cloudinary or other CDN)
-    if (imageUrl.startsWith('http')) {
-      try {
-        return getOptimizedImageUrl(imageUrl, { width: 400, height: 250 });
-      } catch (error) {
-        console.error('Error optimizing image URL:', error);
-        return imageUrl; // Return original URL if optimization fails
-      }
-    }
-    
-    // If it's a relative path, make it absolute
-    return imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
-  };
-
-  /**
-   * Project card component
-   */
-  const ProjectCard = ({ project, index }) => {
-    const [imageLoaded, setImageLoaded] = useState(false);
-    const [imageError, setImageError] = useState(false);
-    const imageUrl = getImageUrl(project.imageUrl);
-
-    const handleImageLoad = () => {
-      setImageError(false);
-      setImageLoaded(true);
-    };
-
-    const handleImageError = () => {
-      setImageError(true);
-      setImageLoaded(true);
-    };
-
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: index * 0.1 }}
-        className="group ProjectCard overflow-hidden"
-      >
-        {/* Project Image */}
-        <div className="relative overflow-hidden rounded-t-lg mb-4 h-48 bg-gray-100">
-          {/* Loading state */}
-          {!imageLoaded && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-200 animate-pulse">
-              <div className="w-6 h-6 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          )}
-
-          {/* Error/No image state */}
-          {(imageError || !imageUrl) && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 text-gray-500">
-              <FaImage className="w-12 h-12 mb-2" />
-              <span className="text-sm font-medium">{project.title}</span>
-              <span className="text-xs text-gray-400">{project.category}</span>
-            </div>
-          )}
-
-          {/* Actual image */}
-          {imageUrl && (
-            <img
-              src={imageUrl}
-              alt={project.title}
-              className={`w-full h-48 object-cover transition-all duration-300 group-hover:scale-110 ${
-                imageLoaded && !imageError ? 'opacity-100' : 'opacity-0'
-              }`}
-              onLoad={handleImageLoad}
-              onError={handleImageError}
-              loading="lazy"
-            />
-          )}
-
-          {/* Hover overlay */}
-          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-            <Link
-              to={`/portfolio/${project.id}`}
-              className="text-white font-semibold bg-primary-600 px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
-            >
-              View Details
-            </Link>
-          </div>
-        </div>
-
-        {/* Project Info */}
-        <div className='p-6'>
-          <div className="flex items-center justify-between mb-2 ">
-            <span className="text-sm text-primary-600 font-medium">
-              {project.category}
-            </span>
-            <div className="flex items-center space-x-2">
-              {project.featured && (
-                <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
-                  Featured
-                </span>
-              )}
-              {project.underConstruction && (
-                <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full flex items-center">
-                  <FaTools className="w-3 h-3 mr-1" />
-                  Under Construction
-                </span>
-              )}
-            </div>
-          </div>
-          
-          <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
-            <Link to={`/portfolio/${project.id}`}>
-              {project.title}
-            </Link>
-          </h3>
-          
-          <p className="text-gray-600 mb-4 line-clamp-2">
-            {project.description}
-          </p>
-
-          {/* Technologies */}
-          {project.technologies && (
-            <div className="flex flex-wrap gap-2 mb-4">
-              {project.technologies.slice(0, 3).map((tech, techIndex) => (
-                <span
-                  key={techIndex}
-                  className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
-                >
-                  {tech}
-                </span>
-              ))}
-              {project.technologies.length > 3 && (
-                <span className="text-xs text-gray-500">
-                  +{project.technologies.length - 3} more
-                </span>
-              )}
-            </div>
-          )}
-
-          {/* Project Links */}
-          <div className="flex space-x-3">
-            {project.liveUrl && (
-              <a
-                href={project.liveUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary-600 hover:text-primary-700 font-medium text-sm"
-              >
-                Live Demo
-              </a>
-            )}
-            {project.githubUrl && (
-              <a
-                href={project.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-600 hover:text-gray-700 font-medium text-sm"
-              >
-                GitHub
-              </a>
-            )}
-          </div>
-        </div>
-      </motion.div>
-    );
-  };
-
   return (
     <>
       <SEOHead
@@ -279,103 +114,184 @@ const Portfolio = () => {
       
       <div className="pt-20">
         {/* Header Section */}
-        <section ref={headerRef} className="py-20 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
-          <div className="container-custom">
+        <section ref={headerRef} className="py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white relative overflow-hidden">
+          {/* Animated background elements */}
+          <div className="absolute inset-0">
+            <div className="absolute top-20 left-20 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-20 right-20 w-80 h-80 bg-secondary-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          </div>
+          
+          <div className="container-custom relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               animate={headerInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8 }}
               className="text-center"
             >
-              <h1 className="text-5xl md:text-6xl font-bold mb-6">
+              <motion.h1
+                className="text-5xl md:text-6xl font-bold mb-6"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={headerInView ? { opacity: 1, scale: 1 } : {}}
+                transition={{ duration: 0.8, delay: 0.2 }}
+              >
                 My Portfolio
-              </h1>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              </motion.h1>
+              <motion.p
+                className="text-xl text-gray-300 max-w-3xl mx-auto"
+                initial={{ opacity: 0, y: 20 }}
+                animate={headerInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.8, delay: 0.4 }}
+              >
                 Explore my collection of projects showcasing creativity, technical skills, and problem-solving abilities.
-              </p>
+              </motion.p>
             </motion.div>
           </div>
         </section>
 
-        {/* Filters Section */}
-        <section className="py-8 bg-white border-b">
+        {/* Enhanced Filters Section */}
+        <section className="py-8 bg-white border-b shadow-sm sticky top-20 z-40">
           <div className="container-custom">
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
               {/* Search */}
-              <div className="w-full md:w-auto">
-                <input
-                  type="text"
-                  placeholder="Search projects..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="form-input w-full md:w-64"
-                />
-              </div>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+                className="w-full lg:w-auto"
+              >
+                <div className="relative">
+                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="Search projects..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="form-input pl-10 w-full lg:w-80"
+                  />
+                </div>
+              </motion.div>
 
               {/* Category Filter */}
-              <div className="flex flex-wrap gap-2">
-                <button
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="flex flex-wrap gap-2 justify-center"
+              >
+                <motion.button
                   onClick={() => setSelectedCategory('all')}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                     selectedCategory === 'all'
-                      ? 'bg-primary-600 text-white'
+                      ? 'bg-primary-600 text-white shadow-lg'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  All
-                </button>
-                {categories.map(category => (
-                  <button
+                  All Projects
+                </motion.button>
+                {categories.map((category, index) => (
+                  <motion.button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors capitalize ${
+                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 capitalize ${
                       selectedCategory === category
-                        ? 'bg-primary-600 text-white'
+                        ? 'bg-primary-600 text-white shadow-lg'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: 0.1 + index * 0.05 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
                     {category}
-                  </button>
+                  </motion.button>
                 ))}
-              </div>
+              </motion.div>
 
               {/* Sort */}
-              <div className="w-full md:w-auto">
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="form-input w-full md:w-40"
-                >
-                  <option value="newest">Newest First</option>
-                  <option value="oldest">Oldest First</option>
-                  <option value="title">Title A-Z</option>
-                </select>
-              </div>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="w-full lg:w-auto"
+              >
+                <div className="relative">
+                  <FaSort className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="form-input pl-10 w-full lg:w-48"
+                  >
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="title">Title A-Z</option>
+                    <option value="popular">Most Popular</option>
+                  </select>
+                </div>
+              </motion.div>
             </div>
+
+            {/* Results count */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="mt-4 text-center text-gray-600"
+            >
+              {loading ? (
+                'Loading projects...'
+              ) : (
+                `Showing ${filteredProjects.length} of ${projects.length} projects`
+              )}
+            </motion.div>
           </div>
         </section>
 
         {/* Projects Section */}
-        <section className="py-20 bg-gray-100">
+        <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
           <div className="container-custom">
             {loading ? (
               <div className="flex justify-center items-center py-20">
-                <div className="spinner"></div>
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full"
+                />
               </div>
             ) : filteredProjects.length === 0 ? (
-              <div className="text-center py-20">
-                <FaImage className="mx-auto h-16 w-16 text-gray-400 mb-4" />
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="text-center py-20"
+              >
+                <FaImage className="mx-auto h-20 w-20 text-gray-400 mb-6" />
+                <h3 className="text-3xl font-bold text-gray-900 mb-4">
                   No projects found
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-gray-600 text-lg max-w-md mx-auto">
                   {searchTerm || selectedCategory !== 'all'
-                    ? 'Try adjusting your filters or search term.'
+                    ? 'Try adjusting your filters or search term to find what you\'re looking for.'
                     : 'Projects will appear here once they are added.'}
                 </p>
-              </div>
+                {(searchTerm || selectedCategory !== 'all') && (
+                  <motion.button
+                    onClick={() => {
+                      setSearchTerm('');
+                      setSelectedCategory('all');
+                    }}
+                    className="mt-6 btn-primary"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Clear Filters
+                  </motion.button>
+                )}
+              </motion.div>
             ) : (
-              <div className="portfolio-grid ">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredProjects.map((project, index) => (
                   <ProjectCard
                     key={project.id}

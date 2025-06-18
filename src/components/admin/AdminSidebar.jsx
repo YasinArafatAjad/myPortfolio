@@ -10,7 +10,8 @@ import {
   FaEnvelope,
   FaCog,
   FaBell,
-  FaTimes
+  FaTimes,
+  FaStar
 } from 'react-icons/fa';
 
 /**
@@ -23,6 +24,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
     activeProjects: 0,
     unreadMessages: 0,
     unreadNotifications: 0,
+    pendingReviews: 0,
     totalViews: 0
   });
 
@@ -44,6 +46,12 @@ const AdminSidebar = ({ isOpen, onClose }) => {
       label: 'Messages',
       icon: FaEnvelope,
       badge: stats.unreadMessages
+    },
+    {
+      path: '/admin/dashboard/reviews',
+      label: 'Reviews',
+      icon: FaStar,
+      badge: stats.pendingReviews
     },
     {
       path: '/admin/dashboard/notifications',
@@ -75,16 +83,22 @@ const AdminSidebar = ({ isOpen, onClose }) => {
       const notificationsSnapshot = await getDocs(collection(db, 'notifications'));
       const notifications = notificationsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
+      // Fetch reviews
+      const reviewsSnapshot = await getDocs(collection(db, 'reviews'));
+      const reviews = reviewsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
       // Calculate stats
       const activeProjects = projects.filter(p => p.published === true).length;
       const unreadMessages = messages.filter(m => m.read !== true).length;
       const unreadNotifications = notifications.filter(n => n.read !== true).length;
+      const pendingReviews = reviews.filter(r => r.approved !== true).length;
       const totalViews = projects.reduce((sum, p) => sum + (parseInt(p.views) || 0), 0);
 
       setStats({
         activeProjects,
         unreadMessages,
         unreadNotifications,
+        pendingReviews,
         totalViews
       });
     } catch (error) {
@@ -219,6 +233,12 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                 <span>Unread Messages</span>
                 <span className={`font-medium ${stats.unreadMessages > 0 ? 'text-orange-600' : ''}`}>
                   {stats.unreadMessages}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Pending Reviews</span>
+                <span className={`font-medium ${stats.pendingReviews > 0 ? 'text-purple-600' : ''}`}>
+                  {stats.pendingReviews}
                 </span>
               </div>
               <div className="flex justify-between">

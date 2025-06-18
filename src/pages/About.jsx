@@ -20,24 +20,24 @@ const About = () => {
 
   // Experience/Timeline data
   const timeline = [
-    // {
-    //   year: '2023',
-    //   title: 'Senior Full Stack Developer',
-    //   company: 'Tech Company',
-    //   description: 'Led development of multiple web applications using React and Node.js'
-    // },
-    // {
-    //   year: '2022',
-    //   title: 'Frontend Developer',
-    //   company: 'Digital Agency',
-    //   description: 'Created responsive web applications and improved user experiences'
-    // },
-    // {
-    //   year: '2021',
-    //   title: 'Junior Developer',
-    //   company: 'Startup',
-    //   description: 'Learned modern web development practices and contributed to team projects'
-    // }
+    {
+      year: '2023',
+      title: 'Senior Full Stack Developer',
+      company: 'Tech Company',
+      description: 'Led development of multiple web applications using React and Node.js'
+    },
+    {
+      year: '2022',
+      title: 'Frontend Developer',
+      company: 'Digital Agency',
+      description: 'Created responsive web applications and improved user experiences'
+    },
+    {
+      year: '2021',
+      title: 'Junior Developer',
+      company: 'Startup',
+      description: 'Learned modern web development practices and contributed to team projects'
+    }
   ];
 
   return (
@@ -110,10 +110,20 @@ const About = () => {
               >
                 <div className="aspect-square bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl p-8 flex items-center justify-center">
                   <div className="w-full h-full bg-white/10 rounded-xl backdrop-blur-sm flex items-center justify-center">
-                    <span className="text-white text-6xl font-bold">
-                      {/* You can replace this with an actual image */}
-                      {/* 👨‍💻 */}
-                      <img src="../../public/A.png" alt="A" />
+                    <img 
+                      src="/A.png" 
+                      alt="Profile" 
+                      className="w-32 h-32 object-contain"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'block';
+                      }}
+                    />
+                    <span 
+                      className="text-white text-6xl font-bold hidden"
+                      style={{ display: 'none' }}
+                    >
+                      👨‍💻
                     </span>
                   </div>
                 </div>
@@ -121,6 +131,7 @@ const About = () => {
             </div>
           </div>
         </section>
+        
         {/* Skills Section */}
         <section ref={skillsRef} className="py-20 bg-gray-50">
           <div className="container-custom">
@@ -167,6 +178,7 @@ const About = () => {
             </div>
           </div>
         </section>
+        
         {/* Experience Timeline */}
         <section ref={experienceRef} className="py-20">
           <div className="container-custom">
@@ -189,7 +201,7 @@ const About = () => {
                   key={index}
                   initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
                   animate={experienceInView ? { opacity: 1, x: 0 } : {}}
-                  transition={{ duration: 0.8, delay: index * 0.8 }}
+                  transition={{ duration: 0.8, delay: index * 0.2 }}
                   className={`flex items-center mb-12 ${
                     index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'
                   }`}
@@ -217,6 +229,7 @@ const About = () => {
             </div>
           </div>
         </section>
+        
         {/* Call to Action */}
         <section className="py-20 bg-gradient-to-br from-primary-600 to-secondary-600 text-white">
           <div className="container-custom text-center">

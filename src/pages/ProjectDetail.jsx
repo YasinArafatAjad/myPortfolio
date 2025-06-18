@@ -17,6 +17,7 @@ const ProjectDetail = () => {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const { notifyProjectMilestone } = useBusinessNotifications();
 
   /**
@@ -63,6 +64,37 @@ const ProjectDetail = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  /**
+   * Get image URL with fallback
+   */
+  const getImageUrl = (imageUrl) => {
+    if (!imageUrl) return '/placeholder-project.jpg';
+    
+    // If it's already a full URL, return as is
+    if (imageUrl.startsWith('http')) {
+      return getOptimizedImageUrl(imageUrl, { width: 1200, quality: 90 });
+    }
+    
+    // If it's a relative path, make it absolute
+    return imageUrl;
+  };
+
+  /**
+   * Handle image load error
+   */
+  const handleImageError = () => {
+    setImageError(true);
+    setImageLoaded(true);
+  };
+
+  /**
+   * Handle image load success
+   */
+  const handleImageLoad = () => {
+    setImageError(false);
+    setImageLoaded(true);
   };
 
   useEffect(() => {
@@ -137,7 +169,7 @@ const ProjectDetail = () => {
           </div>
         </section>
 
-        {/* Project Image - Fixed Height Issue */}
+        {/* Project Image */}
         <section className="py-12">
           <div className="container-custom">
             <motion.div
@@ -145,6 +177,7 @@ const ProjectDetail = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
               className="relative rounded-2xl overflow-hidden shadow-2xl bg-gray-100"
+              style={{ minHeight: '400px' }}
             >
               {/* Loading placeholder */}
               {!imageLoaded && (
@@ -153,15 +186,29 @@ const ProjectDetail = () => {
                 </div>
               )}
               
+              {/* Error placeholder */}
+              {imageError && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 text-gray-500">
+                  <svg className="w-16 h-16 mb-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-lg font-medium">Project Image</p>
+                  <p className="text-sm">Image could not be loaded</p>
+                </div>
+              )}
+              
+              {/* Main project image */}
               <img
-                src={getOptimizedImageUrl(project.imageUrl, { width: 1200, quality: 90 })}
+                src={getImageUrl(project.imageUrl)}
                 alt={project.title}
                 className={`w-full h-auto max-h-[70vh] object-contain bg-white transition-opacity duration-300 ${
-                  imageLoaded ? 'opacity-100' : 'opacity-0'
+                  imageLoaded && !imageError ? 'opacity-100' : 'opacity-0'
                 }`}
-                onLoad={() => setImageLoaded(true)}
+                onLoad={handleImageLoad}
+                onError={handleImageError}
                 style={{
-                  minHeight: '400px', // Minimum height to prevent layout shift
+                  minHeight: '400px',
+                  maxHeight: '70vh'
                 }}
               />
               

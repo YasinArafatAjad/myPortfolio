@@ -71,9 +71,6 @@ const ProjectImage = ({ project }) => {
           }}
         />
       )}
-      
-      {/* Image Overlay with Project Links */}
-     
     </div>
   );
 };

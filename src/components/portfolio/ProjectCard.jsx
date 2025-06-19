@@ -500,7 +500,7 @@ const ProjectCard = ({ project, index = 0 }) => {
               </Link>
             </motion.div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Decorative corner element */}
         <div className="absolute bottom-0 right-0 w-20 h-20 overflow-hidden">

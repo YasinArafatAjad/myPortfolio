@@ -513,7 +513,6 @@ const ProjectCard = ({ project, index = 0 }) => {
             transition={{ duration: 0.3 }}
           />
         </div>
-      </motion.div>
     </motion.div>
   );
 };

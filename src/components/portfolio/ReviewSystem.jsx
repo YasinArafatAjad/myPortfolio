@@ -347,29 +347,31 @@ const ReviewSystem = ({ projectId }) => {
     try {
       setLoading(true);
       
-      // Use the optimized query with composite index
-      const q = query(
-        collection(db, 'reviews'),
-        where('projectId', '==', projectId),
-        where('approved', '==', true),
-        orderBy('createdAt', 'desc')
-      );
-      
-      const querySnapshot = await getDocs(q);
-      const reviewsData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      
-      setReviews(reviewsData);
-    } catch (error) {
-      console.error('Error fetching reviews:', error);
-      
-      // If there's still an index issue, fall back to a simpler approach
-      if (error.message.includes('index') || error.code === 'failed-precondition') {
-        console.warn('Using fallback query method');
+      // First, try the optimized query with composite index
+      try {
+        const q = query(
+          collection(db, 'reviews'),
+          where('projectId', '==', projectId),
+          where('approved', '==', true),
+          orderBy('createdAt', 'desc')
+        );
         
-        try {
+        const querySnapshot = await getDocs(q);
+        const reviewsData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        
+        setReviews(reviewsData);
+        return; // Success, exit early
+      } catch (indexError) {
+        console.warn('Composite index not available, using fallback query:', indexError.message);
+        
+        // If the error is related to missing index, use fallback
+        if (indexError.code === 'failed-precondition' || 
+            indexError.message.includes('index') || 
+            indexError.message.includes('requires an index')) {
+          
           // Fallback: Query without ordering, then sort in memory
           const fallbackQuery = query(
             collection(db, 'reviews'),
@@ -391,13 +393,14 @@ const ReviewSystem = ({ projectId }) => {
           });
           
           setReviews(reviewsData);
-        } catch (fallbackError) {
-          console.error('Fallback query also failed:', fallbackError);
-          setReviews([]);
+        } else {
+          // If it's a different error, re-throw it
+          throw indexError;
         }
-      } else {
-        setReviews([]);
       }
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+      setReviews([]);
     } finally {
       setLoading(false);
     }

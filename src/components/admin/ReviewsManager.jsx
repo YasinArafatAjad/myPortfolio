@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { collection, getDocs, updateDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useNotification } from '../../contexts/NotificationContext';
-import { FaStar, FaCheck, FaTimes, FaEye, FaTrash, FaUser } from 'react-icons/fa';
+import { FaStar, FaCheck, FaTimes, FaEye, FaTrash, FaUser, FaTrophy, FaQuoteLeft } from 'react-icons/fa';
 
 /**
  * Star Rating Display Component
@@ -95,10 +95,30 @@ const ReviewsManager = () => {
   };
 
   /**
+   * Toggle testimonial status
+   */
+  const toggleTestimonial = async (reviewId, currentStatus) => {
+    try {
+      await updateDoc(doc(db, 'reviews', reviewId), {
+        isTestimonial: !currentStatus
+      });
+      showSuccess(`Review ${!currentStatus ? 'added to' : 'removed from'} testimonials`);
+      fetchReviews();
+    } catch (error) {
+      console.error('Error updating testimonial status:', error);
+      showError('Failed to update testimonial status');
+    }
+  };
+
+  /**
    * Delete review
    */
   const deleteReview = async (reviewId) => {
-   try {
+    if (!window.confirm('Are you sure you want to delete this review?')) {
+      return;
+    }
+
+    try {
       await deleteDoc(doc(db, 'reviews', reviewId));
       showSuccess('Review deleted successfully');
       fetchReviews();
@@ -116,9 +136,13 @@ const ReviewsManager = () => {
 
     // Apply status filter
     if (filterStatus !== 'all') {
-      filtered = filtered.filter(review =>
-        filterStatus === 'approved' ? review.approved : !review.approved
-      );
+      if (filterStatus === 'approved') {
+        filtered = filtered.filter(review => review.approved);
+      } else if (filterStatus === 'pending') {
+        filtered = filtered.filter(review => !review.approved);
+      } else if (filterStatus === 'testimonials') {
+        filtered = filtered.filter(review => review.isTestimonial);
+      }
     }
 
     // Apply sorting
@@ -158,6 +182,7 @@ const ReviewsManager = () => {
   const filteredReviews = getFilteredReviews();
   const pendingCount = reviews.filter(r => !r.approved).length;
   const approvedCount = reviews.filter(r => r.approved).length;
+  const testimonialCount = reviews.filter(r => r.isTestimonial).length;
 
   return (
     <div className="space-y-6">
@@ -165,7 +190,7 @@ const ReviewsManager = () => {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Reviews Management</h1>
         <p className="text-gray-600 mt-1">
-          Manage project reviews and ratings
+          Manage project reviews, ratings, and testimonials
           {pendingCount > 0 && (
             <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
               {pendingCount} pending approval
@@ -175,7 +200,7 @@ const ReviewsManager = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center">
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -211,6 +236,18 @@ const ReviewsManager = () => {
             </div>
           </div>
         </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center">
+            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+              <FaTrophy className="w-6 h-6 text-purple-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Testimonials</p>
+              <p className="text-2xl font-bold text-gray-900">{testimonialCount}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Filters */}
@@ -226,6 +263,7 @@ const ReviewsManager = () => {
               <option value="all">All Reviews</option>
               <option value="approved">Approved</option>
               <option value="pending">Pending Approval</option>
+              <option value="testimonials">Testimonials</option>
             </select>
           </div>
           <div>
@@ -269,7 +307,7 @@ const ReviewsManager = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className={`p-6 hover:bg-gray-50 transition-colors ${
-                  !review.approved ? 'bg-orange-50' : ''
+                  !review.approved ? 'bg-orange-50' : review.isTestimonial ? 'bg-purple-50' : ''
                 }`}
               >
                 <div className="flex items-start justify-between">
@@ -286,11 +324,19 @@ const ReviewsManager = () => {
                           {review.name}
                         </h3>
                         <StarRating rating={review.rating} size="md" />
-                        {!review.approved && (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                            Pending Approval
-                          </span>
-                        )}
+                        <div className="flex items-center space-x-2">
+                          {!review.approved && (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                              Pending Approval
+                            </span>
+                          )}
+                          {review.isTestimonial && (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                              <FaTrophy className="w-3 h-3 mr-1" />
+                              Testimonial
+                            </span>
+                          )}
+                        </div>
                       </div>
                       
                       {/* Email and Project */}
@@ -302,9 +348,14 @@ const ReviewsManager = () => {
                       </div>
                       
                       {/* Comment */}
-                      <p className="text-gray-700 mb-3 leading-relaxed">
-                        {review.comment}
-                      </p>
+                      <div className="relative mb-3">
+                        {review.isTestimonial && (
+                          <FaQuoteLeft className="absolute -top-2 -left-2 w-4 h-4 text-purple-300" />
+                        )}
+                        <p className="text-gray-700 leading-relaxed pl-4">
+                          {review.comment}
+                        </p>
+                      </div>
                       
                       {/* Date */}
                       <p className="text-xs text-gray-500">
@@ -330,6 +381,21 @@ const ReviewsManager = () => {
                         title="Unapprove review"
                       >
                         <FaTimes className="w-4 h-4" />
+                      </button>
+                    )}
+
+                    {/* Testimonial Toggle */}
+                    {review.approved && (
+                      <button
+                        onClick={() => toggleTestimonial(review.id, review.isTestimonial)}
+                        className={`p-2 rounded-lg transition-colors ${
+                          review.isTestimonial
+                            ? 'text-purple-600 hover:bg-purple-50'
+                            : 'text-gray-400 hover:bg-gray-50'
+                        }`}
+                        title={review.isTestimonial ? 'Remove from testimonials' : 'Add to testimonials'}
+                      >
+                        <FaTrophy className="w-4 h-4" />
                       </button>
                     )}
                     

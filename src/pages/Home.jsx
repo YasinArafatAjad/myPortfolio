@@ -7,6 +7,7 @@ import { db } from '../config/firebase';
 import { getOptimizedImageUrl } from '../config/cloudinary';
 import { useSettings } from '../contexts/SettingsContext';
 import SEOHead from '../components/SEOHead';
+import TestimonialSection from '../components/home/TestimonialSection';
 import { FaChevronLeft, FaChevronRight, FaExternalLinkAlt, FaGithub, FaEye } from 'react-icons/fa';
 
 /**
@@ -769,6 +770,9 @@ const Home = () => {
             </section>
           </ParallaxBackground>
         )}
+
+        {/* Testimonials Section */}
+        <TestimonialSection />
 
         {/* About Preview Section with Parallax */}
         <ParallaxBackground offset={0.2}>

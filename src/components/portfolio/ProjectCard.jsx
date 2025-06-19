@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../../config/cloudinary';
 import { getOptimizedImageUrl } from '../../config/cloudinary';
 import { FaImage, FaTools, FaExternalLinkAlt, FaGithub, FaEye, FaStar, FaStarHalfAlt } from 'react-icons/fa';
 
@@ -126,15 +128,54 @@ const ProjectCard = ({ project, index = 0 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [averageRating, setAverageRating] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
   const controls = useAnimation();
-  
-  // Mock review data (in real app, this would come from the project data)
-  const mockReviews = {
-    rating: 4.5 + Math.random() * 0.5, // Random rating between 4.5-5.0
-    count: Math.floor(Math.random() * 50) + 10 // Random count between 10-60
-  };
 
   const imageUrl = getOptimizedImageUrl(project.imageUrl, { width: 400, height: 250 });
+
+  /**
+   * Fetch reviews for this project
+   */
+  const fetchProjectReviews = async () => {
+    try {
+      setReviewsLoading(true);
+      
+      // Query reviews for this specific project that are approved
+      const reviewsQuery = query(
+        collection(db, 'reviews'),
+        where('projectId', '==', project.id),
+        where('approved', '==', true)
+      );
+      
+      const reviewsSnapshot = await getDocs(reviewsQuery);
+      const reviewsData = reviewsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      
+      setReviews(reviewsData);
+      setReviewCount(reviewsData.length);
+      
+      // Calculate average rating
+      if (reviewsData.length > 0) {
+        const totalRating = reviewsData.reduce((sum, review) => sum + review.rating, 0);
+        const avgRating = totalRating / reviewsData.length;
+        setAverageRating(avgRating);
+      } else {
+        setAverageRating(0);
+      }
+    } catch (error) {
+      console.error('Error fetching project reviews:', error);
+      setReviews([]);
+      setReviewCount(0);
+      setAverageRating(0);
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
 
   const handleImageLoad = () => {
     setImageError(false);
@@ -161,6 +202,13 @@ const ProjectCard = ({ project, index = 0 }) => {
       });
     }
   }, [isHovered, controls]);
+
+  // Fetch reviews when component mounts
+  useEffect(() => {
+    if (project.id) {
+      fetchProjectReviews();
+    }
+  }, [project.id]);
 
   return (
     <motion.div
@@ -332,12 +380,27 @@ const ProjectCard = ({ project, index = 0 }) => {
               {project.category}
             </motion.span>
             
+            {/* Real Reviews Rating */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.6 }}
             >
-              <StarRating rating={mockReviews.rating} size="sm" showValue={false} />
+              {reviewsLoading ? (
+                <div className="flex items-center space-x-1">
+                  <div className="w-3 h-3 bg-gray-300 rounded-full animate-pulse"></div>
+                  <div className="w-3 h-3 bg-gray-300 rounded-full animate-pulse"></div>
+                  <div className="w-3 h-3 bg-gray-300 rounded-full animate-pulse"></div>
+                </div>
+              ) : reviewCount > 0 ? (
+                <StarRating rating={averageRating} size="sm" showValue={false} />
+              ) : (
+                <div className="flex items-center space-x-1 text-gray-400">
+                  {[...Array(5)].map((_, i) => (
+                    <FaStar key={i} className="w-3 h-3" />
+                  ))}
+                </div>
+              )}
             </motion.div>
           </div>
           
@@ -398,10 +461,21 @@ const ProjectCard = ({ project, index = 0 }) => {
             className="flex items-center justify-between pt-4 border-t border-gray-100"
           >
             <div className="flex items-center space-x-2">
-              <StarRating rating={mockReviews.rating} size="sm" />
-              <span className="text-sm text-gray-500">
-                ({mockReviews.count} reviews)
-              </span>
+              {reviewsLoading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="w-16 h-4 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="w-12 h-4 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+              ) : reviewCount > 0 ? (
+                <>
+                  <StarRating rating={averageRating} size="sm" />
+                  <span className="text-sm text-gray-500">
+                    ({reviewCount} review{reviewCount !== 1 ? 's' : ''})
+                  </span>
+                </>
+              ) : (
+                <span className="text-sm text-gray-500">No reviews yet</span>
+              )}
             </div>
             
             <motion.div
@@ -425,7 +499,7 @@ const ProjectCard = ({ project, index = 0 }) => {
                 </motion.svg>
               </Link>
             </motion.div>
-          </motion.div>
+          </div>
         </div>
 
         {/* Decorative corner element */}

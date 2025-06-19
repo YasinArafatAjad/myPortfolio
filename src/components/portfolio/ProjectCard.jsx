@@ -313,15 +313,12 @@ const ProjectCard = ({ project, index = 0 }) => {
             
             {/* Real Reviews Rating */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
             >
                {project.featured && (
-              <span
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
+              <span                
                 className="bg-yellow-500 text-white px-3 py-1.5 rounded-full text-xs font-medium shadow-lg"
               >
                 ⭐ Featured

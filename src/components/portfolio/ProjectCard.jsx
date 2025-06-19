@@ -262,9 +262,6 @@ const ProjectCard = ({ project, index = 0 }) => {
               className={`w-full h-56 object-cover transition-all duration-500 ${
                 imageLoaded && !imageError ? 'opacity-100' : 'opacity-0'
               }`}
-              style={{
-                transform: isHovered ? 'scale(1.1)' : 'scale(1)',
-              }}
               onLoad={handleImageLoad}
               onError={handleImageError}
               loading="lazy"

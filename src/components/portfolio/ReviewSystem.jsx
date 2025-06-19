@@ -251,14 +251,14 @@ const ReviewCard = ({ review, index = 0 }) => {
             <h4 className="font-semibold text-gray-900">{review.name}</h4>
             <InteractiveStarRating rating={review.rating} readonly size="sm" />
           </div>
-          
-          <p className="text-gray-600 mb-3 leading-relaxed relative">
-            {review.comment}
+          <div className="text-sm text-gray-500 relative">
+            <p className="text-gray-600 mb-3 leading-relaxed ">
+            {review.comment}            
+          </p>
             <div className="absolute top-0 left-0 text-primary-100">
               <FaQuoteLeft className="w-8 h-8" />
            </div>
-          </p>
-          
+          </div>          
           <div className="text-sm text-gray-500">
             {review.createdAt?.toDate?.()?.toLocaleDateString() || 'Recently'}
           </div>

@@ -113,12 +113,12 @@ const ReviewForm = ({ projectId, onReviewSubmitted }) => {
         ...formData,
         projectId,
         createdAt: serverTimestamp(),
-        approved: false // Reviews need approval before showing
+        approved: true // Auto-approve reviews - no admin approval needed
       };
 
       await addDoc(collection(db, 'reviews'), reviewData);
       
-      showSuccess('Thank you for your review! It will be published after approval.');
+      showSuccess('Thank you for your review! It has been published.');
       
       // Reset form
       setFormData({
@@ -212,10 +212,10 @@ const ReviewForm = ({ projectId, onReviewSubmitted }) => {
           {isSubmitting ? (
             <div className="flex items-center justify-center space-x-2">
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              <span>Submitting...</span>
+              <span>Publishing...</span>
             </div>
           ) : (
-            'Submit Review'
+            'Publish Review'
           )}
         </motion.button>
       </form>
@@ -341,13 +341,14 @@ const ReviewSystem = ({ projectId }) => {
   const [showForm, setShowForm] = useState(false);
 
   /**
-   * Fetch approved reviews for the project
+   * Fetch all approved reviews for the project
    */
   const fetchReviews = async () => {
     try {
       setLoading(true);
       
-      // First, try the optimized query with composite index
+      // Since reviews are now auto-approved, we still filter by approved: true
+      // but all new reviews will have this set to true automatically
       try {
         const q = query(
           collection(db, 'reviews'),
@@ -414,7 +415,8 @@ const ReviewSystem = ({ projectId }) => {
 
   const handleReviewSubmitted = () => {
     setShowForm(false);
-    // Note: Don't refetch reviews immediately since they need approval
+    // Refresh reviews to show the newly published review immediately
+    fetchReviews();
   };
 
   if (loading) {

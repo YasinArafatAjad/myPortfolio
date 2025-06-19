@@ -317,7 +317,16 @@ const ProjectCard = ({ project, index = 0 }) => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.6 }}
             >
-              
+               {project.featured && (
+              <span
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg"
+              >
+                ⭐ Featured
+              </span>
+            )}
             </motion.div>
           </div>
           

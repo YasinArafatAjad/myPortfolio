@@ -4,7 +4,8 @@ import { collection, addDoc, query, where, getDocs, orderBy, serverTimestamp } f
 import { db } from '../../config/firebase';
 import { useNotification } from '../../contexts/NotificationContext';
 import AnimatedReviewFeedback from './AnimatedReviewFeedback';
-import { FaStar, FaUser, FaQuoteLeft, FaPaperPlane, FaSparkles } from 'react-icons/fa';
+import { FaStar, FaUser, FaQuoteLeft, FaPaperPlane } from 'react-icons/fa';
+import { FaSparkles } from 'react-icons/fa6';
 
 /**
  * Interactive Star Rating Component with Enhanced Animations

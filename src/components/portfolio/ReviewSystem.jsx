@@ -254,7 +254,7 @@ const ReviewCard = ({ review, index = 0 }) => {
           
           <p className="text-gray-600 mb-3 leading-relaxed relative">
             {review.comment}
-            <div className="absolute top-4 right-4 text-primary-100">
+            <div className="absolute top-0 left-0 text-primary-100">
               <FaQuoteLeft className="w-8 h-8" />
            </div>
           </p>

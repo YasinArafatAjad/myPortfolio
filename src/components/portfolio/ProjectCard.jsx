@@ -191,7 +191,7 @@ const ProjectCard = ({ project, index = 0 }) => {
     if (isHovered) {
       controls.start({
         y: -8,
-        scale: 1.02,
+        scale: 1,
         transition: { duration: 0.3, ease: "easeOut" }
       });
     } else {

@@ -149,7 +149,7 @@ const Portfolio = () => {
         </section>
 
         {/* Enhanced Filters Section */}
-        <section className="py-8 bg-white border-b shadow-sm sticky top-20 z-40">
+        <section className="py-8 bg-white border-b shadow-sm  top-20 z-40">
           <div className="container-custom">
             <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
               {/* Search */}

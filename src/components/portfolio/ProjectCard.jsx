@@ -270,63 +270,6 @@ const ProjectCard = ({ project, index = 0 }) => {
               loading="lazy"
             />
           )}
-
-          {/* Hover overlay with actions */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isHovered ? 1 : 0 }}
-            transition={{ duration: 0.3 }}
-            className="absolute inset-0 bg-black/60 flex items-center justify-center space-x-4"
-          >
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: isHovered ? 0 : 20, opacity: isHovered ? 1 : 0 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
-            >
-              <Link
-                to={`/portfolio/${project.id}`}
-                className="bg-white text-gray-900 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center space-x-2"
-              >
-                <FaEye className="w-4 h-4" />
-                <span>View Details</span>
-              </Link>
-            </motion.div>
-            
-            <div className="flex space-x-2">
-              {project.liveUrl && (
-                <motion.a
-                  href={project.liveUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-primary-600 text-white p-3 rounded-lg hover:bg-primary-700 transition-colors"
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: isHovered ? 0 : 20, opacity: isHovered ? 1 : 0 }}
-                  transition={{ duration: 0.3, delay: 0.2 }}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <FaExternalLinkAlt className="w-4 h-4" />
-                </motion.a>
-              )}
-              
-              {project.githubUrl && (
-                <motion.a
-                  href={project.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-gray-800 text-white p-3 rounded-lg hover:bg-gray-900 transition-colors"
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: isHovered ? 0 : 20, opacity: isHovered ? 1 : 0 }}
-                  transition={{ duration: 0.3, delay: 0.3 }}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <FaGithub className="w-4 h-4" />
-                </motion.a>
-              )}
-            </div>
-          </motion.div>
-
           {/* Status badges */}
           <div className="absolute top-4 left-4 flex flex-col space-y-2">
             {project.featured && (

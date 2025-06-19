@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../../config/cloudinary';
+import { db } from '../../config/firebase';
 import { getOptimizedImageUrl } from '../../config/cloudinary';
 import { FaImage, FaTools, FaExternalLinkAlt, FaGithub, FaEye, FaStar, FaStarHalfAlt } from 'react-icons/fa';
 
@@ -499,8 +499,8 @@ const ProjectCard = ({ project, index = 0 }) => {
                 </motion.svg>
               </Link>
             </motion.div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
 
         {/* Decorative corner element */}
         <div className="absolute bottom-0 right-0 w-20 h-20 overflow-hidden">

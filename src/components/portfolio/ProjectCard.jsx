@@ -7,7 +7,7 @@ import { getOptimizedImageUrl } from '../../config/cloudinary';
 import { FaImage, FaTools, FaExternalLinkAlt, FaGithub, FaEye, FaStar, FaStarHalfAlt } from 'react-icons/fa';
 
 /**
- * Star Rating Component
+ * Star Rating Display Component
  */
 const StarRating = ({ rating, size = 'sm', showValue = true }) => {
   const fullStars = Math.floor(rating);
@@ -137,13 +137,13 @@ const ProjectCard = ({ project, index = 0 }) => {
   const imageUrl = getOptimizedImageUrl(project.imageUrl, { width: 400, height: 250 });
 
   /**
-   * Fetch reviews for this project
+   * Fetch reviews for this project (now all auto-approved)
    */
   const fetchProjectReviews = async () => {
     try {
       setReviewsLoading(true);
       
-      // Query reviews for this specific project that are approved
+      // Query reviews for this specific project that are approved (all new reviews are auto-approved)
       const reviewsQuery = query(
         collection(db, 'reviews'),
         where('projectId', '==', project.id),

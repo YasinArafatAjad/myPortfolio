@@ -98,11 +98,7 @@ const ReviewsManager = () => {
    * Delete review
    */
   const deleteReview = async (reviewId) => {
-    if (!window.confirm('Are you sure you want to delete this review? This action cannot be undone.')) {
-      return;
-    }
-
-    try {
+   try {
       await deleteDoc(doc(db, 'reviews', reviewId));
       showSuccess('Review deleted successfully');
       fetchReviews();

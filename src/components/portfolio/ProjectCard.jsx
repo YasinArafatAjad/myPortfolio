@@ -272,8 +272,6 @@ const ProjectCard = ({ project, index = 0 }) => {
           )}
           {/* Status badges */}
           <div className="absolute top-4 left-4 flex flex-col space-y-2">
-           
-            
             {project.underConstruction && (
               <motion.span
                 initial={{ x: -20, opacity: 0 }}
@@ -286,7 +284,6 @@ const ProjectCard = ({ project, index = 0 }) => {
               </motion.span>
             )}
           </div>
-
           {/* View count */}
           <div className="absolute top-4 right-4">
             <motion.div
@@ -320,21 +317,7 @@ const ProjectCard = ({ project, index = 0 }) => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.6 }}
             >
-              {reviewsLoading ? (
-                <div className="flex items-center space-x-1">
-                  <div className="w-3 h-3 bg-gray-300 rounded-full animate-pulse"></div>
-                  <div className="w-3 h-3 bg-gray-300 rounded-full animate-pulse"></div>
-                  <div className="w-3 h-3 bg-gray-300 rounded-full animate-pulse"></div>
-                </div>
-              ) : reviewCount > 0 ? (
-                <StarRating rating={averageRating} size="sm" showValue={false} />
-              ) : (
-                <div className="flex items-center space-x-1 text-gray-400">
-                  {[...Array(5)].map((_, i) => (
-                    <FaStar key={i} className="w-3 h-3" />
-                  ))}
-                </div>
-              )}
+              
             </motion.div>
           </div>
           

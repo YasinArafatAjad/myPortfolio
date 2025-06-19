@@ -313,9 +313,9 @@ const ProjectCard = ({ project, index = 0 }) => {
             
             {/* Real Reviews Rating */}
             <motion.div
-              initial={{ x: -20, opacity: 0 }}
+              initial={{ x: 40, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.3, delay: 0.2 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
             >
                {project.featured && (
               <span                

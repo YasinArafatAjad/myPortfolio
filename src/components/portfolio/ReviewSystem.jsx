@@ -252,7 +252,7 @@ const ReviewCard = ({ review, index = 0 }) => {
             <InteractiveStarRating rating={review.rating} readonly size="sm" />
           </div>
           <div className="text-sm text-gray-500 relative">
-            <p className="text-gray-600 mb-3 leading-relaxed ">
+            <p className="text-gray-600 mb-5 ml-10 leading-relaxed ">
             {review.comment}            
           </p>
             <div className="absolute top-0 left-0 text-primary-100">

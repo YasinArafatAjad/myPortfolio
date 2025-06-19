@@ -5,7 +5,6 @@ import { db } from '../../config/firebase';
 import { useNotification } from '../../contexts/NotificationContext';
 import AnimatedReviewFeedback from './AnimatedReviewFeedback';
 import { FaStar, FaUser, FaQuoteLeft, FaPaperPlane } from 'react-icons/fa';
-import { FaSparkles } from 'react-icons/fa6';
 
 /** 
  * Interactive Star Rating Component with Enhanced Animations
@@ -75,7 +74,7 @@ const InteractiveStarRating = ({ rating, onRatingChange, size = 'md', readonly =
                 transition={{ duration: 0.6 }}
                 className="absolute inset-0 pointer-events-none"
               >
-                <FaSparkles className={`${sizeClasses[size]} text-yellow-400`} />
+                <FaStar className={`${sizeClasses[size]} text-yellow-400`} />
               </motion.div>
             )}
           </motion.button>
@@ -218,7 +217,7 @@ const ReviewForm = ({ projectId, onReviewSubmitted }) => {
             className="text-center mb-8"
           >
             <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center justify-center">
-              <FaSparkles className="w-6 h-6 text-yellow-400 mr-2" />
+              <FaStar className="w-6 h-6 text-yellow-400 mr-2" />
               Leave a Review
             </h3>
             <p className="text-gray-600">Share your experience with this project</p>

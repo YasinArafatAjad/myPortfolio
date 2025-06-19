@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaStar, FaCheck, FaHeart, FaRocket, FaThumbsUp } from 'react-icons/fa';
-import { FaSparkles } from 'react-icons/fa6';
 
 /** 
  * Animated Review Submit Feedback Component
@@ -135,7 +134,7 @@ const AnimatedReviewFeedback = ({
                 height: particle.size
               }}
             >
-              <FaSparkles className="w-full h-full" />
+              <FaStar className="w-full h-full" />
             </motion.div>
           ))}
         </div>
@@ -332,7 +331,7 @@ const AnimatedReviewFeedback = ({
             }}
             className="absolute top-4 right-4 w-8 h-8 text-yellow-400/20"
           >
-            <FaSparkles className="w-full h-full" />
+            <FaStar className="w-full h-full" />
           </motion.div>
 
           <motion.div

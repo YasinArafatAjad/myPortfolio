@@ -235,9 +235,7 @@ const ReviewCard = ({ review, index = 0 }) => {
       className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 relative overflow-hidden"
     >
       {/* Decorative quote */}
-      <div className="absolute top-4 right-4 text-primary-100">
-        <FaQuoteLeft className="w-8 h-8" />
-      </div>
+      
       
       <div className="flex items-start space-x-4">
         {/* Avatar */}

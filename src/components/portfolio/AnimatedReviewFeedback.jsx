@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaStar, FaCheck, FaHeart, FaRocket, FaThumbsUp } from 'react-icons/fa';
 import { FaSparkles } from 'react-icons/fa6';
 
-/**
+/** 
  * Animated Review Submit Feedback Component
  * Shows beautiful animations and feedback after review submission
  */

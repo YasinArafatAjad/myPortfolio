@@ -190,7 +190,7 @@ const ProjectCard = ({ project, index = 0 }) => {
   useEffect(() => {
     if (isHovered) {
       controls.start({
-        y: -8,
+        y: 0,
         scale: 1,
         transition: { duration: 0.3, ease: "easeOut" }
       });

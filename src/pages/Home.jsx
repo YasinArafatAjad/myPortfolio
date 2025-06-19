@@ -677,7 +677,7 @@ const Home = () => {
                     to="/contact"
                     className="border-2 border-white text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-white hover:text-primary-600 transition-all duration-300 backdrop-blur-sm inline-block"
                   >
-                    Let's Connect
+                    Message Me
                   </Link>
                 </motion.div>
               </motion.div>

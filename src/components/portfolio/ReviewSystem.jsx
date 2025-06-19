@@ -232,7 +232,7 @@ const ReviewCard = ({ review, index = 0 }) => {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 relative overflow-hidden"
+      className="bg-white rounded-xl shadow-lg p-6 border border-gray-200  overflow-hidden"
     >
       {/* Decorative quote */}
       
@@ -252,11 +252,11 @@ const ReviewCard = ({ review, index = 0 }) => {
             <InteractiveStarRating rating={review.rating} readonly size="sm" />
           </div>
           
-          <p className="text-gray-600 mb-3 leading-relaxed">
+          <p className="text-gray-600 mb-3 leading-relaxed relative">
             {review.comment}
             <div className="absolute top-4 right-4 text-primary-100">
-        <FaQuoteLeft className="w-8 h-8" />
-      </div>
+              <FaQuoteLeft className="w-8 h-8" />
+           </div>
           </p>
           
           <div className="text-sm text-gray-500">

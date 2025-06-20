@@ -159,41 +159,57 @@ const TestimonialSection = () => {
     try {
       setLoading(true);
       
-      // Query for approved reviews that are marked as testimonials
+      // First, try to get all approved reviews without orderBy to avoid composite index requirement
       const q = query(
         collection(db, 'reviews'),
         where('approved', '==', true),
-        where('isTestimonial', '==', true),
-        orderBy('createdAt', 'desc'),
-        limit(10)
+        limit(50) // Get more to filter client-side
       );
       
       const querySnapshot = await getDocs(q);
-      const testimonialsData = querySnapshot.docs.map(doc => {
+      const allApprovedReviews = querySnapshot.docs.map(doc => {
         const data = doc.data();
         return {
           id: doc.id,
           ...data,
           // Get project title if available
-          projectTitle: data.projectTitle || 'Portfolio Project'
+          projectTitle: data.projectTitle || 'Portfolio Project',
+          // Convert Firestore timestamp to Date for sorting
+          createdAt: data.createdAt?.toDate() || new Date()
         };
       });
       
+      // Filter for testimonials and sort client-side
+      const testimonialsData = allApprovedReviews
+        .filter(review => review.isTestimonial === true)
+        .sort((a, b) => b.createdAt - a.createdAt) // Sort by date descending
+        .slice(0, 10); // Limit to 10 testimonials
+      
       setTestimonials(testimonialsData);
+      
     } catch (error) {
       console.error('Error fetching testimonials:', error);
-      // Fallback: try without composite index
+      
+      // Final fallback: try to get any reviews at all
       try {
         const fallbackQuery = query(
           collection(db, 'reviews'),
-          where('approved', '==', true),
-          limit(10)
+          limit(20)
         );
         
         const fallbackSnapshot = await getDocs(fallbackQuery);
         const fallbackData = fallbackSnapshot.docs
-          .map(doc => ({ id: doc.id, ...doc.data() }))
-          .filter(review => review.isTestimonial === true)
+          .map(doc => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              ...data,
+              projectTitle: data.projectTitle || 'Portfolio Project',
+              createdAt: data.createdAt?.toDate() || new Date()
+            };
+          })
+          .filter(review => review.approved === true && review.isTestimonial === true)
+          .sort((a, b) => b.createdAt - a.createdAt)
           .slice(0, 10);
         
         setTestimonials(fallbackData);

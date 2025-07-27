@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import AdminSidebar from '../components/admin/AdminSidebar';
 import AdminHeader from '../components/admin/AdminHeader';
@@ -43,12 +42,7 @@ const AdminDashboard = () => {
           />
 
           {/* Page Content */}
-          <motion.main
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="p-6"
-          >
+          <main className="p-6 animate-fade-in">
             <Routes>
               <Route index element={<Dashboard />} />
               <Route path="projects/*" element={<ProjectsManager />} />
@@ -58,7 +52,7 @@ const AdminDashboard = () => {
               <Route path="settings" element={<SettingsManager />} />
               <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
             </Routes>
-          </motion.main>
+          </main>
         </div>
       </div>
     </>

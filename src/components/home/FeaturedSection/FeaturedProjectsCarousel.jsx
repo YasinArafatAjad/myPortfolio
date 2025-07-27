@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, useAnimation } from "framer-motion";
 import { getOptimizedImageUrl } from "../../../config/cloudinary";
 import {
   FaChevronLeft,
@@ -84,14 +83,7 @@ const FeaturedProjectsCarousel = ({ projects }) => {
             <div className="relative z-10 h-full flex items-center">
               <div className="container-custom">
                 <div className="max-w-2xl text-white">
-                  <motion.div
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{
-                      opacity: index === currentIndex ? 1 : 0,
-                      y: index === currentIndex ? 0 : 50,
-                    }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
-                  >
+                  <div className={`transition-all duration-800 ${index === currentIndex ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
                     <span className="inline-block bg-primary-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
                       {project.category}
                     </span>
@@ -155,7 +147,7 @@ const FeaturedProjectsCarousel = ({ projects }) => {
                         </a>
                       )}
                     </div>
-                  </motion.div>
+                  </div>
                 </div>
               </div>
             </div>

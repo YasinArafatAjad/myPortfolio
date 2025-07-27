@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { FaStar, FaCheck, FaHeart, FaRocket, FaThumbsUp } from 'react-icons/fa';
 
 /** 
@@ -97,166 +96,76 @@ const AnimatedReviewFeedback = ({
   const IconComponent = currentStepData.icon;
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-        onClick={onClose}
-      >
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
         {/* Floating Particles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {particles.map((particle) => (
-            <motion.div
+            <div
               key={particle.id}
-              initial={{ 
-                opacity: 0, 
-                scale: 0,
-                x: `${particle.x}vw`,
-                y: `${particle.y}vh`
-              }}
-              animate={{ 
-                opacity: [0, 1, 0],
-                scale: [0, 1, 0],
-                y: `${particle.y - 20}vh`,
-                rotate: [0, 180, 360]
-              }}
-              transition={{
-                duration: particle.duration,
-                delay: particle.delay,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-              className={`absolute ${particle.color}`}
+              className={`absolute ${particle.color} float-animation`}
               style={{
+                left: `${particle.x}vw`,
+                top: `${particle.y}vh`,
                 width: particle.size,
-                height: particle.size
+                height: particle.size,
+                animationDelay: `${particle.delay}s`,
+                animationDuration: `${particle.duration}s`
               }}
             >
               <FaStar className="w-full h-full" />
-            </motion.div>
+            </div>
           ))}
         </div>
 
         {/* Main Feedback Card */}
-        <motion.div
-          initial={{ scale: 0, rotate: -10 }}
-          animate={{ scale: 1, rotate: 0 }}
-          exit={{ scale: 0, rotate: 10 }}
-          transition={{ 
-            type: "spring", 
-            damping: 15, 
-            stiffness: 300,
-            duration: 0.6
-          }}
-          className="relative bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4 overflow-hidden"
-          onClick={(e) => e.stopPropagation()}
-        >
+        <div className="relative bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4 overflow-hidden animate-slide-up" onClick={(e) => e.stopPropagation()}>
           {/* Animated Background Gradient */}
-          <motion.div
-            key={currentStep}
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 0.1 }}
-            transition={{ duration: 0.8 }}
-            className={`absolute inset-0 bg-gradient-to-br ${currentStepData.color} rounded-3xl`}
-          />
+          <div className={`absolute inset-0 bg-gradient-to-br ${currentStepData.color} rounded-3xl opacity-10 animate-fade-in`} />
 
           {/* Progress Indicator */}
           <div className="relative z-10 mb-6">
             <div className="flex justify-center space-x-2">
               {steps.map((_, index) => (
-                <motion.div
+                <div
                   key={index}
-                  initial={{ scale: 0.8, opacity: 0.3 }}
-                  animate={{ 
-                    scale: index <= currentStep ? 1.2 : 0.8,
-                    opacity: index <= currentStep ? 1 : 0.3,
-                    backgroundColor: index <= currentStep ? '#10B981' : '#E5E7EB'
-                  }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                  className="w-3 h-3 rounded-full"
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    index <= currentStep 
+                      ? 'bg-green-500 scale-125 opacity-100' 
+                      : 'bg-gray-300 scale-100 opacity-30'
+                  }`}
+                  style={{ transitionDelay: `${index * 0.1}s` }}
                 />
               ))}
             </div>
           </div>
 
           {/* Main Icon with Pulse Animation */}
-          <motion.div
-            key={currentStep}
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ 
-              type: "spring", 
-              damping: 10, 
-              stiffness: 200,
-              delay: 0.2 
-            }}
-            className="relative z-10 flex justify-center mb-6"
-          >
-            <motion.div
-              animate={{ 
-                scale: [1, 1.1, 1],
-                boxShadow: [
-                  "0 0 0 0 rgba(59, 130, 246, 0.4)",
-                  "0 0 0 20px rgba(59, 130, 246, 0)",
-                  "0 0 0 0 rgba(59, 130, 246, 0)"
-                ]
-              }}
-              transition={{ 
-                duration: 2, 
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-              className={`w-20 h-20 ${currentStepData.bgColor} rounded-full flex items-center justify-center`}
-            >
+          <div className="relative z-10 flex justify-center mb-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <div className={`w-20 h-20 ${currentStepData.bgColor} rounded-full flex items-center justify-center animate-pulse`}>
               <IconComponent className={`w-10 h-10 ${currentStepData.textColor}`} />
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
 
           {/* Title and Subtitle with Typewriter Effect */}
           <div className="relative z-10 text-center mb-6">
-            <motion.h3
-              key={`title-${currentStep}`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-2xl font-bold text-gray-900 mb-2"
-            >
+            <h3 className="text-2xl font-bold text-gray-900 mb-2 animate-slide-up" style={{ animationDelay: '0.3s' }}>
               {currentStepData.title}
-            </motion.h3>
+            </h3>
             
-            <motion.p
-              key={`subtitle-${currentStep}`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="text-gray-600"
-            >
+            <p className="text-gray-600 animate-fade-in" style={{ animationDelay: '0.5s' }}>
               {currentStepData.subtitle}
-            </motion.p>
+            </p>
           </div>
 
           {/* Review Data Display */}
           {reviewData && currentStep === 1 && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.7 }}
-              className="relative z-10 bg-white/80 backdrop-blur-sm rounded-2xl p-4 mb-6"
-            >
+            <div className="relative z-10 bg-white/80 backdrop-blur-sm rounded-2xl p-4 mb-6 animate-slide-up" style={{ animationDelay: '0.7s' }}>
               <div className="flex items-center justify-center space-x-1 mb-2">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <motion.div
+                  <div
                     key={star}
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ 
-                      duration: 0.3, 
-                      delay: 0.8 + star * 0.1,
-                      type: "spring",
-                      stiffness: 200
-                    }}
+                    className="animate-fade-in"
+                    style={{ animationDelay: `${0.8 + star * 0.1}s` }}
                   >
                     <FaStar 
                       className={`w-6 h-6 ${
@@ -265,92 +174,52 @@ const AnimatedReviewFeedback = ({
                           : 'text-gray-300'
                       }`} 
                     />
-                  </motion.div>
+                  </div>
                 ))}
               </div>
               <p className="text-sm text-gray-600 text-center">
                 "{reviewData.comment?.substring(0, 50)}..."
               </p>
-            </motion.div>
+            </div>
           )}
 
           {/* Success Metrics */}
           {currentStep === 3 && (
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.7 }}
-              className="relative z-10 grid grid-cols-2 gap-4 mb-6"
-            >
+            <div className="relative z-10 grid grid-cols-2 gap-4 mb-6 animate-slide-up" style={{ animationDelay: '0.7s' }}>
               <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 0.5, delay: 1 }}
-                  className="text-2xl font-bold text-green-600"
-                >
+                <div className="text-2xl font-bold text-green-600 animate-fade-in" style={{ animationDelay: '1s' }}>
                   <FaThumbsUp className="w-6 h-6 mx-auto mb-1" />
-                </motion.div>
+                </div>
                 <p className="text-xs text-gray-600">Helpful Review</p>
               </div>
               <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 0.5, delay: 1.2 }}
-                  className="text-2xl font-bold text-blue-600"
-                >
+                <div className="text-2xl font-bold text-blue-600 animate-fade-in" style={{ animationDelay: '1.2s' }}>
                   <FaRocket className="w-6 h-6 mx-auto mb-1" />
-                </motion.div>
+                </div>
                 <p className="text-xs text-gray-600">Now Live</p>
               </div>
-            </motion.div>
+            </div>
           )}
 
           {/* Close Button */}
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 1 }}
+          <button
             onClick={onClose}
-            className="relative z-10 w-full bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105"
+            className="relative z-10 w-full bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 animate-fade-in"
+            style={{ animationDelay: '1s' }}
           >
             Continue Exploring
-          </motion.button>
+          </button>
 
           {/* Decorative Elements */}
-          <motion.div
-            animate={{ 
-              rotate: [0, 360],
-              scale: [1, 1.1, 1]
-            }}
-            transition={{ 
-              duration: 8, 
-              repeat: Infinity,
-              ease: "linear"
-            }}
-            className="absolute top-4 right-4 w-8 h-8 text-yellow-400/20"
-          >
+          <div className="absolute top-4 right-4 w-8 h-8 text-yellow-400/20 float-animation">
             <FaStar className="w-full h-full" />
-          </motion.div>
+          </div>
 
-          <motion.div
-            animate={{ 
-              rotate: [360, 0],
-              scale: [1, 0.8, 1]
-            }}
-            transition={{ 
-              duration: 6, 
-              repeat: Infinity,
-              ease: "linear"
-            }}
-            className="absolute bottom-4 left-4 w-6 h-6 text-pink-400/20"
-          >
+          <div className="absolute bottom-4 left-4 w-6 h-6 text-pink-400/20 float-animation-reverse">
             <FaHeart className="w-full h-full" />
-          </motion.div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+          </div>
+        </div>
+    </div>
   );
 };
 

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotification } from '../contexts/NotificationContext';
@@ -134,12 +133,7 @@ const AdminLogin = () => {
       
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
         <div className="w-full max-w-md">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="bg-white rounded-xl shadow-2xl p-8"
-          >
+          <div className="bg-white rounded-xl shadow-2xl p-8 animate-fade-in">
             {/* Logo and Title */}
             <div className="text-center mb-8">
               {settings.logo ? (
@@ -219,12 +213,10 @@ const AdminLogin = () => {
                 )}
               </div>
 
-              <motion.button
+              <button
                 type="submit"
                 disabled={loading}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className={`w-full btn-primary ${
+                className={`w-full btn-primary hover:scale-105 transition-transform duration-200 ${
                   loading ? 'opacity-75 cursor-not-allowed' : ''
                 }`}
               >
@@ -236,7 +228,7 @@ const AdminLogin = () => {
                 ) : (
                   needsRegistration ? 'Create Admin Account' : 'Sign In'
                 )}
-              </motion.button>
+              </button>
             </form>
 
             {/* Forgot Password Link */}
@@ -278,19 +270,14 @@ const AdminLogin = () => {
                 ← Back to Portfolio
               </a>
             </div>
-          </motion.div>
+          </div>
 
           {/* Security Notice */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="mt-6 text-center"
-          >
+          <div className="mt-6 text-center animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <p className="text-sm text-gray-400">
               🔒 This area is restricted to authorized personnel only
             </p>
-          </motion.div>
+          </div>
         </div>
       </div>
     </>

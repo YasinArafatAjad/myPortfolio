@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 
 /**
  * Optimized image component with lazy loading and WebP support
@@ -68,7 +67,7 @@ const OptimizedImage = ({
           {webp && (
             <source srcSet={webp} type="image/webp" />
           )}
-          <motion.img
+          <img
             src={original}
             alt={alt}
             width={width}
@@ -80,9 +79,6 @@ const OptimizedImage = ({
             className={`w-full h-full object-cover transition-opacity duration-300 ${
               imageLoaded ? 'opacity-100' : 'opacity-0'
             }`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: imageLoaded ? 1 : 0 }}
-            transition={{ duration: 0.3 }}
           />
         </picture>
       )}

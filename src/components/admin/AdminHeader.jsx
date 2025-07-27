@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../config/firebase';
@@ -107,13 +106,9 @@ const AdminHeader = ({ onMenuClick, user }) => {
             >
               <FaBell className="h-5 w-5" />
               {unreadNotifications > 0 && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium"
-                >
+                <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
                   {unreadNotifications > 99 ? '99+' : unreadNotifications}
-                </motion.span>
+                </span>
               )}
             </button>
 
@@ -132,45 +127,38 @@ const AdminHeader = ({ onMenuClick, user }) => {
               </button>
 
               {/* User dropdown */}
-              <AnimatePresence>
-                {userMenuOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
-                  >
-                    <div className="p-4 border-b border-gray-200">
-                      <p className="text-sm font-medium text-gray-900">
-                        {user?.email?.split('@')[0] || 'Admin'}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {user?.email}
-                      </p>
-                    </div>
-                    <div className="py-2">
-                      <Link
-                        to="/admin/dashboard/settings"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      >
-                        <FaCog className="mr-3 h-4 w-4" />
-                        Settings
-                      </Link>
-                      <button
-                        onClick={() => {
-                          setUserMenuOpen(false);
-                          handleLogout();
-                        }}
-                        className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                      >
-                        <FaSignOutAlt className="mr-3 h-4 w-4" />
-                        Sign out
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {userMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                  <div className="p-4 border-b border-gray-200">
+                    <p className="text-sm font-medium text-gray-900">
+                      {user?.email?.split('@')[0] || 'Admin'}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {user?.email}
+                    </p>
+                  </div>
+                  <div className="py-2">
+                    <Link
+                      to="/admin/dashboard/settings"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      <FaCog className="mr-3 h-4 w-4" />
+                      Settings
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        handleLogout();
+                      }}
+                      className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      <FaSignOutAlt className="mr-3 h-4 w-4" />
+                      Sign out
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

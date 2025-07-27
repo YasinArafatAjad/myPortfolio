@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   collection,
   addDoc,
@@ -60,26 +59,15 @@ const InteractiveStarRating = ({
       {[1, 2, 3, 4, 5].map((star) => {
         const isActive = star <= (hoverRating || rating);
         return (
-          <motion.button
+          <button
             key={star}
             type="button"
             onClick={() => handleStarClick(star)}
             onMouseEnter={() => handleStarHover(star)}
             className={`${
               readonly ? "cursor-default" : "cursor-pointer"
-            } transition-all duration-200 relative`}
+            } transition-all duration-200 relative hover:scale-110`}
             disabled={readonly}
-            whileHover={readonly ? {} : { scale: 1.2, rotate: 5 }}
-            whileTap={readonly ? {} : { scale: 0.9 }}
-            animate={
-              isAnimating && star <= rating
-                ? {
-                    scale: [1, 1.3, 1],
-                    rotate: [0, 15, 0],
-                  }
-                : {}
-            }
-            transition={{ duration: 0.3, delay: star * 0.05 }}
           >
             <FaStar
               className={`${sizeClasses[size]} transition-all duration-200 ${
@@ -87,16 +75,11 @@ const InteractiveStarRating = ({
               }`}
             />
             {isActive && !readonly && (
-              <motion.div
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1.5, opacity: 0 }}
-                transition={{ duration: 0.6 }}
-                className="absolute inset-0 pointer-events-none"
-              >
+              <div className="absolute inset-0 pointer-events-none animate-ping">
                 <FaStar className={`${sizeClasses[size]} text-yellow-400`} />
-              </motion.div>
+              </div>
             )}
-          </motion.button>
+          </button>
         );
       })}
     </div>
@@ -230,32 +213,12 @@ const ReviewForm = ({ projectId, projectTitle, onReviewSubmitted }) => {
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200 relative overflow-hidden"
-      >
+      <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200 relative overflow-hidden animate-fade-in">
         {/* Animated Background Gradient */}
-        <motion.div
-          animate={{
-            background: [
-              "linear-gradient(45deg, #f3f4f6, #e5e7eb)",
-              "linear-gradient(45deg, #dbeafe, #bfdbfe)",
-              "linear-gradient(45deg, #f3f4f6, #e5e7eb)",
-            ],
-          }}
-          transition={{ duration: 4, repeat: Infinity }}
-          className="absolute inset-0 opacity-30"
-        />
+        <div className="absolute inset-0 opacity-30 bg-gradient-to-br from-gray-100 to-blue-100" />
 
         <div className="relative z-10">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-8"
-          >
+          <div className="text-center mb-8 animate-fade-in">
             <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center justify-center">
               <FaStar className="w-6 h-6 text-yellow-400 mr-2" />
               Leave a Review
@@ -263,7 +226,7 @@ const ReviewForm = ({ projectId, projectTitle, onReviewSubmitted }) => {
             <p className="text-gray-600">
               Share your experience with this project
             </p>
-          </motion.div>
+          </div>
 
           {/* Progress Bar */}
           <div className="mb-8">
@@ -276,27 +239,16 @@ const ReviewForm = ({ projectId, projectTitle, onReviewSubmitted }) => {
               </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{
-                  width: `${((currentStep + 1) / formSteps.length) * 100}%`,
-                }}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
-                className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full"
+              <div
+                className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-500 ease-in-out"
+                style={{ width: `${((currentStep + 1) / formSteps.length) * 100}%` }}
               />
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentStep}
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -50 }}
-                transition={{ duration: 0.3 }}
-                className="min-h-[120px]"
-              >
+            <div className="min-h-[120px] transition-all duration-300">
+              <div key={currentStep} className="animate-slide-up">
                 {formSteps[currentStep].type === "rating" ? (
                   <div className="text-center">
                     <label className="block text-lg font-semibold text-gray-900 mb-4">
@@ -309,11 +261,7 @@ const ReviewForm = ({ projectId, projectTitle, onReviewSubmitted }) => {
                         size="lg"
                       />
                     </div>
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: formData.rating > 0 ? 1 : 0 }}
-                      className="text-sm text-gray-600"
-                    >
+                    <p className={`text-sm text-gray-600 transition-opacity duration-300 ${formData.rating > 0 ? 'opacity-100' : 'opacity-0'}`}>
                       {formData.rating > 0 && (
                         <>
                           {formData.rating === 5 && "Outstanding! 🌟"}
@@ -323,7 +271,7 @@ const ReviewForm = ({ projectId, projectTitle, onReviewSubmitted }) => {
                           {formData.rating === 1 && "Could be better 💭"}
                         </>
                       )}
-                    </motion.p>
+                    </p>
                   </div>
                 ) : (
                   <div>
@@ -331,7 +279,7 @@ const ReviewForm = ({ projectId, projectTitle, onReviewSubmitted }) => {
                       {formSteps[currentStep].label} *
                     </label>
                     {formSteps[currentStep].type === "textarea" ? (
-                      <motion.textarea
+                      <textarea
                         name={formSteps[currentStep].field}
                         value={formData[formSteps[currentStep].field]}
                         onChange={handleInputChange}
@@ -347,10 +295,9 @@ const ReviewForm = ({ projectId, projectTitle, onReviewSubmitted }) => {
                         }`}
                         placeholder={formSteps[currentStep].placeholder}
                         required
-                        whileFocus={{ scale: 1.02 }}
                       />
                     ) : (
-                      <motion.input
+                      <input
                         type={formSteps[currentStep].type}
                         name={formSteps[currentStep].field}
                         value={formData[formSteps[currentStep].field]}
@@ -366,17 +313,16 @@ const ReviewForm = ({ projectId, projectTitle, onReviewSubmitted }) => {
                         }`}
                         placeholder={formSteps[currentStep].placeholder}
                         required
-                        whileFocus={{ scale: 1.02 }}
                       />
                     )}
                   </div>
                 )}
-              </motion.div>
-            </AnimatePresence>
+              </div>
+            </div>
 
             {/* Navigation Buttons */}
             <div className="flex justify-between items-center pt-6">
-              <motion.button
+              <button
                 type="button"
                 onClick={prevStep}
                 disabled={currentStep === 0}
@@ -385,14 +331,12 @@ const ReviewForm = ({ projectId, projectTitle, onReviewSubmitted }) => {
                     ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                 }`}
-                whileHover={currentStep > 0 ? { scale: 1.05 } : {}}
-                whileTap={currentStep > 0 ? { scale: 0.95 } : {}}
               >
                 Previous
-              </motion.button>
+              </button>
 
               {currentStep < formSteps.length - 1 ? (
-                <motion.button
+                <button
                   type="button"
                   onClick={nextStep}
                   disabled={!isStepValid(currentStep)}
@@ -401,13 +345,11 @@ const ReviewForm = ({ projectId, projectTitle, onReviewSubmitted }) => {
                       ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700"
                       : "bg-gray-100 text-gray-400 cursor-not-allowed"
                   }`}
-                  whileHover={isStepValid(currentStep) ? { scale: 1.05 } : {}}
-                  whileTap={isStepValid(currentStep) ? { scale: 0.95 } : {}}
                 >
                   Next
-                </motion.button>
+                </button>
               ) : (
-                <motion.button
+                <button
                   type="submit"
                   disabled={isSubmitting || !isStepValid(currentStep)}
                   className={`px-8 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2 ${
@@ -415,28 +357,10 @@ const ReviewForm = ({ projectId, projectTitle, onReviewSubmitted }) => {
                       ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                       : "bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700"
                   }`}
-                  whileHover={
-                    !isSubmitting && isStepValid(currentStep)
-                      ? { scale: 1.05 }
-                      : {}
-                  }
-                  whileTap={
-                    !isSubmitting && isStepValid(currentStep)
-                      ? { scale: 0.95 }
-                      : {}
-                  }
                 >
                   {isSubmitting ? (
                     <>
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{
-                          duration: 1,
-                          repeat: Infinity,
-                          ease: "linear",
-                        }}
-                        className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                      />
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       <span>Publishing...</span>
                     </>
                   ) : (
@@ -445,12 +369,12 @@ const ReviewForm = ({ projectId, projectTitle, onReviewSubmitted }) => {
                       <span>Publish Review</span>
                     </>
                   )}
-                </motion.button>
+                </button>
               )}
             </div>
           </form>
         </div>
-      </motion.div>
+      </div>
 
       {/* Animated Feedback Modal */}
       <AnimatedReviewFeedback
@@ -468,28 +392,20 @@ const ReviewForm = ({ projectId, projectTitle, onReviewSubmitted }) => {
  */
 const ReviewCard = ({ review, index = 0 }) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.1 }}
-      whileHover={{ y: -3 }}
-      className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 overflow-hidden w-[80%] lg:w-[65%] mx-auto relative"
+    <div
+      className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 overflow-hidden w-[80%] lg:w-[65%] mx-auto relative hover:-translate-y-1 transition-transform duration-300 animate-fade-in"
+      style={{ animationDelay: `${index * 0.1}s` }}
     >
       {/* top line */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" />
 
       <div className="flex flex-col md:flex-row items-start gap-x-4 gap-y-2">
         {/* Avatar */}
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.5, delay: index * 0.1 + 0.2 }}
-          className="flex-shrink-0"
-        >
+        <div className="flex-shrink-0 animate-fade-in" style={{ animationDelay: `${index * 0.1 + 0.2}s` }}>
           <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
             <FaUser className="w-6 h-6 text-white" />
           </div>
-        </motion.div>
+        </div>
 
         {/* Review content */}
         <div className="flex-1">
@@ -504,31 +420,21 @@ const ReviewCard = ({ review, index = 0 }) => {
             </div>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: index * 0.1 + 0.5 }}
-            className="text-sm text-gray-500 relative mb-4"
-          >
+          <div className="text-sm text-gray-500 relative mb-4 animate-fade-in" style={{ animationDelay: `${index * 0.1 + 0.5}s` }}>
             <div className="absolute top-0 left-0 text-primary-100">
               <FaQuoteLeft className="w-8 h-8" />
             </div>
             <p className="text-gray-600 leading-relaxed ml-10">
               {review.comment}
             </p>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: index * 0.1 + 0.6 }}
-            className="text-sm text-gray-500"
-          >
+          <div className="text-sm text-gray-500 animate-fade-in" style={{ animationDelay: `${index * 0.1 + 0.6}s` }}>
             {review.createdAt?.toDate?.()?.toLocaleDateString() || "Recently"}
-          </motion.div>
+          </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -550,24 +456,9 @@ const ReviewsSummary = ({ reviews }) => {
   });
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200 relative overflow-hidden"
-    >
+    <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200 relative overflow-hidden animate-fade-in">
       {/* Animated background */}
-      <motion.div
-        animate={{
-          background: [
-            "linear-gradient(45deg, #f8fafc, #f1f5f9)",
-            "linear-gradient(45deg, #fef3c7, #fde68a)",
-            "linear-gradient(45deg, #f8fafc, #f1f5f9)",
-          ],
-        }}
-        transition={{ duration: 6, repeat: Infinity }}
-        className="absolute inset-0 opacity-30"
-      />
+      <div className="absolute inset-0 opacity-30 bg-gradient-to-br from-gray-50 to-yellow-100" />
 
       <div className="relative z-10">
         <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center flex items-center justify-center">
@@ -578,44 +469,28 @@ const ReviewsSummary = ({ reviews }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Overall rating */}
           <div className="text-center">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.8, type: "spring", stiffness: 100 }}
-              className="text-5xl font-bold text-gray-900 mb-4"
-            >
+            <div className="text-5xl font-bold text-gray-900 mb-4 animate-fade-in">
               {averageRating.toFixed(1)}
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-            >
+            </div>
+            <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
               <InteractiveStarRating
                 rating={averageRating}
                 readonly
                 size="lg"
               />
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="text-sm text-gray-600 mt-3"
-            >
+            </div>
+            <div className="text-sm text-gray-600 mt-3 animate-slide-up" style={{ animationDelay: '0.5s' }}>
               Based on {totalReviews} review{totalReviews !== 1 ? "s" : ""}
-            </motion.div>
+            </div>
           </div>
 
           {/* Rating distribution */}
           <div className="space-y-3">
             {ratingDistribution.map(({ rating, count, percentage }, index) => (
-              <motion.div
+              <div
                 key={rating}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
-                className="flex items-center space-x-3"
+                className="flex items-center space-x-3 animate-slide-up"
+                style={{ animationDelay: `${0.7 + index * 0.1}s` }}
               >
                 <div className="flex items-center space-x-1 w-16">
                   <span className="text-sm text-gray-600 font-medium">
@@ -625,23 +500,25 @@ const ReviewsSummary = ({ reviews }) => {
                 </div>
 
                 <div className="flex-1 bg-gray-200 rounded-full h-3 overflow-hidden">
-                  <motion.div
+                  <div
                     className="bg-gradient-to-r from-yellow-400 to-orange-500 h-3 rounded-full"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${percentage}%` }}
-                    transition={{ duration: 1, delay: 1 + index * 0.1 }}
+                    style={{ 
+                      width: `${percentage}%`,
+                      transition: 'width 1s ease-in-out',
+                      transitionDelay: `${1 + index * 0.1}s`
+                    }}
                   />
                 </div>
 
                 <span className="text-sm text-gray-600 w-8 font-medium">
                   {count}
                 </span>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -732,11 +609,7 @@ const ReviewSystem = ({ projectId, projectTitle }) => {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"
-        />
+        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -761,34 +634,22 @@ const ReviewSystem = ({ projectId, projectTitle }) => {
       </div>
 
       {/* Review Form */}
-      <AnimatePresence>
-        {showForm && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-          >
-            <ReviewForm
-              projectId={projectId}
-              projectTitle={projectTitle}
-              onReviewSubmitted={handleReviewSubmitted}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {showForm && (
+        <div className="animate-slide-up">
+          <ReviewForm
+            projectId={projectId}
+            projectTitle={projectTitle}
+            onReviewSubmitted={handleReviewSubmitted}
+          />
+        </div>
+      )}
 
       {/* Reviews List */}
       {reviews.length > 0 ? (
         <div className="space-y-6">
-          <motion.h3
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-2xl font-bold text-gray-900 text-center"
-          >
+          <h3 className="text-2xl font-bold text-gray-900 text-center animate-fade-in">
             Customer Reviews ({reviews.length})
-          </motion.h3>
+          </h3>
           <div className="grid grid-cols-1 gap-6">
             {reviews.map((review, index) => (
               <ReviewCard key={review.id} review={review} index={index} />
@@ -796,29 +657,17 @@ const ReviewSystem = ({ projectId, projectTitle }) => {
           </div>
         </div>
       ) : (
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center py-16 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl"
-        >
-          <motion.div
-            animate={{
-              scale: [1, 1.1, 1],
-              rotate: [0, 5, -5, 0],
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="text-gray-400 mb-6"
-          >
+        <div className="text-center py-16 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl animate-fade-in">
+          <div className="text-gray-400 mb-6 float-animation">
             <FaStar className="w-16 h-16 mx-auto" />
-          </motion.div>
+          </div>
           <h3 className="text-2xl font-bold text-gray-900 mb-3">
             No reviews yet
           </h3>
           <p className="text-gray-600 text-lg">
             Be the first to share your thoughts about this project!
           </p>
-        </motion.div>
+        </div>
       )}
     </div>
   );

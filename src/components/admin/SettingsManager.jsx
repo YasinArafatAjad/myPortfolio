@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { useSettings } from "../../contexts/SettingsContext";
 import { useNotification } from "../../contexts/NotificationContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -423,11 +422,7 @@ const SettingsManager = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* General Settings */}
         {activeTab === "general" && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
-          >
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 animate-fade-in">
             <h2 className="text-lg font-semibold text-gray-900 mb-6">
               General Settings
             </h2>
@@ -545,16 +540,12 @@ const SettingsManager = () => {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Branding Settings */}
         {activeTab === "branding" && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
-          >
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 animate-fade-in">
             <h2 className="text-lg font-semibold text-gray-900 mb-6">
               Branding
             </h2>
@@ -588,16 +579,12 @@ const SettingsManager = () => {
                 )}
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* SEO Settings */}
         {activeTab === "seo" && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
-          >
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 animate-fade-in">
             <h2 className="text-lg font-semibold text-gray-900 mb-6">
               SEO Settings
             </h2>
@@ -668,16 +655,12 @@ const SettingsManager = () => {
                 placeholder="Verification meta tag content"
               />
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Security Settings */}
         {activeTab === "security" && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
-          >
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 animate-fade-in">
             <h2 className="text-lg font-semibold text-gray-900 mb-6">
               Security Settings
             </h2>
@@ -838,7 +821,7 @@ const SettingsManager = () => {
                 <li>• Never share your admin credentials</li>
               </ul>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Save Button - Only show for non-security tabs */}

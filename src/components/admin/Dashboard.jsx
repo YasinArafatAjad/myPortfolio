@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { FaProjectDiagram, FaEnvelope, FaEye, FaChartLine } from 'react-icons/fa';
@@ -80,12 +79,7 @@ const Dashboard = () => {
    * Stat card component
    */
   const StatCard = ({ title, value, icon: Icon, color, change }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="bg-white rounded-xl shadow-sm p-6 border border-gray-200"
-    >
+    <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-gray-600">{title}</p>
@@ -100,7 +94,7 @@ const Dashboard = () => {
           <Icon className="w-6 h-6 text-white" />
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 
   if (loading) {
@@ -154,12 +148,7 @@ const Dashboard = () => {
       {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Projects */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="bg-white rounded-xl shadow-sm border border-gray-200"
-        >
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 animate-fade-in">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900">Recent Projects</h3>
@@ -213,15 +202,10 @@ const Dashboard = () => {
               </div>
             )}
           </div>
-        </motion.div>
+        </div>
 
         {/* Recent Messages */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="bg-white rounded-xl shadow-sm border border-gray-200"
-        >
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 animate-fade-in">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900">Recent Messages</h3>
@@ -266,16 +250,11 @@ const Dashboard = () => {
               </div>
             )}
           </div>
-        </motion.div>
+        </div>
       </div>
 
       {/* Quick Actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-        className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
-      >
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 animate-fade-in">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link
@@ -302,7 +281,7 @@ const Dashboard = () => {
             <span>Check Messages</span>
           </Link>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

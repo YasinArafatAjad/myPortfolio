@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../config/firebase';
@@ -69,12 +68,7 @@ const ForgotPassword = () => {
       
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
         <div className="w-full max-w-md">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="bg-white rounded-xl shadow-2xl p-8"
-          >
+          <div className="bg-white rounded-xl shadow-2xl p-8 animate-fade-in">
             {/* Back to Login Link */}
             <div className="mb-6">
               <Link
@@ -130,12 +124,10 @@ const ForgotPassword = () => {
                   </div>
                 </div>
 
-                <motion.button
+                <button
                   type="submit"
                   disabled={loading}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className={`w-full btn-primary ${
+                  className={`w-full btn-primary hover:scale-105 transition-transform duration-200 ${
                     loading ? 'opacity-75 cursor-not-allowed' : ''
                   }`}
                 >
@@ -147,16 +139,11 @@ const ForgotPassword = () => {
                   ) : (
                     'Send Reset Email'
                   )}
-                </motion.button>
+                </button>
               </form>
             ) : (
               /* Success Message */
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="text-center"
-              >
+              <div className="text-center animate-fade-in">
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <FaEnvelope className="w-8 h-8 text-green-600" />
                 </div>
@@ -180,7 +167,7 @@ const ForgotPassword = () => {
                     Try again with different email
                   </button>
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {/* Additional Help */}
@@ -205,19 +192,14 @@ const ForgotPassword = () => {
                 ← Back to Portfolio
               </a>
             </div>
-          </motion.div>
+          </div>
 
           {/* Security Notice */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="mt-6 text-center"
-          >
+          <div className="mt-6 text-center animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <p className="text-sm text-gray-400">
               🔒 Password reset links expire after 1 hour for security
             </p>
-          </motion.div>
+          </div>
         </div>
       </div>
     </>

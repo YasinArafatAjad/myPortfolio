@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 /**
  * Notification context for managing app notifications
@@ -52,13 +51,7 @@ const Notification = ({ notification, onClose }) => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 300 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 300 }}
-      transition={{ duration: 0.3 }}
-      className={getNotificationStyles(notification.type)}
-    >
+    <div className={`${getNotificationStyles(notification.type)} animate-slide-up`}>
       <div className="flex items-start justify-between">
         <div className="flex items-start">
           <span className="text-lg mr-3 flex-shrink-0">
@@ -83,7 +76,7 @@ const Notification = ({ notification, onClose }) => {
           ✕
         </button>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -205,15 +198,13 @@ export const NotificationProvider = ({ children }) => {
       {/* Notification container */}
       <div className="fixed top-4 right-4 z-50 pointer-events-none">
         <div className="pointer-events-auto">
-          <AnimatePresence>
-            {notifications.map(notification => (
-              <Notification
-                key={notification.id}
-                notification={notification}
-                onClose={() => removeNotification(notification.id)}
-              />
-            ))}
-          </AnimatePresence>
+          {notifications.map(notification => (
+            <Notification
+              key={notification.id}
+              notification={notification}
+              onClose={() => removeNotification(notification.id)}
+            />
+          ))}
         </div>
       </div>
     </NotificationContext.Provider>

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { motion, useAnimation } from "framer-motion";
 import { Link } from "react-router-dom";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../config/firebase";
@@ -96,40 +95,36 @@ const AnimatedLines = () => {
         </defs>
 
         {/* Curved lines */}
-        <motion.path
+        <path
           d="M0,150 Q100,50 200,150 T400,150"
           stroke="url(#line-gradient-1)"
           strokeWidth="2"
           fill="none"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
-          transition={{ duration: 2, ease: "easeInOut" }}
+          className="animate-fade-in"
         />
 
-        <motion.path
+        <path
           d="M0,200 Q150,100 300,200 T400,100"
           stroke="url(#line-gradient-2)"
           strokeWidth="1.5"
           fill="none"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
-          transition={{ duration: 2.5, delay: 0.5, ease: "easeInOut" }}
+          className="animate-fade-in"
+          style={{ animationDelay: '0.5s' }}
         />
 
         {/* Geometric shapes */}
-        <motion.circle
+        <circle
           cx="350"
           cy="50"
           r="30"
           stroke="url(#line-gradient-1)"
           strokeWidth="1"
           fill="none"
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 0.3 }}
-          transition={{ duration: 1, delay: 1 }}
+          className="animate-fade-in opacity-30"
+          style={{ animationDelay: '1s' }}
         />
 
-        <motion.rect
+        <rect
           x="20"
           y="20"
           width="40"
@@ -138,9 +133,8 @@ const AnimatedLines = () => {
           strokeWidth="1"
           fill="none"
           rx="8"
-          initial={{ rotate: 0, opacity: 0 }}
-          animate={{ rotate: 45, opacity: 0.2 }}
-          transition={{ duration: 1.5, delay: 0.8 }}
+          className="animate-fade-in opacity-20"
+          style={{ animationDelay: '0.8s', transform: 'rotate(45deg)' }}
         />
       </svg>
     </div>
@@ -156,7 +150,6 @@ const ProjectCard = ({ project, index = 0 }) => {
   const [reviewsLoading, setReviewsLoading] = useState(true);
   const [averageRating, setAverageRating] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
-  const controls = useAnimation();
 
   const imageUrl = getOptimizedImageUrl(project.imageUrl, {
     width: 400,
@@ -215,21 +208,6 @@ const ProjectCard = ({ project, index = 0 }) => {
     setImageLoaded(true);
   };
 
-  useEffect(() => {
-    if (isHovered) {
-      controls.start({
-        y: 0,
-        scale: 1,
-        transition: { duration: 0.3, ease: "easeOut" },
-      });
-    } else {
-      controls.start({
-        y: 0,
-        scale: 1,
-        transition: { duration: 0.3, ease: "easeOut" },
-      });
-    }
-  }, [isHovered, controls]);
 
   // Fetch reviews when component mounts
   useEffect(() => {
@@ -239,18 +217,13 @@ const ProjectCard = ({ project, index = 0 }) => {
   }, [project.id]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="group relative"
+    <div
+      className="group relative animate-fade-in"
+      style={{ animationDelay: `${index * 0.1}s` }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <motion.div
-        animate={controls}
-        className="relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100"
-      >
+      <div className="relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100">
         {/* Animated background lines */}
         <AnimatedLines />
         {/* Gradient overlay */}
@@ -261,28 +234,18 @@ const ProjectCard = ({ project, index = 0 }) => {
           {/* Status badges */}
           <div className="absolute top-4 left-4 flex flex-col space-y-2">
             {project.underConstruction && (
-              <motion.span
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center shadow-lg"
-              >
+              <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center shadow-lg animate-slide-up" style={{ animationDelay: '0.3s' }}>
                 <FaTools className="w-3 h-3 mr-1" />
                 In Progress
-              </motion.span>
+              </span>
             )}
           </div>
           {/* View count */}
           <div className="absolute top-4 right-4">
-            <motion.div
-              initial={{ x: 20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="bg-black/70 text-white px-3 py-1 rounded-full text-xs flex items-center space-x-1 backdrop-blur-sm"
-            >
+            <div className="bg-black/70 text-white px-3 py-1 rounded-full text-xs flex items-center space-x-1 backdrop-blur-sm animate-slide-up" style={{ animationDelay: '0.4s' }}>
               <FaEye className="w-3 h-3" />
               <span>{project.views || 0}</span>
-            </motion.div>
+            </div>
           </div>
           {/* Project image with Fallback */}
           {!project.imageUrl || project.imageUrl === "" ? (
@@ -305,84 +268,52 @@ const ProjectCard = ({ project, index = 0 }) => {
         <div className="p-6 relative z-10">
           {/* Category  */}
           <div className="flex items-center justify-between min-h-[2.5rem] mb-3">
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-              className="text-sm text-primary-600 font-semibold uppercase tracking-wide"
-            >
+            <span className="text-sm text-primary-600 font-semibold uppercase tracking-wide animate-fade-in" style={{ animationDelay: '0.5s' }}>
               Category: {project.category}
-            </motion.span>
+            </span>
 
             {/* Featured Badge */}
             {project.featured && (
-              <motion.span
-                initial={{ x: 40, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="flex gap-1 items-center bg-green-400 text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-lg"
-              >
+              <span className="flex gap-1 items-center bg-green-400 text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-lg animate-slide-up">
                 <GiEmptyHourglass size={20} /> <span>Featured</span>
-              </motion.span>
+              </span>
             )}
           </div>
 
           {/* Title */}
-          <motion.h3
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.7 }}
-            className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors line-clamp-2"
-          >
+          <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors line-clamp-2 animate-slide-up" style={{ animationDelay: '0.7s' }}>
             <Link to={`/portfolio/${project.id}`}>{project.title}</Link>
-          </motion.h3>
+          </h3>
 
           {/* Description */}
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.8 }}
-            className="text-gray-600 mb-4 line-clamp-2 leading-relaxed"
-          >
+          <p className="text-gray-600 mb-4 line-clamp-2 leading-relaxed animate-fade-in" style={{ animationDelay: '0.8s' }}>
             {project.description}
-          </motion.p>
+          </p>
 
           {/* Technologies */}
           {project.technologies && project.technologies.length > 0 ? (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.9 }}
-              className="flex flex-wrap gap-2 mb-4"
-            >
+            <div className="flex flex-wrap gap-2 mb-4 animate-slide-up" style={{ animationDelay: '0.9s' }}>
               {project.technologies.slice(0, 3).map((tech, techIndex) => (
-                <motion.span
+                <span
                   key={techIndex}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3, delay: 1 + techIndex * 0.1 }}
-                  className="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs font-medium hover:from-primary-100 hover:to-primary-200 hover:text-primary-700 transition-all duration-200"
+                  className="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs font-medium hover:from-primary-100 hover:to-primary-200 hover:text-primary-700 transition-all duration-200 animate-fade-in"
+                  style={{ animationDelay: `${1 + techIndex * 0.1}s` }}
                 >
                   {tech}
-                </motion.span>
+                </span>
               ))}
               {project.technologies.length > 3 && (
                 <span className="text-xs text-gray-500 flex items-center">
                   +{project.technologies.length - 3} more
                 </span>
               )}
-            </motion.div>
+            </div>
           ) : (
             <div className="h-[1.6rem] mb-4" /> // to balance card height
           )}
 
           {/* Reviews and Rating */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 1.1 }}
-            className="flex items-center justify-between pt-4 border-t border-gray-100"
-          >
+          <div className="flex items-center justify-between pt-4 border-t border-gray-100 animate-fade-in" style={{ animationDelay: '1.1s' }}>
             <div className="flex items-center space-x-2">
               {reviewsLoading ? (
                 <div className="flex items-center space-x-2">
@@ -401,19 +332,18 @@ const ProjectCard = ({ project, index = 0 }) => {
               )}
             </div>
 
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <div className="hover:scale-105 transition-transform duration-200">
               <Link
                 to={`/portfolio/${project.id}`}
                 className="text-primary-600 hover:text-primary-700 font-medium text-sm flex items-center space-x-1 transition-colors"
               >
                 <span>Learn More</span>
-                <motion.svg
+                <svg
                   className="w-4 h-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
-                  animate={{ x: isHovered ? 4 : 0 }}
-                  transition={{ duration: 0.2 }}
+                  style={{ transform: isHovered ? 'translateX(4px)' : 'translateX(0)' }}
                 >
                   <path
                     strokeLinecap="round"
@@ -421,13 +351,13 @@ const ProjectCard = ({ project, index = 0 }) => {
                     strokeWidth={2}
                     d="M9 5l7 7-7 7"
                   />
-                </motion.svg>
+                </svg>
               </Link>
-            </motion.div>
+            </div>
           </motion.div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 };
 

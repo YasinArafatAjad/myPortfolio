@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Routes, Route, useNavigate, Link, useParams } from 'react-router-dom';
 import {
   collection,
@@ -227,10 +226,8 @@ const MessagesList = () => {
         ) : (
           <div className="divide-y divide-gray-200">
             {getFilteredMessages().map((message) => (
-              <motion.div
+              <div
                 key={message.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
                 className={`p-6 border-b hover:bg-gray-50 cursor-pointer transition-colors ${!message.read ? 'bg-blue-50' : ''
                   }`}
                 onClick={() => handleMessageClick(message)}
@@ -293,7 +290,7 @@ const MessagesList = () => {
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
 

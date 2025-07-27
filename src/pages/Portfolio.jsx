@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
@@ -122,29 +121,14 @@ const Portfolio = () => {
           </div>
           
           <div className="container-custom relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={headerInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8 }}
-              className="text-center"
-            >
-              <motion.h1
-                className="text-5xl md:text-6xl font-bold mb-6"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={headerInView ? { opacity: 1, scale: 1 } : {}}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              >
+            <div className={`text-center ${headerInView ? 'animate-fade-in' : 'opacity-0'}`}>
+              <h1 className={`text-5xl md:text-6xl font-bold mb-6 ${headerInView ? 'animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '0.2s' }}>
                 My Portfolio
-              </motion.h1>
-              <motion.p
-                className="text-xl text-gray-300 max-w-3xl mx-auto"
-                initial={{ opacity: 0, y: 20 }}
-                animate={headerInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.4 }}
-              >
+              </h1>
+              <p className={`text-xl text-gray-300 max-w-3xl mx-auto ${headerInView ? 'animate-slide-up' : 'opacity-0'}`} style={{ animationDelay: '0.4s' }}>
                 Explore my collection of projects showcasing creativity, technical skills, and problem-solving abilities.
-              </motion.p>
-            </motion.div>
+              </p>
+            </div>
           </div>
         </section>
 
@@ -153,12 +137,7 @@ const Portfolio = () => {
           <div className="container-custom">
             <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
               {/* Search */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
-                className="w-full lg:w-auto"
-              >
+              <div className="w-full lg:w-auto animate-slide-up">
                 <div className="relative">
                   <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <input
@@ -169,29 +148,22 @@ const Portfolio = () => {
                     className="form-input pl-10 w-full lg:w-80"
                   />
                 </div>
-              </motion.div>
+              </div>
 
               {/* Category Filter */}
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="flex flex-wrap gap-2 justify-center"
-              >
-                <motion.button
+              <div className="flex flex-wrap gap-2 justify-center animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                <button
                   onClick={() => setSelectedCategory('all')}
                   className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                     selectedCategory === 'all'
                       ? 'bg-primary-600 text-white shadow-lg'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
                 >
                   All Projects
-                </motion.button>
+                </button>
                 {categories.map((category, index) => (
-                  <motion.button
+                  <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
                     className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 capitalize ${
@@ -199,24 +171,14 @@ const Portfolio = () => {
                         ? 'bg-primary-600 text-white shadow-lg'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: 0.1 + index * 0.05 }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
                   >
                     {category}
-                  </motion.button>
+                  </button>
                 ))}
-              </motion.div>
+              </div>
 
               {/* Sort */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="w-full lg:w-auto"
-              >
+              <div className="w-full lg:w-auto animate-slide-up" style={{ animationDelay: '0.2s' }}>
                 <div className="relative">
                   <FaSort className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <select
@@ -230,22 +192,17 @@ const Portfolio = () => {
                     <option value="popular">Most Popular</option>
                   </select>
                 </div>
-              </motion.div>
+              </div>
             </div>
 
             {/* Results count */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="mt-4 text-center text-gray-600"
-            >
+            <div className="mt-4 text-center text-gray-600 animate-fade-in" style={{ animationDelay: '0.3s' }}>
               {loading ? (
                 'Loading projects...'
               ) : (
                 `Showing ${filteredProjects.length} of ${projects.length} projects`
               )}
-            </motion.div>
+            </div>
           </div>
         </section>
 
@@ -254,19 +211,10 @@ const Portfolio = () => {
           <div className="container-custom">
             {loading ? (
               <div className="flex justify-center items-center py-20">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full"
-                />
+                <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin" />
               </div>
             ) : filteredProjects.length === 0 ? (
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                className="text-center py-20"
-              >
+              <div className="text-center py-20 animate-fade-in">
                 <FaImage className="mx-auto h-20 w-20 text-gray-400 mb-6" />
                 <h3 className="text-3xl font-bold text-gray-900 mb-4">
                   No projects found
@@ -277,19 +225,17 @@ const Portfolio = () => {
                     : 'Projects will appear here once they are added.'}
                 </p>
                 {(searchTerm || selectedCategory !== 'all') && (
-                  <motion.button
+                  <button
                     onClick={() => {
                       setSearchTerm('');
                       setSelectedCategory('all');
                     }}
-                    className="mt-6 btn-primary"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    className="mt-6 btn-primary hover:scale-105 transition-transform duration-200"
                   >
                     Clear Filters
-                  </motion.button>
+                  </button>
                 )}
-              </motion.div>
+              </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredProjects.map((project, index) => (

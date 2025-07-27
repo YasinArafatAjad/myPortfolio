@@ -12,7 +12,6 @@ export default defineConfig({
           // Vendor chunks
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'firebase-vendor': ['firebase/app', 'firebase/auth', 'firebase/firestore'],
-          'animation-vendor': ['framer-motion'],
           'ui-vendor': ['react-intersection-observer', 'react-helmet-async'],
           
           // Admin chunks (loaded only when needed)
@@ -50,7 +49,6 @@ export default defineConfig({
       'react',
       'react-dom',
       'react-router-dom',
-      'framer-motion',
       'react-intersection-observer'
     ],
     exclude: [

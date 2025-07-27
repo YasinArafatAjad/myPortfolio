@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   collection,
   query,
@@ -177,22 +176,8 @@ const NotificationCenter = ({ isOpen, onClose, maxNotifications = 10 }) => {
   if (!isOpen) return null;
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-end p-4"
-        onClick={onClose}
-      >
-        <motion.div
-          initial={{ x: 400, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: 400, opacity: 0 }}
-          transition={{ type: "spring", damping: 25, stiffness: 200 }}
-          className="bg-white rounded-lg shadow-2xl w-full max-w-md max-h-[80vh] overflow-hidden"
-          onClick={(e) => e.stopPropagation()}
-        >
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-end p-4" onClick={onClose}>
+      <div className="bg-white rounded-lg shadow-2xl w-full max-w-md max-h-[80vh] overflow-hidden animate-slide-up" onClick={(e) => e.stopPropagation()}>
           {/* Header */}
           <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
@@ -284,10 +269,8 @@ const NotificationCenter = ({ isOpen, onClose, maxNotifications = 10 }) => {
                               >
                                 <FaCheck size={20} />
                               </button>
-
+                  <div
                             <button
-                              onClick={(e) => {
-                                e.stopPropagation();
                                 deleteNotification(notification.id);
                               }}
                               className="text-red-600 hover:text-red-700  bg-gray-300/30 p-2 rounded-full hover:bg-gray-300/50 transition-all ease-out duration-300"
@@ -313,14 +296,13 @@ const NotificationCenter = ({ isOpen, onClose, maxNotifications = 10 }) => {
                   (window.location.href = "/admin/dashboard/notifications")
                 }
                 className="text-sm text-primary-600 hover:text-primary-700 font-medium"
-              >
+                  </div>
                 View All Notifications
               </button>
             </div>
           )}
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+      </div>
+    </div>
   );
 };
 

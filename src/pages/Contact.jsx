@@ -129,7 +129,7 @@ const Contact = () => {
       
       <div className="pt-20">
         {/* Header Section */}
-        <section ref={headerRef} className="py-20 bg-gradient-to-br from-primary-600 to-secondary-600 text-white">
+        <section ref={headerRef} className="py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
           <div className="container-custom">
             <motion.div
               initial={{ opacity: 0, y: 50 }}
@@ -232,10 +232,10 @@ const Contact = () => {
                               href={url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="w-10 h-10 bg-gray-100 hover:bg-primary-100 rounded-lg flex items-center justify-center transition-colors group"
+                              className="px-4 py-3 bg-gray-100 hover:bg-primary-100 rounded-lg flex items-center justify-center transition-colors group"
                             >
                               <span className="text-gray-600 group-hover:text-primary-600 capitalize">
-                                {platform.charAt(0).toUpperCase()}
+                                {platform.toUpperCase()}
                               </span>
                             </a>
                           );

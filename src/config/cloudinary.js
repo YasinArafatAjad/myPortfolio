@@ -95,7 +95,7 @@ export const deleteFromCloudinary = async (publicId) => {
   try {
     // This would typically be done on the server side for security
     // For now, we'll just return true
-    console.log('Delete image:', publicId);
+    // console.log('Delete image:', publicId);
     return true;
   } catch (error) {
     console.error('Cloudinary delete error:', error);

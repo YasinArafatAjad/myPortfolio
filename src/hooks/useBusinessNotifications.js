@@ -30,7 +30,7 @@ export const useBusinessNotifications = () => {
             const hasCreatedToday = await notificationService.hasDailySummaryForToday();
             
             if (!hasCreatedToday) {
-              console.log('Creating daily summary at 7:00 PM...');
+              // console.log('Creating daily summary at 7:00 PM...');
               await notificationService.generateDailyActivitySummary();
               localStorage.setItem('lastDailySummary', today);
             } else {
@@ -83,7 +83,7 @@ export const useBusinessNotifications = () => {
 
     // Schedule first daily summary check
     const timeUntil7PM = getTimeUntilNext7PM();
-    console.log(`Next daily summary scheduled in ${Math.round(timeUntil7PM / (1000 * 60 * 60))} hours`);
+    // console.log(`Next daily summary scheduled in ${Math.round(timeUntil7PM / (1000 * 60 * 60))} hours`);
     
     const initialDailySummaryTimeout = setTimeout(() => {
       checkDailySummary();

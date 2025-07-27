@@ -22,14 +22,14 @@ export const useSettings = () => {
  * Default settings object
  */
 const defaultSettings = {
-  siteName: 'My Portfolio',
+  siteName: '',
   siteDescription: 'Professional portfolio website showcasing my work and skills',
-  siteKeywords: 'portfolio, web developer, designer, creative',
+  siteKeywords: 'portfolio, web developer, designer, creative, Yasin , Arafat , Ajad , Azad , আজাদ , ইয়াসিন , আরাফাত, আরাফত , আজদ, ইসিন, araft arfat , arft, ajd',
   logo: '',
-  favicon: '/favicon.ico',
+  favicon: '/LogoBlack.png',
   primaryColor: '#3b82f6',
   secondaryColor: '#06b6d4',
-  contactEmail: 'contact@example.com',
+  contactEmail: 'yasinarafatazad173@gmail.com',
   socialLinks: {
     github: '',
     linkedin: '',
@@ -133,9 +133,7 @@ export const SettingsProvider = ({ children }) => {
       head.appendChild(createFaviconLink('apple-touch-icon', null, logoUrl));
       
       // Shortcut icon for older browsers
-      head.appendChild(createFaviconLink('shortcut icon', 'image/x-icon', logoUrl));
-      
-      console.log('Favicon updated successfully to:', logoUrl);
+      head.appendChild(createFaviconLink('shortcut icon', 'image/x-icon', logoUrl));      
     } catch (error) {
       console.error('Error updating favicon:', error);
     }

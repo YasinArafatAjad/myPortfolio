@@ -32,7 +32,7 @@ const Footer = () => {
                   src={settings.logo}
                   alt={settings.siteName}
                   className="h-16 w-16 object-contain"
-                  loading="lazy"
+                   
                 />
               ) : (
                 <div className="h-8 w-8 bg-primary-600 rounded-lg flex items-center justify-center">
@@ -130,7 +130,7 @@ const Footer = () => {
               © {currentYear} {settings.siteName}. All rights reserved.
             </div>
             <div className="flex items-center text-gray-400 text-sm">
-              <span>Made with <span className="mx-2 text-red-500 h-4 w-4" >Yasin Arafat Ajad</span></span>
+              <span>Developed by <span className="mx-2 text-red-500 h-4 w-4" >Yasin Arafat Ajad</span></span>
             </div>
           </div>
         </div>

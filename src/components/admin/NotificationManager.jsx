@@ -14,7 +14,7 @@ const NotificationManager = () => {
   const [filterType, setFilterType] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
 
-  const { showSuccess, showError } = useNotification();
+  // const { showSuccess, showError } = useNotification();
 
   /**
    * Fetch notifications from Firestore
@@ -57,7 +57,7 @@ const NotificationManager = () => {
       await updateDoc(doc(db, 'notifications', notificationId), {
         read: !currentStatus
       });
-      showSuccess(`Notification marked as ${!currentStatus ? 'read' : 'unread'}`);
+      // showSuccess(`Notification marked as ${!currentStatus ? 'read' : 'unread'}`);
       fetchNotifications();
     } catch (error) {
       console.error('Error updating notification:', error);
@@ -96,7 +96,7 @@ const NotificationManager = () => {
       );
       
       await Promise.all(updatePromises);
-      showSuccess('All notifications marked as read');
+      // showSuccess('All notifications marked as read');
       fetchNotifications();
     } catch (error) {
       console.error('Error marking all as read:', error);
@@ -317,9 +317,9 @@ const NotificationManager = () => {
                       title={notification.read ? 'Mark as unread' : 'Mark as read'}
                     >
                       {notification.read ? (
-                        <FaBell className="w-4 h-4" />
+                        <FaBell className="w-6 h-6" />
                       ) : (
-                        <FaCheck className="w-4 h-4" />
+                        <FaCheck className="w-6 h-6" />
                       )}
                     </button>
                     <button
@@ -327,7 +327,7 @@ const NotificationManager = () => {
                       className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       title="Delete notification"
                     >
-                      <FaTrash className="w-4 h-4" />
+                      <FaTrash className="w-6 h-6" />
                     </button>
                   </div>
                 </div>

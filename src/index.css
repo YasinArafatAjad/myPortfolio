@@ -2,23 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom scrollbar styles */
+/* Custom scrollbar styles matching orange & red theme */
 ::-webkit-scrollbar {
   width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #fff7f3; /* very light warm tone */
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: #fd7014; /* primary orange */
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: #ef4444; /* secondary red for hover */
 }
+
 
 /* Smooth scrolling */
 html {
@@ -41,7 +42,7 @@ body {
 img {
   max-width: 100%;
   height: auto;
-  loading: lazy;
+  /* loading: lazy; */
 }
 
 /* Custom animation classes */
@@ -55,9 +56,8 @@ img {
 
 /* Utility classes */
 .container-custom {
-  max-width: 1200px;
+  width: 90%;
   margin: 0 auto;
-  padding: 0 1rem;
 }
 
 /* Loading spinner */

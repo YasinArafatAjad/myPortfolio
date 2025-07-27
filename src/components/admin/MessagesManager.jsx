@@ -278,7 +278,7 @@ const MessagesList = () => {
                         className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         title="Reply"
                       >
-                        <FaReply />
+                        <FaReply size={20}/>
                       </button>
                       <button
                         onClick={(e) => {
@@ -288,7 +288,7 @@ const MessagesList = () => {
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Delete"
                       >
-                        <FaTrash />
+                        <FaTrash size={20}/>
                       </button>
                     </div>
                   </div>

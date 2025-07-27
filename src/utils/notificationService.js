@@ -309,12 +309,12 @@ class NotificationService {
       // Double-check that we haven't already created a summary today
       const hasExisting = await this.hasDailySummaryForToday();
       if (hasExisting) {
-        console.log('Daily summary already exists for today, skipping...');
+        // console.log('Daily summary already exists for today, skipping...');
         return;
       }
 
       const now = new Date();
-      console.log(`Generating daily activity summary at ${now.toLocaleTimeString()}`);
+      // console.log(`Generating daily activity summary at ${now.toLocaleTimeString()}`);
 
       const today = new Date();
       const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -350,7 +350,7 @@ class NotificationService {
         publishedProjects
       }, 'daily');
 
-      console.log('Daily activity summary created successfully at 7:00 PM');
+      // console.log('Daily activity summary created successfully at 7:00 PM');
 
     } catch (error) {
       console.error('Error generating daily activity summary:', error);

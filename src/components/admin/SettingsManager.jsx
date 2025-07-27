@@ -232,25 +232,16 @@ const SettingsManager = () => {
 
     try {
       setChangingPassword(true);
-
-      console.log('Starting password change process...');
-      console.log('Current user:', currentUser.email);
-
       // Re-authenticate user with current password
       const credential = EmailAuthProvider.credential(
         currentUser.email,
         securityData.currentPassword
       );
       
-      console.log('Re-authenticating user...');
       await reauthenticateWithCredential(currentUser, credential);
-      console.log('Re-authentication successful');
       
       // Update password
-      console.log('Updating password...');
-      await updatePassword(currentUser, securityData.newPassword);
-      console.log('Password updated successfully');
-      
+      await updatePassword(currentUser, securityData.newPassword);      
       showSuccess('Password updated successfully');
       
       // Clear form

@@ -1,21 +1,30 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { collection, query, orderBy, limit, onSnapshot, updateDoc, doc, deleteDoc } from 'firebase/firestore';
-import { db } from '../../config/firebase';
-import { useNotification } from '../../contexts/NotificationContext';
-import { 
-  FaBell, 
-  FaEnvelope, 
-  FaTrophy, 
-  FaTools, 
-  FaChartLine, 
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  collection,
+  query,
+  orderBy,
+  limit,
+  onSnapshot,
+  updateDoc,
+  doc,
+  deleteDoc,
+} from "firebase/firestore";
+import { db } from "../../config/firebase";
+import { useNotification } from "../../contexts/NotificationContext";
+import {
+  FaBell,
+  FaEnvelope,
+  FaTrophy,
+  FaTools,
+  FaChartLine,
   FaShieldAlt,
   FaDatabase,
   FaProjectDiagram,
   FaTimes,
   FaCheck,
-  FaEye
-} from 'react-icons/fa';
+  FaTrash
+} from "react-icons/fa";
 
 /**
  * Notification Center Component - Real-time notification display
@@ -23,7 +32,7 @@ import {
 const NotificationCenter = ({ isOpen, onClose, maxNotifications = 10 }) => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { showSuccess, showError } = useNotification();
+  // const { showSuccess, showError } = useNotification();
 
   /**
    * Get icon for notification category
@@ -37,9 +46,9 @@ const NotificationCenter = ({ isOpen, onClose, maxNotifications = 10 }) => {
       project: FaProjectDiagram,
       performance: FaChartLine,
       security: FaShieldAlt,
-      backup: FaDatabase
+      backup: FaDatabase,
     };
-    
+
     return icons[category] || FaBell;
   };
 
@@ -47,15 +56,15 @@ const NotificationCenter = ({ isOpen, onClose, maxNotifications = 10 }) => {
    * Get notification color scheme
    */
   const getNotificationStyle = (type, read) => {
-    const baseStyle = read ? 'opacity-75' : '';
-    
+    const baseStyle = read ? "opacity-75" : "";
+
     const styles = {
       success: `bg-green-50 border-green-200 text-green-800 ${baseStyle}`,
       error: `bg-red-50 border-red-200 text-red-800 ${baseStyle}`,
       warning: `bg-yellow-50 border-yellow-200 text-yellow-800 ${baseStyle}`,
-      info: `bg-blue-50 border-blue-200 text-blue-800 ${baseStyle}`
+      info: `bg-blue-50 border-blue-200 text-blue-800 ${baseStyle}`,
     };
-    
+
     return styles[type] || styles.info;
   };
 
@@ -64,13 +73,12 @@ const NotificationCenter = ({ isOpen, onClose, maxNotifications = 10 }) => {
    */
   const markAsRead = async (notificationId) => {
     try {
-      await updateDoc(doc(db, 'notifications', notificationId), {
-        read: true
+      await updateDoc(doc(db, "notifications", notificationId), {
+        read: true,
       });
-      showSuccess('Notification marked as read');
     } catch (error) {
-      console.error('Error marking notification as read:', error);
-      showError('Failed to mark notification as read');
+      console.error("Error marking notification as read:", error);
+      showError("Failed to mark notification as read");
     }
   };
 
@@ -79,10 +87,10 @@ const NotificationCenter = ({ isOpen, onClose, maxNotifications = 10 }) => {
    */
   const deleteNotification = async (notificationId) => {
     try {
-      await deleteDoc(doc(db, 'notifications', notificationId));
+      await deleteDoc(doc(db, "notifications", notificationId));
     } catch (error) {
-      console.error('Error deleting notification:', error);
-      showError('Failed to delete notification');
+      console.error("Error deleting notification:", error);
+      showError("Failed to delete notification");
     }
   };
 
@@ -90,21 +98,21 @@ const NotificationCenter = ({ isOpen, onClose, maxNotifications = 10 }) => {
    * Format notification time
    */
   const formatTime = (timestamp) => {
-    if (!timestamp) return 'Just now';
-    
+    if (!timestamp) return "Just now";
+
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
     const now = new Date();
     const diff = now - date;
-    
+
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
-    
-    if (minutes < 1) return 'Just now';
+
+    if (minutes < 1) return "Just now";
     if (minutes < 60) return `${minutes}m ago`;
     if (hours < 24) return `${hours}h ago`;
     if (days < 7) return `${days}d ago`;
-    
+
     return date.toLocaleDateString();
   };
 
@@ -113,19 +121,19 @@ const NotificationCenter = ({ isOpen, onClose, maxNotifications = 10 }) => {
    */
   const handleNotificationAction = (notification) => {
     const { category, metadata } = notification;
-    
+
     switch (category) {
-      case 'contact':
+      case "contact":
         if (metadata?.messageId) {
           window.location.href = `/admin/dashboard/messages/${metadata.messageId}`;
         }
         break;
-      case 'project':
+      case "project":
         if (metadata?.projectId) {
           window.location.href = `/admin/dashboard/projects/edit/${metadata.projectId}`;
         }
         break;
-      case 'milestone':
+      case "milestone":
         if (metadata?.projectId) {
           window.location.href = `/portfolio/${metadata.projectId}`;
         }
@@ -143,22 +151,22 @@ const NotificationCenter = ({ isOpen, onClose, maxNotifications = 10 }) => {
     if (!isOpen) return;
 
     const q = query(
-      collection(db, 'notifications'),
-      orderBy('createdAt', 'desc'),
+      collection(db, "notifications"),
+      orderBy("createdAt", "desc"),
       limit(maxNotifications)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const notificationsData = snapshot.docs.map(doc => {
+      const notificationsData = snapshot.docs.map((doc) => {
         const data = doc.data();
         // Exclude any numeric 'id' field from the document data and use the actual document ID
         const { id: _, ...cleanData } = data;
         return {
           id: doc.id, // Use the actual Firestore document ID
-          ...cleanData
+          ...cleanData,
         };
       });
-      
+
       setNotifications(notificationsData);
       setLoading(false);
     });
@@ -193,9 +201,9 @@ const NotificationCenter = ({ isOpen, onClose, maxNotifications = 10 }) => {
                 <h3 className="text-lg font-semibold text-gray-900">
                   Notifications
                 </h3>
-                {notifications.filter(n => !n.read).length > 0 && (
+                {notifications.filter((n) => !n.read).length > 0 && (
                   <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                    {notifications.filter(n => !n.read).length}
+                    {notifications.filter((n) => !n.read).length}
                   </span>
                 )}
               </div>
@@ -203,7 +211,7 @@ const NotificationCenter = ({ isOpen, onClose, maxNotifications = 10 }) => {
                 onClick={onClose}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
               >
-                <FaTimes className="w-5 h-5" />
+                <FaTimes size={25} classN ame="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -223,64 +231,70 @@ const NotificationCenter = ({ isOpen, onClose, maxNotifications = 10 }) => {
               <div className="divide-y divide-gray-200">
                 {notifications.map((notification) => {
                   const IconComponent = getCategoryIcon(notification.category);
-                  
+
                   return (
                     <motion.div
                       key={notification.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer border-l-4 ${getNotificationStyle(notification.type, notification.read)}`}
+                      className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer border-l-4 ${getNotificationStyle(
+                        notification.type,
+                        notification.read
+                      )}`}
                       onClick={() => handleNotificationAction(notification)}
                     >
-                      <div className="flex items-start space-x-3">
+                      <div className="flex items-center gap-x-4">
                         <div className="flex-shrink-0">
                           <IconComponent className="w-5 h-5" />
                         </div>
-                        
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-1">
-                            <h4 className="text-sm font-medium truncate">
-                              {notification.title}
-                            </h4>
-                            {!notification.read && (
-                              <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 ml-2"></div>
-                            )}
-                          </div>
-                          
-                          <p className="text-sm text-gray-600 mb-2 whitespace-pre-line">
-                            {notification.message}
-                          </p>
-                          
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-500">
-                              {formatTime(notification.createdAt)}
-                            </span>
-                            
-                            <div className="flex items-center space-x-1">
+
+                        <div className="flex items-center justify-between gap-3 w-full">
+                          <div className="">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="text-sm font-medium truncate">
+                                {notification.title}
+                              </h4>
                               {!notification.read && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    markAsRead(notification.id);
-                                  }}
-                                  className="text-blue-600 hover:text-blue-700 p-1"
-                                  title="Mark as read"
-                                >
-                                  <FaCheck className="w-3 h-3" />
-                                </button>
+                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                               )}
+                            </div>
+
+                            <p className="text-sm text-gray-600 mb-2 whitespace-pre-line">
+                              {notification.message}
+                            </p>
+
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-gray-500">
+                                {formatTime(notification.createdAt)}
+                              </span>
+                            </div>
+                          </div>
+                          {/* Actions */}
+                          <div className="flex flex-col items-center gap-3">
+                            {/* {!notification.read && (
                               
-                              <button
+                            )} */}
+                            <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  deleteNotification(notification.id);
+                                  markAsRead(notification.id);
                                 }}
-                                className="text-red-600 hover:text-red-700 p-1"
-                                title="Delete"
+                                className={`${!notification.read ? 'text-blue-600' : 'text-gray-500' } bg-gray-300/30 p-2 rounded-full hover:bg-gray-300/50 transition-all ease-out duration-300`}
+                                title="Mark as read"
                               >
-                                <FaTimes className="w-3 h-3" />
+                                <FaCheck size={20} />
                               </button>
-                            </div>
+
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteNotification(notification.id);
+                              }}
+                              className="text-red-600 hover:text-red-700  bg-gray-300/30 p-2 rounded-full hover:bg-gray-300/50 transition-all ease-out duration-300"
+                              title="Delete"
+                            >
+                              <FaTrash size={20} />
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -295,7 +309,9 @@ const NotificationCenter = ({ isOpen, onClose, maxNotifications = 10 }) => {
           {notifications.length > 0 && (
             <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
               <button
-                onClick={() => window.location.href = '/admin/dashboard/notifications'}
+                onClick={() =>
+                  (window.location.href = "/admin/dashboard/notifications")
+                }
                 className="text-sm text-primary-600 hover:text-primary-700 font-medium"
               >
                 View All Notifications

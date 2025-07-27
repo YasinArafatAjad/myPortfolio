@@ -123,7 +123,7 @@ const About = () => {
                 viewport={{ once: true }}
                 className="relative"
               >
-                <div className="aspect-square bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl pt-3 pr-3 h-[70vh] flex items-center justify-center">
+                <div className="aspect-square bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl pt-3 pr-3 lg:h-[70vh] w-full flex items-center justify-center">
                   <div className="w-full h-full bg-white rounded-xl backdrop-blur-sm flex items-center justify-center">
                     <img
                       src="../../public/LogoBlack.png"

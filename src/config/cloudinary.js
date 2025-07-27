@@ -54,6 +54,10 @@ export const uploadToCloudinary = async (file, folder = 'portfolio') => {
       
       // Handle specific Cloudinary errors
       if (response.status === 400) {
+        if (errorData.error?.message?.includes('Upload preset not found') || 
+            errorData.error?.message?.includes('upload preset')) {
+          throw new Error(`Upload preset "${cloudinaryConfig.uploadPreset}" not found. Please create an unsigned upload preset in your Cloudinary account or check your VITE_CLOUDINARY_UPLOAD_PRESET environment variable.`);
+        }
         if (errorData.error?.message?.includes('Invalid upload preset')) {
           throw new Error('Upload preset is invalid or not configured for unsigned uploads. Please check your Cloudinary settings.');
         }

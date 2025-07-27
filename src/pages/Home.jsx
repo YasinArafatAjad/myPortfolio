@@ -1,4 +1,11 @@
 import { useState, useEffect, useRef } from "react";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useSpring,
+  useAnimation,
+} from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Link } from "react-router-dom";
 // import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
@@ -17,15 +24,29 @@ import CallToAction from "../components/CallToAction/CallToAction";
 const AnimatedHeroImage = ({ src, alt, className, delay = 0 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const controls = useAnimation();
 
   useEffect(() => {
     if (imageLoaded && !imageError) {
-      // Image loaded, can add any additional logic here
+      controls.start({
+        opacity: 1,
+        scale: 1,
+        y: 0,
+        transition: {
+          duration: 0.8,
+          delay: delay,
+          ease: "easeOut",
+        },
+      });
     }
-  }, [imageLoaded, imageError, delay]);
+  }, [imageLoaded, imageError, controls, delay]);
 
   return (
-    <div className={`relative overflow-hidden ${className} ${imageLoaded && !imageError ? 'animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: `${delay}s` }}>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8, y: 50 }}
+      animate={controls}
+      className={`relative overflow-hidden ${className}`}
+    >
       {!imageLoaded && !imageError && (
         <div className="absolute inset-0 bg-gradient-to-br from-primary-200 to-secondary-200 animate-pulse rounded-2xl" />
       )}
@@ -54,8 +75,13 @@ const AnimatedHeroImage = ({ src, alt, className, delay = 0 }) => {
       )}
 
       {/* Animated overlay */}
-      <div className={`absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl transition-opacity duration-500 ${imageLoaded && !imageError ? 'opacity-10' : 'opacity-0'}`} style={{ transitionDelay: `${delay + 0.3}s` }} />
-    </div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: imageLoaded && !imageError ? 0.1 : 0 }}
+        transition={{ duration: 0.5, delay: delay + 0.3 }}
+        className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"
+      />
+    </motion.div>
   );
 };
 
@@ -80,15 +106,26 @@ const FloatingProjectCards = ({ projects }) => {
         const position = positions[index] || positions[0];
 
         return (
-          <div
+          <motion.div
             key={project.id}
-            className={`absolute ${position.size} pointer-events-auto opacity-80 float-animation animate-fade-in`}
-            style={position}
-            style={{
-              ...position,
-              animationDelay: `${1.5 + index * 0.2}s`,
-              animationDuration: `${3 + index * 0.5}s`
+            initial={{ opacity: 0, scale: 0, rotate: -10 }}
+            animate={{
+              opacity: 0.8,
+              scale: 1,
+              rotate: 0,
+              y: [0, -10, 0],
             }}
+            transition={{
+              duration: 0.8,
+              delay: 1.5 + index * 0.2,
+              y: {
+                duration: 3 + index * 0.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              },
+            }}
+            className={`absolute ${position.size} pointer-events-auto`}
+            style={position}
           >
             <div className="relative w-full h-full group cursor-pointer">
               <AnimatedHeroImage
@@ -102,7 +139,11 @@ const FloatingProjectCards = ({ projects }) => {
               />
 
               {/* Project info overlay */}
-              <div className="absolute inset-0 bg-black/70 rounded-2xl flex flex-col justify-center items-center text-white text-center p-2 opacity-0 hover:opacity-100 transition-opacity duration-300">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileHover={{ opacity: 1, y: 0 }}
+                className="absolute inset-0 bg-black/70 rounded-2xl flex flex-col justify-center items-center text-white text-center p-2"
+              >
                 <h4 className="text-xs font-semibold mb-1 line-clamp-1">
                   {project.title}
                 </h4>
@@ -113,9 +154,9 @@ const FloatingProjectCards = ({ projects }) => {
                 >
                   View
                 </Link>
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         );
       })}
     </div>
@@ -129,22 +170,69 @@ const AnimatedBackgroundShapes = () => {
   return (
     <div className="absolute inset-0 overflow-hidden">
       {/* Large floating shapes */}
-      <div className="absolute top-20 left-20 w-64 h-64 bg-gradient-to-br from-primary-400/10 to-secondary-400/10 rounded-full blur-3xl float-animation" />
+      <motion.div
+        animate={{
+          y: [0, -30, 0],
+          rotate: [0, 10, 0],
+          scale: [1, 1.1, 1],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="absolute top-20 left-20 w-64 h-64 bg-gradient-to-br from-primary-400/10 to-secondary-400/10 rounded-full blur-3xl"
+      />
 
-      <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-br from-secondary-400/10 to-primary-400/10 rounded-full blur-3xl float-animation-reverse" style={{ animationDelay: '1s' }} />
+      <motion.div
+        animate={{
+          y: [0, 40, 0],
+          rotate: [0, -15, 0],
+          scale: [1, 0.9, 1],
+        }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 1,
+        }}
+        className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-br from-secondary-400/10 to-primary-400/10 rounded-full blur-3xl"
+      />
 
-      <div className="absolute top-1/2 left-10 w-48 h-48 bg-gradient-to-br from-yellow-400/10 to-orange-400/10 rounded-full blur-2xl float-animation" style={{ animationDelay: '2s' }} />
+      <motion.div
+        animate={{
+          y: [0, -20, 0],
+          x: [0, 20, 0],
+          rotate: [0, 5, 0],
+        }}
+        transition={{
+          duration: 12,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 2,
+        }}
+        className="absolute top-1/2 left-10 w-48 h-48 bg-gradient-to-br from-yellow-400/10 to-orange-400/10 rounded-full blur-2xl"
+      />
 
       {/* Smaller animated dots */}
       {Array.from({ length: 20 }).map((_, i) => (
-        <div
+        <motion.div
           key={i}
-          className="absolute w-2 h-2 bg-white/20 rounded-full float-animation"
+          animate={{
+            y: [0, -Math.random() * 50, 0],
+            x: [0, Math.random() * 30 - 15, 0],
+            opacity: [0.3, 0.8, 0.3],
+          }}
+          transition={{
+            duration: 4 + Math.random() * 4,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: Math.random() * 3,
+          }}
+          className="absolute w-2 h-2 bg-white/20 rounded-full"
           style={{
             top: `${Math.random() * 100}%`,
             left: `${Math.random() * 100}%`,
-            animationDelay: `${Math.random() * 3}s`,
-            animationDuration: `${4 + Math.random() * 4}s`
           }}
         />
       ))}

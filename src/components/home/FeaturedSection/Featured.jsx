@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import {
   collection,
@@ -291,7 +292,12 @@ export const Featured = () => {
       {featuredProjects.length > 0 && (
         <section ref={projectsRef} className="pt-16 pb-8 bg-white relative">
           <div className="container-custom">
-            <div className={`tittle text-center mb-20 ${projectsInView ? 'animate-fade-in' : 'opacity-0'}`}>
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={projectsInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8 }}
+              className="tittle text-center mb-20"
+            >
               <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-8">
                 Featured Projects
               </h2>
@@ -300,21 +306,30 @@ export const Featured = () => {
                 innovative work that showcases creativity, technical expertise,
                 and problem-solving abilities.
               </p>
-            </div>
+            </motion.div>
 
             {loadingProjects ? (
               <div className="flex justify-center items-center py-32 ">
                 <div className="spinner"></div>
               </div>
             ) : (
-              <div className={`${projectsInView ? 'animate-slide-up' : 'opacity-0'}`} style={{ animationDelay: '0.3s' }}>
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={projectsInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.8, delay: 0.3 }}
+              >
                 <FeaturedProjectsCarousel
                   projects={featuredProjects.slice(0, 10)}
                 />
-              </div>
+              </motion.div>
             )}
 
-            <div className={`text-center mt-16 ${projectsInView ? 'animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '0.6s' }}>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={projectsInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="text-center mt-16"
+            >
               <Link
                 to="/portfolio"
                 className="inline-flex items-center space-x-3 bg-primary-500 hover:bg-[#fd5614] text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-lg transition-all duration-300 transform "
@@ -332,7 +347,7 @@ export const Featured = () => {
                   />
                 </svg>
               </Link>
-            </div>
+            </motion.div>
           </div>
         </section>
       )}

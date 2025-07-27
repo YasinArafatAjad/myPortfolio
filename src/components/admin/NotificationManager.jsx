@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { collection, getDocs, query, orderBy, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useNotification } from '../../contexts/NotificationContext';
@@ -273,8 +274,10 @@ const NotificationManager = () => {
         ) : (
           <div className="divide-y divide-gray-200">
             {filteredNotifications.map((notification) => (
-              <div
+              <motion.div
                 key={notification.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
                 className={`p-6 hover:bg-gray-50 transition-colors ${
                   !notification.read ? 'bg-blue-50' : ''
                 }`}
@@ -328,7 +331,7 @@ const NotificationManager = () => {
                     </button>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { collection, getDocs, updateDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useNotification } from '../../contexts/NotificationContext';
@@ -284,8 +285,10 @@ const ReviewsManager = () => {
         ) : (
           <div className="divide-y divide-gray-200">
             {filteredReviews.map((review) => (
-              <div
+              <motion.div
                 key={review.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
                 className={`p-6 hover:bg-gray-50 transition-colors ${
                   !review.approved ? 'bg-orange-50' : review.isTestimonial ? 'bg-purple-50' : ''
                 }`}
@@ -387,7 +390,7 @@ const ReviewsManager = () => {
                     </button>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}

@@ -1,4 +1,11 @@
 import React from "react";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useSpring,
+  useAnimation,
+} from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Link } from "react-router-dom";
 
@@ -48,7 +55,12 @@ const AboutSection = () => {
       >
         <div className="container-custom">
           {/* tittle */}
-          <div className={`tittle text-center mb-20 ${aboutInView ? 'animate-fade-in' : 'opacity-0'}`}>
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={aboutInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8 }}
+            className="tittle text-center mb-20"
+          >
             <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-8">
               About Me
             </h2>
@@ -58,16 +70,18 @@ const AboutSection = () => {
               bring ideas to life through clean code, innovative solutions, and
               meticulous attention to detail.
             </p>
-          </div>
+          </motion.div>
 
           {/* All About Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-6xl mx-auto">
             {/* particular About Card */}
             {aboutCard.map((e, i) => (
-              <div
+              <motion.div
                 key={i}
-                className={`group ${aboutInView ? 'animate-slide-up' : 'opacity-0'}`}
-                style={{ animationDelay: `${0.4 + i * 0.2}s` }}
+                initial={{ opacity: 0, x: 50 }}
+                animate={aboutInView ? { opacity: 1, x: 0 } : {}}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="group"
               >
                 <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 transform group-hover:-mt-3">
                   <div className="w-20 h-20 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-2xl flex items-center justify-center mb-6 group-hover:-rotate-12 transition-transform duration-300">
@@ -78,12 +92,17 @@ const AboutSection = () => {
                   </h3>
                   <p className="text-gray-600 leading-relaxed">{e.desc}</p>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
 
           {/* About Button */}
-          <div className={`group text-center mt-16 ${aboutInView ? 'animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '0.6s' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={aboutInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="group text-center mt-16"
+          >
             <Link
               to="/about"
               className="inline-flex items-center space-x-3 bg-gradient-to-r from-gray-900 to-gray-700 text-white pl-8 pr-12 py-4 rounded-xl font-semibold text-lg hover:shadow-lg transition-all duration-300 relative"
@@ -103,7 +122,7 @@ const AboutSection = () => {
                 </svg>
               </span>
             </Link>
-          </div>
+          </motion.div>
         </div>
       </section>
     </>

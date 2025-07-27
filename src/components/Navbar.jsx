@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { useSettings } from "../contexts/SettingsContext";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -55,7 +56,13 @@ const Navbar = () => {
   const isHomePage = location.pathname === "/";
 
   return (
-    <nav className="fixed top-0 w-full py-3 bg-white/95 backdrop-blur-md shadow-lg z-50 transition-all duration-300 overflow-hidden">
+    <motion.nav
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5 }}
+      className={`fixed top-0 w-full py-3  bg-white/95  backdrop-blur-md shadow-lg z-50 transition-all duration-300"
+      } overflow-hidden`}
+    >
       <div className="container-custom">
         <div className="flex items-center justify-between">
           {/* Desktop Navigation */}
@@ -73,7 +80,11 @@ const Navbar = () => {
                   >
                     {item.label}
                     {isActive(item.path) && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500" />
+                      <motion.div
+                        layoutId="activeTab"
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500"
+                        transition={{ duration: 0.3 }}
+                      />
                     )}
                   </Link>
                 ))}
@@ -123,7 +134,11 @@ const Navbar = () => {
                   >
                     {item.label}
                     {isActive(item.path) && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500" />
+                      <motion.div
+                        layoutId="activeTab"
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500"
+                        transition={{ duration: 0.3 }}
+                      />
                     )}
                   </Link>
                 ))}
@@ -167,27 +182,35 @@ const Navbar = () => {
         </div>
 
         {/* Mobile Navigation */}
-        {isOpen && (
-          <div className="md:hidden bg-white/95 backdrop-blur-md rounded-lg mt-2 shadow-lg">
-            <div className="px-4 py-6 space-y-4">
-              {[...navItems1, ...navItems2].map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`block px-3 py-2 text-base font-medium rounded-lg transition-colors ${
-                    isActive(item.path)
-                      ? "text-primary-500 bg-primary-50"
-                      : "text-gray-700 hover:text-primary-500 hover:bg-gray-50"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="md:hidden bg-white/95 backdrop-blur-md rounded-lg mt-2 shadow-lg"
+            >
+              <div className="px-4 py-6 space-y-4">
+                {[...navItems1, ...navItems2].map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`block px-3 py-2 text-base font-medium rounded-lg transition-colors ${
+                      isActive(item.path)
+                        ? "text-primary-500 bg-primary-50"
+                        : "text-gray-700 hover:text-primary-500 hover:bg-gray-50"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 

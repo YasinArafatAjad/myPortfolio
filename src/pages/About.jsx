@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import SEOHead from "../components/SEOHead";
 import { h1 } from "framer-motion/client";
@@ -65,13 +66,18 @@ const About = () => {
         {/* Hero Header Section */}
         <section className="py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
           <div className="container-custom">
-            <div className="text-center animate-fade-in">
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center"
+            >
               <h1 className="text-5xl md:text-6xl font-bold mb-6">About Me</h1>
               <p className="text-xl text-gray-300 max-w-3xl mx-auto">
                 I'm a passionate web developer with a love for creating
                 beautiful, functional, and user-friendly digital experiences.
               </p>
-            </div>
+            </motion.div>
           </div>
         </section>
 
@@ -79,7 +85,13 @@ const About = () => {
         <section className="py-20">
           <div className="container-custom">
             <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-12">
-              <div className="w-full animate-slide-up">
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+                className="w-full"
+              >
                 <h2 className="text-4xl font-bold text-gray-900 mb-6 text-center md:text-left">
                   My Journey
                 </h2>
@@ -103,8 +115,14 @@ const About = () => {
                     sharing knowledge with the developer community.
                   </p>
                 </div>
-              </div>
-              <div className="relative animate-slide-up" style={{ animationDelay: '0.2s' }}>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+                className="relative"
+              >
                 <div className="aspect-square bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl pt-3 pr-3 h-[70vh] flex items-center justify-center">
                   <div className="w-full h-full bg-white rounded-xl backdrop-blur-sm flex items-center justify-center">
                     <img
@@ -114,7 +132,7 @@ const About = () => {
                     />
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </section>
@@ -122,7 +140,12 @@ const About = () => {
         {/* Skills Section */}
         <section ref={skillsRef} className="py-20 bg-gray-50">
           <div className="container-custom">
-            <div className={`text-center mb-16 ${skillsInView ? 'animate-fade-in' : 'opacity-0'}`}>
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={skillsInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8 }}
+              className="text-center mb-16"
+            >
               <h2 className="text-4xl font-bold text-gray-900 mb-6">
                 Skills & Expertise
               </h2>
@@ -130,13 +153,15 @@ const About = () => {
                 Here are the technologies and tools I work with to bring ideas
                 to life.
               </p>
-            </div>
+            </motion.div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {skills.map((skill, index) => (
-                <div
+                <motion.div
                   key={skill.name}
-                  className={`card w-full ${skillsInView ? 'animate-slide-up' : 'opacity-0'}`}
-                  style={{ animationDelay: `${index * 0.1}s` }}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={skillsInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.8, delay: index * 0.1 }}
+                  className="card w-full"
                 >
                   <div className="flex justify-between items-center mb-3">
                     <h3 className="text-lg font-semibold text-gray-900">
@@ -147,15 +172,14 @@ const About = () => {
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-gradient-to-r from-primary-500 to-secondary-500 h-2 rounded-full transition-all duration-1000 ease-out"
-                      style={{ 
-                        width: skillsInView ? `${skill.level}%` : '0%',
-                        transitionDelay: `${index * 0.1 + 0.5}s`
-                      }}
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={skillsInView ? { width: `${skill.level}%` } : {}}
+                      transition={{ duration: 1, delay: index * 0.1 + 0.5 }}
+                      className="bg-gradient-to-r from-primary-500 to-secondary-500 h-2 rounded-full"
                     />
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -164,18 +188,23 @@ const About = () => {
         {/* Experience Timeline */}
         <section ref={experienceRef} className="py-20">
           <div className="container-custom">
-            <div className={`tittle text-center mb-16 ${experienceInView ? 'animate-fade-in' : 'opacity-0'}`}>
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={experienceInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8 }}
+              className="tittle text-center mb-16"
+            >
               <h2 className="text-4xl font-bold text-gray-900 mb-6">
                 Experience
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 My professional journey and key milestones.
               </p>
-            </div>
+            </motion.div>
             <div className="max-w-4xl mx-auto">
               {timeline.length === 0 ? (
                 <>
-                  <div className={`card text-center ${experienceInView ? 'animate-fade-in' : 'opacity-0'}`}>
+                  <div className="card text-center">
                     <div className="text-rose-600 font-bold text-lg mb-2">
                       <h4 className="text-3xl ">Bad Luck!</h4>
                     </div>
@@ -192,12 +221,14 @@ const About = () => {
                 </>
               ) : (
                 timeline.map((item, index) => (
-                  <div
+                  <motion.div
                     key={index}
+                    initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                    animate={experienceInView ? { opacity: 1, x: 0 } : {}}
+                    transition={{ duration: 0.8, delay: index * 0.2 }}
                     className={`flex items-center mb-12 ${
                       index % 2 === 0 ? "flex-row" : "flex-row-reverse"
-                    } ${experienceInView ? 'animate-slide-up' : 'opacity-0'}`}
-                    style={{ animationDelay: `${index * 0.2}s` }}
+                    }`}
                   >
                     <div
                       className={`flex-1 ${index % 2 === 0 ? "pr-8" : "pl-8"}`}
@@ -217,7 +248,7 @@ const About = () => {
                     </div>
                     <div className="flex-shrink-0 w-4 h-4 bg-primary-600 rounded-full border-4 border-white shadow-lg"></div>
                     <div className="flex-1"></div>
-                  </div>
+                  </motion.div>
                 ))
               )}
             </div>

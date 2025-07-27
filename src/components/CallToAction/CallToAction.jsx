@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import BackgroundShapes from "./BackgroundShapes";
 
@@ -7,7 +8,12 @@ const CallToAction = () => {
       <section className="py-32 bg-gradient-to-br from-primary-600 via-primary-700 to-secondary-600 text-white relative overflow-hidden">
         <BackgroundShapes />
         <div className="container-custom text-center relative z-10">
-          <div className="animate-fade-in">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
             <h2 className="text-5xl md:text-6xl font-bold mb-8">
               Let's Create Something
               <span className="block pt-2 pb-4 text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
@@ -40,7 +46,7 @@ const CallToAction = () => {
                 </span>
               </Link>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
     </>

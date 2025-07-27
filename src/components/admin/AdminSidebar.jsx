@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useSettings } from '../../contexts/SettingsContext';
@@ -128,12 +129,25 @@ const AdminSidebar = ({ isOpen, onClose }) => {
   return (
     <>
       {/* Mobile Overlay */}
-      {isOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-75 z-20 lg:hidden" onClick={onClose} />
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-gray-600 bg-opacity-75 z-20 lg:hidden"
+            onClick={onClose}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-xl transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <motion.div
+        initial={{ x: -320 }}
+        animate={{ x: isOpen ? 0 : -320 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className="fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-xl lg:translate-x-0 lg:static lg:inset-0"
+      >
         <div className="flex items-center justify-between gap-3 h-16 px-6 border-b border-gray-200">
           {/* Logo */}
           <div className="flex items-center space-x-2">
@@ -254,7 +268,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
             View Site
           </a>
         </div>
-      </div>
+      </motion.div>
     </>
   );
 };

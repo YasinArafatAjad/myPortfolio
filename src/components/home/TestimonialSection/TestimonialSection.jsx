@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import {
   collection,
   query,
@@ -131,6 +132,7 @@ const TestimonialSection = () => {
   const [loading, setLoading] = useState(true);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const intervalRef = useRef(null);
+  const controls = useAnimation();
 
   const [stateRef, stateInView] = useInView({
     triggerOnce: true,
@@ -262,7 +264,11 @@ const TestimonialSection = () => {
       <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100">
         <div className="container-custom">
           <div className="flex justify-center items-center py-20">
-            <div className="w-12 h-12 border-4 border-primary-600 border-b-transparent border-l-transparent rounded-t-full rounded-r-full animate-spin" />
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="w-12 h-12 border-4 border-primary-600 border-b-transparent border-l-transparent rounded-t-full rounded-r-full"
+            />
           </div>
         </div>
       </section>
@@ -278,12 +284,18 @@ const TestimonialSection = () => {
       <div className="container-custom relative z-10">
         {/* Section Header */}
         <div className="text-center mb-20">
-          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-primary-100 to-secondary-100 px-6 py-3 rounded-full mb-6 animate-fade-in">
+          <motion.div
+            initial={{ scale: 0 }}
+            whileInView={{ scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="inline-flex items-center space-x-2 bg-gradient-to-r from-primary-100 to-secondary-100 px-6 py-3 rounded-full mb-6"
+          >
             <FaStar className="w-5 h-5 text-primary-600" />
             <span className="text-primary-700 font-semibold">
               Client Testimonials
             </span>
-          </div>
+          </motion.div>
 
           <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
             What Clients Say
@@ -302,27 +314,22 @@ const TestimonialSection = () => {
         >
           {/* Main Testimonial Display */}
           <div className="relative h-96 flex items-center justify-center">
-            <div className="w-full max-w-2xl transition-all duration-600 ease-in-out">
-              {testimonials.map((testimonial, index) => (
-                <div
-                  key={index}
-                  className={`${index === currentIndex ? 'block' : 'hidden'}`}
-                >
-                  <TestimonialCard
-                    testimonial={testimonial}
-                    isActive={true}
-                    index={0}
-                  />
-                </div>
-              ))}
-            </div>
-            {/* <div className="w-full max-w-2xl">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentIndex}
+                initial={{ opacity: 0, x: 100, rotateY: 90 }}
+                animate={{ opacity: 1, x: 0, rotateY: 0 }}
+                exit={{ opacity: 0, x: -100, rotateY: -90 }}
+                transition={{ duration: 0.6, ease: "easeInOut" }}
+                className="w-full max-w-2xl"
+              >
                 <TestimonialCard
                   testimonial={testimonials[currentIndex]}
                   isActive={true}
                   index={0}
                 />
-            </div> */}
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           {/* Navigation Arrows */}
@@ -348,7 +355,7 @@ const TestimonialSection = () => {
           {testimonials.length > 1 && (
             <div className="flex justify-center gap-2">
               {testimonials.map((_, index) => (
-                <button
+                <motion.button
                   key={index}
                   onClick={() => goToTestimonial(index)}
                   className={`w-2 h-2 rounded-full transition-all duration-300 ${
@@ -356,6 +363,7 @@ const TestimonialSection = () => {
                       ? "bg-primary-600 scale-125"
                       : "bg-gray-300 hover:bg-gray-400"
                   }`}
+                  whileTap={{ scale: 0.9 }}
                 />
               ))}
             </div>
@@ -363,14 +371,23 @@ const TestimonialSection = () => {
         </div>
 
         {/* Statistics */}
-        <div
+        <motion.div
           ref={stateRef}
-          className={`grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-12 mt-20 ${stateInView ? 'animate-slide-up' : 'opacity-0'}`}
-          style={{ animationDelay: '0.4s' }}
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          viewport={{ once: true }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-12 mt-20"
         >
           <div className="text-center scale-150 md:scale-100">
             {stateInView && (
-              <div className="text-4xl font-bold text-primary-600 mb-2 animate-fade-in" style={{ animationDelay: '0.5s' }}>
+              <motion.div
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                viewport={{ once: true }}
+                className="text-4xl font-bold text-primary-600 mb-2"
+              >
                 {/* {testimonials.length}+ */}
                 <CountUp
                   start={0}
@@ -380,14 +397,20 @@ const TestimonialSection = () => {
                   delay={2}
                 />{" "}
                 <span>+</span>
-              </div>
+              </motion.div>
             )}
             <p className="text-gray-600 font-medium">Happy Clients</p>
           </div>
 
           <div className="text-center scale-150 md:scale-100">
             {stateInView && (
-              <div className="text-4xl font-bold text-secondary-600 mb-2 animate-fade-in" style={{ animationDelay: '0.6s' }}>
+              <motion.div
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+                viewport={{ once: true }}
+                className="text-4xl font-bold text-secondary-600 mb-2"
+              >
                 <CountUp
                   start={0}
                   end={avgRating}
@@ -397,14 +420,20 @@ const TestimonialSection = () => {
                   decimal="."
                   delay={2}
                 />
-              </div>
+              </motion.div>
             )}
             <p className="text-gray-600 font-medium">Average Rating</p>
           </div>
 
           <div className="text-center scale-150 md:scale-100">
             {stateInView && (
-              <div className="text-4xl font-bold text-green-600 mb-2 animate-fade-in" style={{ animationDelay: '0.7s' }}>
+              <motion.div
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.7 }}
+                viewport={{ once: true }}
+                className="text-4xl font-bold text-green-600 mb-2"
+              >
                 <CountUp
                   start={0}
                   end={99.67}
@@ -414,11 +443,11 @@ const TestimonialSection = () => {
                   decimal="."
                   delay={2}
                 ></CountUp>
-              </div>
+              </motion.div>
             )}
             <p className="text-gray-600 font-medium">Satisfaction Rate</p>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

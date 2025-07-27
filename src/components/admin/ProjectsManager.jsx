@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Routes, Route, useNavigate, Link, useParams } from 'react-router-dom';
 import { 
   collection, 

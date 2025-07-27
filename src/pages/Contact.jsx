@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../config/firebase';
@@ -130,7 +131,12 @@ const Contact = () => {
         {/* Header Section */}
         <section ref={headerRef} className="py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
           <div className="container-custom">
-            <div className={`text-center ${headerInView ? 'animate-fade-in' : 'opacity-0'}`}>
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={headerInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8 }}
+              className="text-center"
+            >
               <h1 className="text-5xl md:text-6xl font-bold mb-6">
                 Get in Touch
               </h1>
@@ -138,7 +144,7 @@ const Contact = () => {
                 Have a project in mind or want to collaborate? I'd love to hear from you. 
                 Let's discuss how we can bring your ideas to life.
               </p>
-            </div>
+            </motion.div>
           </div>
         </section>
 
@@ -147,7 +153,12 @@ const Contact = () => {
           <div className="container-custom">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               {/* Contact Information */}
-              <div className="animate-slide-up">
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+              >
                 <h2 className="text-3xl font-bold text-gray-900 mb-8">
                   Let's Start a Conversation
                 </h2>
@@ -233,12 +244,15 @@ const Contact = () => {
                     </div>
                   )}
                 </div>
-              </div>
+              </motion.div>
 
               {/* Contact Form */}
-              <div
+              <motion.div
                 ref={formRef}
-                className={`card lg:card-lg ${formInView ? 'animate-slide-up' : 'opacity-0'}`}
+                initial={{ opacity: 0, x: 50 }}
+                animate={formInView ? { opacity: 1, x: 0 } : {}}
+                transition={{ duration: 0.8 }}
+                className="card lg:card-lg"
               >
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">
                   Send me a message
@@ -304,10 +318,12 @@ const Contact = () => {
                     />
                   </div>
 
-                  <button
+                  <motion.button
                     type="submit"
                     disabled={loading}
-                    className={`w-full btn-primary hover:scale-105 transition-transform duration-200 ${
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`w-full btn-primary ${
                       loading ? 'opacity-75 cursor-not-allowed' : ''
                     }`}
                   >
@@ -321,7 +337,7 @@ const Contact = () => {
                     ) : (
                       'Send Message'
                     )}
-                  </button>
+                  </motion.button>
                 </form>
 
                 {/* EmailJS Setup Notice */}
@@ -332,7 +348,7 @@ const Contact = () => {
                     To enable email notifications, configure EmailJS in your environment variables.
                   </p>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </section>
@@ -340,14 +356,20 @@ const Contact = () => {
         {/* FAQ Section */}
         <section className="py-20 bg-gray-50">
           <div className="container-custom">
-            <div className="text-center mb-16 animate-fade-in">
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
               <h2 className="text-4xl font-bold text-gray-900 mb-6">
                 Frequently Asked Questions
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 Quick answers to common questions about working with me.
               </p>
-            </div>
+            </motion.div>
 
             <div className="max-w-4xl mx-auto space-y-6">
               {[
@@ -368,10 +390,13 @@ const Contact = () => {
                   answer: "Yes, I offer ongoing support and maintenance services. We can discuss support options that fit your needs and budget during the project planning phase."
                 }
               ].map((faq, index) => (
-                <div
+                <motion.div
                   key={index}
-                  className="card animate-slide-up"
-                  style={{ animationDelay: `${index * 0.1}s` }}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="card"
                 >
                   <h3 className="text-lg font-semibold text-gray-900 mb-3">
                     {faq.question}
@@ -379,7 +404,7 @@ const Contact = () => {
                   <p className="text-gray-600">
                     {faq.answer}
                   </p>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>

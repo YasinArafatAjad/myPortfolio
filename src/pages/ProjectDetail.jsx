@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
 import { db } from "../config/firebase";
 import { useBusinessNotifications } from "../hooks/useBusinessNotifications";
@@ -76,7 +77,11 @@ const ProjectDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-20">
-        <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin" />
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full"
+        />
       </div>
     );
   }
@@ -100,7 +105,11 @@ const ProjectDetail = () => {
         {/* Back Navigation */}
         <section className="py-6 bg-gray-50 border-b">
           <div className="container-custom">
-            <div className="animate-slide-up">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+            >
               <Link
                 to="/portfolio"
                 className="inline-flex items-center space-x-2  border-r-[3px] border-zinc-800 pr-2 py-1.5 text-gray-600 hover:text-primary-600 transition-colors group"
@@ -108,14 +117,19 @@ const ProjectDetail = () => {
                 <FaArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                 <span>Back to Portfolio</span>
               </Link>
-            </div>
+            </motion.div>
           </div>
         </section>
 
         {/* Project Header */}
         <section className="pt-8 pb-4">
           <div className="container-custom">
-            <div className="text-center animate-fade-in">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center"
+            >
               {/* tittle */}
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 uppercase">
                 {project.title}
@@ -142,15 +156,16 @@ const ProjectDetail = () => {
                   <span className="text-sm">{project.views || 0} views</span>
                 </div>
               </div>              
-            </div>
+            </motion.div>
           </div>
         </section>
 
         {/* Project Image */}
-        <div
+        <motion.div
           className="projectImage container-custom"
-          className="projectImage container-custom animate-slide-up"
-          style={{ animationDelay: '0.2s' }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
         >
           {!project.imageUrl || project.imageUrl === "" ? (
             <div className="flex flex-col items-center justify-center py-16 bg-gradient-to-br from-gray-100 to-gray-200 text-gray-600">
@@ -164,7 +179,7 @@ const ProjectDetail = () => {
               className="w-full pointer-events-none"
             />
           )}
-        </div>
+        </motion.div>
 
         {/* Project Details */}
         <section className="pt-12 pb-4 bg-gray-50">
@@ -172,7 +187,12 @@ const ProjectDetail = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
               {/* Main Content */}
               <div className="lg:col-span-2">
-                <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.3 }}
+                  className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200"
+                >
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">
                     Project Overview
                   </h2>
@@ -223,33 +243,48 @@ const ProjectDetail = () => {
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
 
               {/* Sidebar */}
               <div className="space-y-6">
                 {/* Technologies */}
                 {!project.technologies.length == 0 && (
-                  <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 animate-slide-up" style={{ animationDelay: '0.4s' }}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.4 }}
+                    className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200"
+                  >
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">
                       Technologies Used
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {project.technologies.map((tech, index) => (
-                        <span
+                        <motion.span
                           key={index}
-                          className="bg-gradient-to-r from-primary-100 to-primary-200 text-primary-700 px-3 py-1 rounded-full text-sm font-medium hover:from-primary-200 hover:to-primary-300 transition-all duration-200 cursor-default animate-fade-in"
-                          style={{ animationDelay: `${0.5 + index * 0.05}s` }}
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{
+                            duration: 0.3,
+                            delay: 0.5 + index * 0.05,
+                          }}
+                          className="bg-gradient-to-r from-primary-100 to-primary-200 text-primary-700 px-3 py-1 rounded-full text-sm font-medium hover:from-primary-200 hover:to-primary-300 transition-all duration-200 cursor-default"
                         >
                           {tech}
-                        </span>
+                        </motion.span>
                       ))}
                     </div>
-                  </div>
+                  </motion.div>
                 )}
 
                 {/* Project Info */}
-                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 animate-slide-up" style={{ animationDelay: '0.5s' }}>
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.5 }}
+                  className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200"
+                >
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     Project Info
                   </h3>
@@ -297,48 +332,60 @@ const ProjectDetail = () => {
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Project Links */}
                 {(project.liveUrl || project.githubUrl) && (
-                  <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 animate-slide-up" style={{ animationDelay: '0.6s' }}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.6 }}
+                    className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200"
+                  >
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">
                       Project Links
                     </h3>
                     <div className="inline-flex flex-col gap-3">
                       {project.liveUrl && (
-                        <a
+                        <motion.a
                           href={project.liveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center space-x-2 text-green-600 hover:text-primary-700 transition-colors group hover:translate-x-1"
+                          className="inline-flex items-center space-x-2 text-green-600 hover:text-primary-700 transition-colors group"
+                          whileHover={{ x: 4 }}
                         >
                           <FaExternalLinkAlt className="w-4 h-4" />
                           <span>Live Demo</span>
-                        </a>
+                        </motion.a>
                       )}
                       {project.githubUrl && (
-                        <a
+                        <motion.a
                           href={project.githubUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-700 transition-colors group hover:translate-x-1"
+                          className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-700 transition-colors group"
+                          whileHover={{ x: 4 }}
                         >
                           <FaGithub className="w-4 h-4" />
                           <span>Source Code</span>
-                        </a>
+                        </motion.a>
                       )}
                     </div>
-                  </div>
+                  </motion.div>
                 )}
 
                 {/* Share Project */}
-                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 animate-slide-up" style={{ animationDelay: '0.7s' }}>
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.7 }}
+                  className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200"
+                >
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     Share Project
                   </h3>
                   <div className="flex space-x-2">
-                    <button
+                    <motion.button
                       onClick={() => {
                         if (navigator.share) {
                           navigator.share({
@@ -351,21 +398,25 @@ const ProjectDetail = () => {
                           alert("Link copied to clipboard!");
                         }
                       }}
-                      className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:scale-105"
+                      className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
                       Share
-                    </button>
-                    <button
+                    </motion.button>
+                    <motion.button
                       onClick={() => {
                         navigator.clipboard.writeText(window.location.href);
                         alert("Link copied to clipboard!");
                       }}
-                      className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:scale-105"
+                      className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
                       Copy Link
-                    </button>
+                    </motion.button>
                   </div>
-                </div>
+                </motion.div>
               </div>
             </div>
           </div>
@@ -374,12 +425,16 @@ const ProjectDetail = () => {
         {/* Reviews Section */}
         <section className="py-20 bg-white">
           <div className="container-custom">
-            <div className="animate-fade-in" style={{ animationDelay: '0.8s' }}>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+            >
               <ReviewSystem
                 projectId={project.id}
                 projectTitle={project.title}
               />
-            </div>
+            </motion.div>
           </div>
         </section>
 

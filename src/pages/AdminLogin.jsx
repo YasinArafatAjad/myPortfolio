@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotification } from '../contexts/NotificationContext';
 import { useSettings } from '../contexts/SettingsContext';
@@ -238,6 +238,18 @@ const AdminLogin = () => {
                 )}
               </motion.button>
             </form>
+
+            {/* Forgot Password Link */}
+            {!needsRegistration && (
+              <div className="mt-4 text-center">
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-primary-600 hover:text-primary-700 transition-colors"
+                >
+                  Forgot your password?
+                </Link>
+              </div>
+            )}
 
             {/* Toggle between login and register */}
             {!loading && (

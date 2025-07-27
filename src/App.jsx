@@ -17,6 +17,7 @@ import SEOHead from "./components/SEOHead";
 // Import components directly (no lazy loading)
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
+import ForgotPassword from "./pages/ForgotPassword";
 import ProjectDetail from "./pages/ProjectDetail";
 
 import "./App.css";
@@ -130,6 +131,7 @@ function App() {
 
                   {/* Admin routes */}
                   <Route path="/login" element={<AdminLogin />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
 
                   <Route
                     path="/admin/dashboard/*"

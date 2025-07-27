@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSettings } from "../contexts/SettingsContext";
+import { useAuth } from "../contexts/AuthContext";
 
 /**
  * Navigation bar component with responsive design and smooth animations
@@ -10,6 +11,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { settings } = useSettings();
+  const { currentUser, isAdmin } = useAuth();
   const location = useLocation();
 
   // Handle scroll effect
@@ -39,7 +41,10 @@ const Navbar = () => {
   const navItems2 = [
     { path: "/about", label: "About" },
     { path: "/contact", label: "Contact" },
-    { path: "/login", label: "Login" },
+    { 
+      path: currentUser && isAdmin ? "/admin/dashboard" : "/login", 
+      label: currentUser && isAdmin ? "Dashboard" : "Login" 
+    },
   ];
 
   // Check if current path is active

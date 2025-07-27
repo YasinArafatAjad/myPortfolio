@@ -1,11 +1,27 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { useSettings } from '../../contexts/SettingsContext';
-import { useNotification } from '../../contexts/NotificationContext';
-import { useAuth } from '../../contexts/AuthContext';
-import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
-import { uploadToCloudinary } from '../../config/cloudinary';
-import { FaSave, FaUpload, FaGlobe, FaPalette, FaSearch, FaImage, FaShieldAlt, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { useSettings } from "../../contexts/SettingsContext";
+import { useNotification } from "../../contexts/NotificationContext";
+import { useAuth } from "../../contexts/AuthContext";
+import {
+  updatePassword,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+} from "firebase/auth";
+import { uploadToCloudinary } from "../../config/cloudinary";
+import {
+  FaSave,
+  FaUpload,
+  FaGlobe,
+  FaPalette,
+  FaSearch,
+  FaImage,
+  FaShieldAlt,
+  FaLock,
+  FaEye,
+  FaEyeSlash,
+} from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 /**
  * Settings manager component for website configuration
@@ -14,44 +30,44 @@ const SettingsManager = () => {
   const { settings, updateSettings, loading } = useSettings();
   const { showSuccess, showError } = useNotification();
   const { currentUser } = useAuth();
-  
+
   const [formData, setFormData] = useState({
-    siteName: '',
-    siteDescription: '',
-    siteKeywords: '',
-    logo: '',
-    contactEmail: '',
+    siteName: "",
+    siteDescription: "",
+    siteKeywords: "",
+    logo: "",
+    contactEmail: "",
     socialLinks: {
-      github: '',
-      linkedin: '',
-      twitter: '',
-      instagram: '',
-      facebook: ''
+      github: "",
+      linkedin: "",
+      twitter: "",
+      instagram: "",
+      facebook: "",
     },
     seoSettings: {
-      ogImage: '',
-      twitterCard: 'summary_large_image',
-      googleAnalytics: '',
-      googleSiteVerification: ''
-    }
+      ogImage: "",
+      twitterCard: "summary_large_image",
+      googleAnalytics: "",
+      googleSiteVerification: "",
+    },
   });
-  
+
   // Security form state
   const [securityData, setSecurityData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
-  
+
   const [logoFile, setLogoFile] = useState(null);
   const [ogImageFile, setOgImageFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [activeTab, setActiveTab] = useState('general');
+  const [activeTab, setActiveTab] = useState("general");
   const [changingPassword, setChangingPassword] = useState(false);
   const [showPasswords, setShowPasswords] = useState({
     current: false,
     new: false,
-    confirm: false
+    confirm: false,
   });
 
   /**
@@ -60,24 +76,26 @@ const SettingsManager = () => {
   useEffect(() => {
     if (settings && !loading) {
       setFormData({
-        siteName: settings.siteName || '',
-        siteDescription: settings.siteDescription || '',
-        siteKeywords: settings.siteKeywords || '',
-        logo: settings.logo || '',
-        contactEmail: settings.contactEmail || '',
+        siteName: settings.siteName || "",
+        siteDescription: settings.siteDescription || "",
+        siteKeywords: settings.siteKeywords || "",
+        logo: settings.logo || "",
+        contactEmail: settings.contactEmail || "",
         socialLinks: {
-          github: settings.socialLinks?.github || '',
-          linkedin: settings.socialLinks?.linkedin || '',
-          twitter: settings.socialLinks?.twitter || '',
-          instagram: settings.socialLinks?.instagram || '',
-          facebook: settings.socialLinks?.facebook || ''
+          github: settings.socialLinks?.github || "",
+          linkedin: settings.socialLinks?.linkedin || "",
+          twitter: settings.socialLinks?.twitter || "",
+          instagram: settings.socialLinks?.instagram || "",
+          facebook: settings.socialLinks?.facebook || "",
         },
         seoSettings: {
-          ogImage: settings.seoSettings?.ogImage || '',
-          twitterCard: settings.seoSettings?.twitterCard || 'summary_large_image',
-          googleAnalytics: settings.seoSettings?.googleAnalytics || '',
-          googleSiteVerification: settings.seoSettings?.googleSiteVerification || ''
-        }
+          ogImage: settings.seoSettings?.ogImage || "",
+          twitterCard:
+            settings.seoSettings?.twitterCard || "summary_large_image",
+          googleAnalytics: settings.seoSettings?.googleAnalytics || "",
+          googleSiteVerification:
+            settings.seoSettings?.googleSiteVerification || "",
+        },
       });
     }
   }, [settings, loading]);
@@ -87,20 +105,20 @@ const SettingsManager = () => {
    */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
-    if (name.includes('.')) {
-      const [parent, child] = name.split('.');
-      setFormData(prev => ({
+
+    if (name.includes(".")) {
+      const [parent, child] = name.split(".");
+      setFormData((prev) => ({
         ...prev,
         [parent]: {
           ...prev[parent],
-          [child]: value
-        }
+          [child]: value,
+        },
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
       }));
     }
   };
@@ -110,9 +128,9 @@ const SettingsManager = () => {
    */
   const handleSecurityInputChange = (e) => {
     const { name, value } = e.target;
-    setSecurityData(prev => ({
+    setSecurityData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -120,9 +138,9 @@ const SettingsManager = () => {
    * Toggle password visibility
    */
   const togglePasswordVisibility = (field) => {
-    setShowPasswords(prev => ({
+    setShowPasswords((prev) => ({
       ...prev,
-      [field]: !prev[field]
+      [field]: !prev[field],
     }));
   };
 
@@ -135,7 +153,7 @@ const SettingsManager = () => {
       setLogoFile(file);
       // Create preview URL
       const previewUrl = URL.createObjectURL(file);
-      setFormData(prev => ({ ...prev, logo: previewUrl }));
+      setFormData((prev) => ({ ...prev, logo: previewUrl }));
     }
   };
 
@@ -148,12 +166,12 @@ const SettingsManager = () => {
       setOgImageFile(file);
       // Create preview URL
       const previewUrl = URL.createObjectURL(file);
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         seoSettings: {
           ...prev.seoSettings,
-          ogImage: previewUrl
-        }
+          ogImage: previewUrl,
+        },
       }));
     }
   };
@@ -163,36 +181,42 @@ const SettingsManager = () => {
    */
   const uploadImages = async () => {
     const uploads = [];
-    
+
     if (logoFile) {
       uploads.push(
-        uploadToCloudinary(logoFile, 'settings').then(url => ({ type: 'logo', url }))
+        uploadToCloudinary(logoFile, "settings").then((url) => ({
+          type: "logo",
+          url,
+        }))
       );
     }
-    
+
     if (ogImageFile) {
       uploads.push(
-        uploadToCloudinary(ogImageFile, 'settings').then(url => ({ type: 'ogImage', url }))
+        uploadToCloudinary(ogImageFile, "settings").then((url) => ({
+          type: "ogImage",
+          url,
+        }))
       );
     }
-    
+
     if (uploads.length === 0) return {};
-    
+
     try {
       const results = await Promise.all(uploads);
       const uploadedUrls = {};
-      
-      results.forEach(result => {
-        if (result.type === 'logo') {
+
+      results.forEach((result) => {
+        if (result.type === "logo") {
           uploadedUrls.logo = result.url;
-        } else if (result.type === 'ogImage') {
+        } else if (result.type === "ogImage") {
           uploadedUrls.ogImage = result.url;
         }
       });
-      
+
       return uploadedUrls;
     } catch (error) {
-      console.error('Error uploading images:', error);
+      console.error("Error uploading images:", error);
       // Provide more specific error message
       throw new Error(`Image upload failed: ${error.message}`);
     }
@@ -203,30 +227,34 @@ const SettingsManager = () => {
    */
   const handlePasswordChange = async (e) => {
     e.preventDefault();
-    
+
     // Validation
-    if (!securityData.currentPassword || !securityData.newPassword || !securityData.confirmPassword) {
-      showError('Please fill in all password fields');
+    if (
+      !securityData.currentPassword ||
+      !securityData.newPassword ||
+      !securityData.confirmPassword
+    ) {
+      showError("Please fill in all password fields");
       return;
     }
 
     if (securityData.newPassword !== securityData.confirmPassword) {
-      showError('New passwords do not match');
+      showError("New passwords do not match");
       return;
     }
 
     if (securityData.newPassword.length < 6) {
-      showError('New password must be at least 6 characters long');
+      showError("New password must be at least 6 characters long");
       return;
     }
 
     if (securityData.currentPassword === securityData.newPassword) {
-      showError('New password must be different from current password');
+      showError("New password must be different from current password");
       return;
     }
 
     if (!currentUser) {
-      showError('User not authenticated. Please log in again.');
+      showError("User not authenticated. Please log in again.");
       return;
     }
 
@@ -237,57 +265,59 @@ const SettingsManager = () => {
         currentUser.email,
         securityData.currentPassword
       );
-      
+
       await reauthenticateWithCredential(currentUser, credential);
-      
+
       // Update password
-      await updatePassword(currentUser, securityData.newPassword);      
-      showSuccess('Password updated successfully');
-      
+      await updatePassword(currentUser, securityData.newPassword);
+      showSuccess("Password updated successfully");
+
       // Clear form
       setSecurityData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
       });
-      
+
       // Hide passwords
       setShowPasswords({
         current: false,
         new: false,
-        confirm: false
+        confirm: false,
       });
-      
     } catch (error) {
-      console.error('Error changing password:', error);
-      console.error('Error code:', error.code);
-      console.error('Error message:', error.message);
-      
-      let errorMessage = 'Failed to change password';
-      
+      console.error("Error changing password:", error);
+      console.error("Error code:", error.code);
+      console.error("Error message:", error.message);
+
+      let errorMessage = "Failed to change password";
+
       switch (error.code) {
-        case 'auth/wrong-password':
-          errorMessage = 'Current password is incorrect';
+        case "auth/wrong-password":
+          errorMessage = "Current password is incorrect";
           break;
-        case 'auth/weak-password':
-          errorMessage = 'New password is too weak. Please use a stronger password.';
+        case "auth/weak-password":
+          errorMessage =
+            "New password is too weak. Please use a stronger password.";
           break;
-        case 'auth/requires-recent-login':
-          errorMessage = 'Please log out and log back in before changing your password';
+        case "auth/requires-recent-login":
+          errorMessage =
+            "Please log out and log back in before changing your password";
           break;
-        case 'auth/invalid-credential':
-          errorMessage = 'Current password is incorrect';
+        case "auth/invalid-credential":
+          errorMessage = "Current password is incorrect";
           break;
-        case 'auth/too-many-requests':
-          errorMessage = 'Too many failed attempts. Please try again later.';
+        case "auth/too-many-requests":
+          errorMessage = "Too many failed attempts. Please try again later.";
           break;
-        case 'auth/network-request-failed':
-          errorMessage = 'Network error. Please check your connection and try again.';
+        case "auth/network-request-failed":
+          errorMessage =
+            "Network error. Please check your connection and try again.";
           break;
         default:
           errorMessage = `Failed to change password: ${error.message}`;
       }
-      
+
       showError(errorMessage);
     } finally {
       setChangingPassword(false);
@@ -299,44 +329,46 @@ const SettingsManager = () => {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.siteName || !formData.siteDescription) {
-      showError('Please fill in all required fields');
+      showError("Please fill in all required fields");
       return;
     }
 
     try {
       setUploading(true);
-      
+
       // Upload images if new files selected
       let uploadedUrls = {};
       try {
         uploadedUrls = await uploadImages();
       } catch (uploadError) {
-        console.error('Image upload failed:', uploadError);
-        showError(uploadError.message || 'Failed to upload images. Please try again.');
+        console.error("Image upload failed:", uploadError);
+        showError(
+          uploadError.message || "Failed to upload images. Please try again."
+        );
         return;
       }
-      
+
       // Prepare settings data
       const settingsData = {
         ...formData,
         logo: uploadedUrls.logo || formData.logo,
         seoSettings: {
           ...formData.seoSettings,
-          ogImage: uploadedUrls.ogImage || formData.seoSettings.ogImage
-        }
+          ogImage: uploadedUrls.ogImage || formData.seoSettings.ogImage,
+        },
       };
 
       await updateSettings(settingsData);
-      showSuccess('Settings updated successfully');
-      
+      showSuccess("Settings updated successfully");
+
       // Clear file inputs
       setLogoFile(null);
       setOgImageFile(null);
     } catch (error) {
-      console.error('Error updating settings:', error);
-      showError(error.message || 'Failed to update settings');
+      console.error("Error updating settings:", error);
+      showError(error.message || "Failed to update settings");
     } finally {
       setUploading(false);
     }
@@ -350,8 +382,8 @@ const SettingsManager = () => {
       onClick={() => setActiveTab(id)}
       className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-colors ${
         activeTab === id
-          ? 'bg-primary-100 text-primary-700'
-          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+          ? "bg-primary-100 text-primary-700"
+          : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
       }`}
     >
       <Icon className="w-4 h-4" />
@@ -372,7 +404,9 @@ const SettingsManager = () => {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-1">Manage your website configuration and preferences</p>
+        <p className="text-gray-600 mt-1">
+          Manage your website configuration and preferences
+        </p>
       </div>
 
       {/* Tab Navigation */}
@@ -388,14 +422,16 @@ const SettingsManager = () => {
       {/* Settings Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* General Settings */}
-        {activeTab === 'general' && (
+        {activeTab === "general" && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
           >
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">General Settings</h2>
-            
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">
+              General Settings
+            </h2>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="form-label">Site Name *</label>
@@ -408,7 +444,7 @@ const SettingsManager = () => {
                   required
                 />
               </div>
-              
+
               <div>
                 <label className="form-label">Contact Email *</label>
                 <input
@@ -448,7 +484,9 @@ const SettingsManager = () => {
 
             {/* Social Links */}
             <div className="mt-8">
-              <h3 className="text-md font-semibold text-gray-900 mb-4">Social Media Links</h3>
+              <h3 className="text-md font-semibold text-gray-900 mb-4">
+                Social Media Links
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="form-label">GitHub URL</label>
@@ -511,14 +549,16 @@ const SettingsManager = () => {
         )}
 
         {/* Branding Settings */}
-        {activeTab === 'branding' && (
+        {activeTab === "branding" && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
           >
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">Branding</h2>
-            
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">
+              Branding
+            </h2>
+
             {/* Logo Upload */}
             <div className="mb-8">
               <label className="form-label">Logo</label>
@@ -540,7 +580,9 @@ const SettingsManager = () => {
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Current logo</p>
-                      <p className="text-xs text-gray-500">This will also be used as favicon</p>
+                      <p className="text-xs text-gray-500">
+                        This will also be used as favicon
+                      </p>
                     </div>
                   </div>
                 )}
@@ -550,14 +592,16 @@ const SettingsManager = () => {
         )}
 
         {/* SEO Settings */}
-        {activeTab === 'seo' && (
+        {activeTab === "seo" && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
           >
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">SEO Settings</h2>
-            
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">
+              SEO Settings
+            </h2>
+
             {/* OG Image */}
             <div className="mb-6">
               <label className="form-label">Open Graph Image</label>
@@ -569,7 +613,8 @@ const SettingsManager = () => {
                   className="form-input focus:outline-none focus:ring-0"
                 />
                 <p className="text-sm text-gray-500">
-                  Recommended size: 1200x630px. This image will be shown when your site is shared on social media.
+                  Recommended size: 1200x630px. This image will be shown when
+                  your site is shared on social media.
                 </p>
                 {formData.seoSettings.ogImage && (
                   <div className="w-full max-w-md bg-gray-100 rounded-lg overflow-hidden">
@@ -593,10 +638,12 @@ const SettingsManager = () => {
                   className="form-input focus:outline-none focus:ring-0"
                 >
                   <option value="summary">Summary</option>
-                  <option value="summary_large_image">Summary Large Image</option>
+                  <option value="summary_large_image">
+                    Summary Large Image
+                  </option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="form-label">Google Analytics ID</label>
                 <input
@@ -625,46 +672,68 @@ const SettingsManager = () => {
         )}
 
         {/* Security Settings */}
-        {activeTab === 'security' && (
+        {activeTab === "security" && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
           >
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">Security Settings</h2>
-            
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">
+              Security Settings
+            </h2>
+
             {/* Account Information */}
             <div className="mb-8 p-4 bg-gray-50 rounded-lg">
-              <h3 className="text-md font-semibold text-gray-900 mb-3">Account Information</h3>
+              <h3 className="text-md font-semibold text-gray-900 mb-3">
+                Account Information
+              </h3>
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Email:</span>
-                  <span className="text-sm font-medium text-gray-900">{currentUser?.email}</span>
+                  <span className="text-sm font-medium text-gray-900">
+                    {currentUser?.email}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Account Type:</span>
-                  <span className="text-sm font-medium text-green-600">Administrator</span>
+                  <span className="text-sm font-medium text-green-600">
+                    Administrator
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Last Sign In:</span>
                   <span className="text-sm font-medium text-gray-900">
-                    {currentUser?.metadata?.lastSignInTime 
-                      ? new Date(currentUser.metadata.lastSignInTime).toLocaleDateString()
-                      : 'Unknown'
-                    }
+                    {currentUser?.metadata?.lastSignInTime
+                      ? new Date(
+                          currentUser.metadata.lastSignInTime
+                        ).toLocaleDateString()
+                      : "Unknown"}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Password Change Form */}
+            {/* Password Change */}
             <div className="border-t border-gray-200 pt-6">
               <h3 className="text-md font-semibold text-gray-900 mb-4 flex items-center">
                 <FaLock className="w-4 h-4 mr-2" />
                 Change Password
               </h3>
-              
-              <form onSubmit={handlePasswordChange} className="space-y-4">
+
+              <p className="mb-2 ml-2 text-xs italic text-gray-500">
+                An email will sent . Check your Inbox or Spam in your Email/Gmail.
+              </p>
+
+              <Link to={"/forgot-password"} className="py-12">
+                <button className="btn-primary">
+                  <div className="flex items-center space-x-2">
+                    <FaLock />
+                    <span>Send Mail</span>
+                  </div>
+                </button>
+              </Link>
+
+              {/* <form onSubmit={handlePasswordChange} className="space-y-4">
                 <div>
                   <label className="form-label">Current Password *</label>
                   <div className="relative">
@@ -748,40 +817,22 @@ const SettingsManager = () => {
                 </div>
 
                 <div className="pt-4">
-                  <button
-                    type="submit"
-                    disabled={changingPassword || !securityData.currentPassword || 
-                             !securityData.newPassword || !securityData.confirmPassword ||
-                             securityData.newPassword !== securityData.confirmPassword}
-                    className={`btn-primary ${
-                      (changingPassword || !securityData.currentPassword || 
-                       !securityData.newPassword || !securityData.confirmPassword ||
-                       securityData.newPassword !== securityData.confirmPassword) 
-                        ? 'opacity-75 cursor-not-allowed' : ''
-                    }`}
-                  >
-                    {changingPassword ? (
-                      <div className="flex items-center space-x-2">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Changing Password...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center space-x-2">
-                        <FaLock />
-                        <span>Change Password</span>
-                      </div>
-                    )}
-                  </button>
+                 
                 </div>
-              </form>
+              </form> */}
             </div>
 
             {/* Security Tips */}
             <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h4 className="text-sm font-semibold text-blue-900 mb-2">Security Tips</h4>
+              <h4 className="text-sm font-semibold text-blue-900 mb-2">
+                Security Tips
+              </h4>
               <ul className="text-xs text-blue-800 space-y-1">
-                <li>• Use a strong password with at least 8 characters</li>
-                <li>• Include uppercase, lowercase, numbers, and special characters</li>
+                <li>• Use a strong password with at least 6 characters</li>
+                <li>
+                  • Include uppercase, lowercase, numbers, and special
+                  characters
+                </li>
                 <li>• Don't reuse passwords from other accounts</li>
                 <li>• Change your password regularly</li>
                 <li>• Never share your admin credentials</li>
@@ -791,12 +842,14 @@ const SettingsManager = () => {
         )}
 
         {/* Save Button - Only show for non-security tabs */}
-        {activeTab !== 'security' && (
+        {activeTab !== "security" && (
           <div className="flex justify-end">
             <button
               type="submit"
               disabled={uploading}
-              className={`btn-primary ${uploading ? 'opacity-75 cursor-not-allowed' : ''}`}
+              className={`btn-primary ${
+                uploading ? "opacity-75 cursor-not-allowed" : ""
+              }`}
             >
               {uploading ? (
                 <div className="flex items-center space-x-2">

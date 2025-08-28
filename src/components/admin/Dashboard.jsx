@@ -1,9 +1,21 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore';
-import { db } from '../../config/firebase';
-import { FaProjectDiagram, FaEnvelope, FaEye, FaChartLine } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  limit,
+  where,
+} from "firebase/firestore";
+import { db } from "../../config/firebase";
+import {
+  FaProjectDiagram,
+  FaEnvelope,
+  FaEye,
+  FaChartLine,
+} from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 /**
  * Main dashboard component with overview statistics and recent activity
@@ -13,10 +25,11 @@ const Dashboard = () => {
     totalProjects: 0,
     publishedProjects: 0,
     unreadMessages: 0,
-    totalViews: 0
+    totalViews: 0,
   });
   const [recentProjects, setRecentProjects] = useState([]);
   const [recentMessages, setRecentMessages] = useState([]);
+  const [recentBlogs, setRecentBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   /**
@@ -25,24 +38,35 @@ const Dashboard = () => {
   const fetchStats = async () => {
     try {
       // Fetch projects stats
-      const projectsSnapshot = await getDocs(collection(db, 'projects'));
-      const projects = projectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      
+      const projectsSnapshot = await getDocs(collection(db, "projects"));
+      const projects = projectsSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
       // Fetch messages stats
-      const messagesSnapshot = await getDocs(collection(db, 'messages'));
-      const messages = messagesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      
+      const messagesSnapshot = await getDocs(collection(db, "messages"));
+      const messages = messagesSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
       // Calculate stats
       const totalProjects = projects.length;
-      const publishedProjects = projects.filter(p => p.published === true).length;
-      const unreadMessages = messages.filter(m => m.read !== true).length;
-      const totalViews = projects.reduce((sum, p) => sum + (parseInt(p.views) || 0), 0);
+      const publishedProjects = projects.filter(
+        (p) => p.published === true
+      ).length;
+      const unreadMessages = messages.filter((m) => m.read !== true).length;
+      const totalViews = projects.reduce(
+        (sum, p) => sum + (parseInt(p.views) || 0),
+        0
+      );
 
       setStats({
         totalProjects,
         publishedProjects,
         unreadMessages,
-        totalViews
+        totalViews,
       });
 
       // Get recent projects (last 5)
@@ -64,13 +88,29 @@ const Dashboard = () => {
         })
         .slice(0, 5);
       setRecentMessages(sortedMessages);
-
     } catch (error) {
-      console.error('Error fetching dashboard stats:', error);
+      console.error("Error fetching dashboard stats:", error);
     } finally {
       setLoading(false);
     }
   };
+
+  // Fetch recent blogs
+  useEffect(() => {
+    const fetchRecentBlogs = async () => {
+      try {
+        const blogsRef = collection(db, "blogs");
+        const q = query(blogsRef, orderBy("createdAt", "desc"), limit(5));
+        const snapshot = await getDocs(q);
+        setRecentBlogs(
+          snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+        );
+      } catch (error) {
+        console.error("Error fetching blogs:", error);
+      }
+    };
+    fetchRecentBlogs();
+  }, []);
 
   useEffect(() => {
     fetchStats();
@@ -91,12 +131,19 @@ const Dashboard = () => {
           <p className="text-sm font-medium text-gray-600">{title}</p>
           <p className="text-3xl font-bold text-gray-900 mt-2">{value}</p>
           {change && (
-            <p className={`text-sm mt-2 ${change > 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {change > 0 ? '+' : ''}{change}% from last month
+            <p
+              className={`text-sm mt-2 ${
+                change > 0 ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {change > 0 ? "+" : ""}
+              {change}% from last month
             </p>
           )}
         </div>
-        <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${color}`}>
+        <div
+          className={`w-12 h-12 rounded-lg flex items-center justify-center ${color}`}
+        >
           <Icon className="w-6 h-6 text-white" />
         </div>
       </div>
@@ -116,7 +163,9 @@ const Dashboard = () => {
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
-        <p className="text-gray-600 mt-1">Welcome back! Here's what's happening with your portfolio.</p>
+        <p className="text-gray-600 mt-1">
+          Welcome back! Here's what's happening with your portfolio.
+        </p>
       </div>
 
       {/* Stats Grid */}
@@ -162,8 +211,10 @@ const Dashboard = () => {
         >
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Recent Projects</h3>
-              <Link 
+              <h3 className="text-lg font-semibold text-gray-900">
+                Recent Projects
+              </h3>
+              <Link
                 to="/admin/dashboard/projects"
                 className="text-sm text-primary-600 hover:text-primary-700"
               >
@@ -196,16 +247,19 @@ const Dashboard = () => {
                         {project.title}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {project.category} • {project.published ? 'Published' : 'Draft'}
+                        {project.category} •{" "}
+                        {project.published ? "Published" : "Draft"}
                       </p>
                     </div>
                     <div className="flex-shrink-0">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        project.published 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {project.published ? 'Live' : 'Draft'}
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          project.published
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {project.published ? "Live" : "Draft"}
                       </span>
                     </div>
                   </div>
@@ -224,8 +278,10 @@ const Dashboard = () => {
         >
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Recent Messages</h3>
-              <Link 
+              <h3 className="text-lg font-semibold text-gray-900">
+                Recent Messages
+              </h3>
+              <Link
                 to="/admin/dashboard/messages"
                 className="text-sm text-primary-600 hover:text-primary-700"
               >
@@ -242,7 +298,7 @@ const Dashboard = () => {
                   <div key={message.id} className="flex items-start space-x-4">
                     <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="text-primary-600 font-medium text-sm">
-                        {message.name?.charAt(0)?.toUpperCase() || 'U'}
+                        {message.name?.charAt(0)?.toUpperCase() || "U"}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
@@ -255,10 +311,11 @@ const Dashboard = () => {
                         )}
                       </div>
                       <p className="text-sm text-gray-600 truncate">
-                        {message.subject || 'No subject'}
+                        {message.subject || "No subject"}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
-                        {message.createdAt?.toDate?.()?.toLocaleDateString() || 'Recently'}
+                        {message.createdAt?.toDate?.()?.toLocaleDateString() ||
+                          "Recently"}
                       </p>
                     </div>
                   </div>
@@ -266,8 +323,44 @@ const Dashboard = () => {
               </div>
             )}
           </div>
-        </motion.div>
+        </motion.div>       
       </div>
+       {/* Recent Blogs */}
+        <motion.section
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm"
+        >
+          <h2 className="text-xl font-semibold mb-4">Recent Blogs</h2>
+          <div className="space-y-4">
+            {recentBlogs.length > 0 ? (
+              recentBlogs.map((blog) => (
+                <div
+                  key={blog.id}
+                  className="border-b border-gray-100 dark:border-gray-700 pb-3 last:border-0"
+                >
+                  <h3 className="font-medium text-primary-700 dark:text-white">
+                    {blog.title}
+                  </h3>
+                  <p className="text-sm text-green-600 dark:text-gray-400">
+                    {blog.createdAt?.toDate?.().toLocaleDateString() ||
+                      "Unknown date"}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300 line-clamp-2">
+                    {blog.article
+                      ?.replace(/<[^>]+>/g, "") // strip HTML
+                      .split(" ")
+                      .slice(0, 25) // first 10 words
+                      .join(" ") + "..."}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500">No blogs yet</p>
+            )}
+          </div>
+        </motion.section>
 
       {/* Quick Actions */}
       <motion.div
@@ -276,7 +369,9 @@ const Dashboard = () => {
         transition={{ duration: 0.5, delay: 0.4 }}
         className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
       >
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          Quick Actions
+        </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link
             to="/admin/dashboard/projects/new"

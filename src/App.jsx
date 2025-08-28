@@ -22,6 +22,8 @@ import ProjectDetail from "./pages/ProjectDetail";
 
 import "./App.css";
 import ClickSpark from "./components/ClickSpark";
+import BlogDetails from "./pages/BlogDetails";
+import Blogs from "./pages/Blogs";
 
 /**
  * Business notifications wrapper component
@@ -90,6 +92,30 @@ function App() {
                     }
                   />
 
+                  <Route
+                    path="/blogs"
+                    element={
+                      <>
+                        <Navbar />
+                        <main className="flex-grow">
+                          <Blogs />
+                        </main>
+                        <Footer />
+                      </>
+                    }
+                  />
+                  <Route
+                    path="blog/:id"
+                    element={
+                      <>
+                        <Navbar />
+                        <main className="flex-grow">
+                          <BlogDetails />
+                        </main>
+                        <Footer />
+                      </>
+                    }
+                  />
                   <Route
                     path="/portfolio"
                     element={

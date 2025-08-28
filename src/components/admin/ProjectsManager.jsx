@@ -321,7 +321,7 @@ const ProjectsList = () => {
         </div>
         <Link
           to="/admin/dashboard/projects/new"
-          className="btn-primary w-full md:w-auto text-center"
+          className="btn-primary w-full md:w-auto text-center text-nowrap flex gap-2 items-center"
         >
           <FaPlus className="mr-2" />
           Add Project

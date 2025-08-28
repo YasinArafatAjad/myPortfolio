@@ -11,7 +11,8 @@ import {
   FaCog,
   FaBell,
   FaTimes,
-  FaStar
+  FaStar,
+  FaScroll
 } from 'react-icons/fa';
 
 /**
@@ -40,6 +41,11 @@ const AdminSidebar = ({ isOpen, onClose }) => {
       path: '/admin/dashboard/projects',
       label: 'Projects',
       icon: FaProjectDiagram
+    },
+    {
+      path: '/admin/dashboard/blogs',
+      label: 'Blogs',
+      icon: FaScroll
     },
     {
       path: '/admin/dashboard/messages',

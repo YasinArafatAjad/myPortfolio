@@ -418,6 +418,8 @@ const ProjectDetail = () => {
           </div>
         </section>
 
+        {/* Project Gallery Grid with free size */}
+
         {/* Reviews Section */}
         <section className="py-20 bg-white">
           <div className="container-custom">

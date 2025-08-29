@@ -157,7 +157,7 @@ const Portfolio = () => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5 }}
-                className="w-full lg:w-auto"
+                className="w-full"
               >
                 <div className="relative">
                   <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -176,7 +176,7 @@ const Portfolio = () => {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="flex flex-wrap gap-2 justify-center"
+                className="flex flex-wrap gap-2 justify-center items-center w-full"
               >
                 <motion.button
                   onClick={() => setSelectedCategory('all')}
@@ -215,7 +215,7 @@ const Portfolio = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="w-full lg:w-auto"
+                className="w-full flex items-center justify-end"
               >
                 <div className="relative">
                   <FaSort className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />

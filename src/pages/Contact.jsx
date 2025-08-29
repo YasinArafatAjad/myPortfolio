@@ -340,14 +340,6 @@ const Contact = () => {
                   </motion.button>
                 </form>
 
-                {/* EmailJS Setup Notice */}
-                <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <h4 className="text-sm font-semibold text-blue-900 mb-2">📧 Email Notifications</h4>
-                  <p className="text-xs text-blue-800">
-                    Messages are saved to your admin dashboard and can also be sent to your email. 
-                    To enable email notifications, configure EmailJS in your environment variables.
-                  </p>
-                </div>
               </motion.div>
             </div>
           </div>

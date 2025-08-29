@@ -21,224 +21,224 @@ import CallToAction from "../components/CallToAction/CallToAction";
 /**
  * Animated Hero Image Component
  */
-const AnimatedHeroImage = ({ src, alt, className, delay = 0 }) => {
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageError, setImageError] = useState(false);
-  const controls = useAnimation();
+// const AnimatedHeroImage = ({ src, alt, className, delay = 0 }) => {
+//   const [imageLoaded, setImageLoaded] = useState(false);
+//   const [imageError, setImageError] = useState(false);
+//   const controls = useAnimation();
 
-  useEffect(() => {
-    if (imageLoaded && !imageError) {
-      controls.start({
-        opacity: 1,
-        scale: 1,
-        y: 0,
-        transition: {
-          duration: 0.8,
-          delay: delay,
-          ease: "easeOut",
-        },
-      });
-    }
-  }, [imageLoaded, imageError, controls, delay]);
+//   useEffect(() => {
+//     if (imageLoaded && !imageError) {
+//       controls.start({
+//         opacity: 1,
+//         scale: 1,
+//         y: 0,
+//         transition: {
+//           duration: 0.8,
+//           delay: delay,
+//           ease: "easeOut",
+//         },
+//       });
+//     }
+//   }, [imageLoaded, imageError, controls, delay]);
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.8, y: 50 }}
-      animate={controls}
-      className={`relative overflow-hidden ${className}`}
-    >
-      {!imageLoaded && !imageError && (
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-200 to-secondary-200 animate-pulse rounded-2xl" />
-      )}
+//   return (
+//     <motion.div
+//       initial={{ opacity: 0, scale: 0.8, y: 50 }}
+//       animate={controls}
+//       className={`relative overflow-hidden ${className}`}
+//     >
+//       {!imageLoaded && !imageError && (
+//         <div className="absolute inset-0 bg-gradient-to-br from-primary-200 to-secondary-200 animate-pulse rounded-2xl" />
+//       )}
 
-      {imageError && (
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center">
-          <div className="text-gray-500 text-center">
-            <div className="w-12 h-12 bg-gray-400 rounded-lg mx-auto mb-2 flex items-center justify-center">
-              <span className="text-white font-bold">IMG</span>
-            </div>
-            <span className="text-sm">{alt}</span>
-          </div>
-        </div>
-      )}
+//       {imageError && (
+//         <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center">
+//           <div className="text-gray-500 text-center">
+//             <div className="w-12 h-12 bg-gray-400 rounded-lg mx-auto mb-2 flex items-center justify-center">
+//               <span className="text-white font-bold">IMG</span>
+//             </div>
+//             <span className="text-sm">{alt}</span>
+//           </div>
+//         </div>
+//       )}
 
-      {src && (
-        <img
-          src={src}
-          alt={alt}
-          className={`w-full h-full object-cover rounded-2xl transition-opacity duration-300 ${
-            imageLoaded && !imageError ? "opacity-100" : "opacity-0"
-          }`}
-          onLoad={() => setImageLoaded(true)}
-          onError={() => setImageError(true)}
-        />
-      )}
+//       {src && (
+//         <img
+//           src={src}
+//           alt={alt}
+//           className={`w-full h-full object-cover rounded-2xl transition-opacity duration-300 ${
+//             imageLoaded && !imageError ? "opacity-100" : "opacity-0"
+//           }`}
+//           onLoad={() => setImageLoaded(true)}
+//           onError={() => setImageError(true)}
+//         />
+//       )}
 
-      {/* Animated overlay */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: imageLoaded && !imageError ? 0.1 : 0 }}
-        transition={{ duration: 0.5, delay: delay + 0.3 }}
-        className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"
-      />
-    </motion.div>
-  );
-};
+//       {/* Animated overlay */}
+//       <motion.div
+//         initial={{ opacity: 0 }}
+//         animate={{ opacity: imageLoaded && !imageError ? 0.1 : 0 }}
+//         transition={{ duration: 0.5, delay: delay + 0.3 }}
+//         className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"
+//       />
+//     </motion.div>
+//   );
+// };
 
 /**
  * Floating Project Cards Component
  */
-const FloatingProjectCards = ({ projects }) => {
-  if (!projects || projects.length === 0) return null;
+// const FloatingProjectCards = ({ projects }) => {
+//   if (!projects || projects.length === 0) return null;
 
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {projects.slice(0, 6).map((project, index) => {
-        const positions = [
-          { top: "10%", left: "5%", size: "w-32 h-20" },
-          { top: "20%", right: "8%", size: "w-28 h-18" },
-          { top: "60%", left: "3%", size: "w-36 h-24" },
-          { bottom: "25%", right: "5%", size: "w-30 h-20" },
-          { top: "45%", left: "15%", size: "w-24 h-16" },
-          { bottom: "10%", right: "20%", size: "w-32 h-20" },
-        ];
+//   return (
+//     <div className="absolute inset-0 overflow-hidden pointer-events-none">
+//       {projects.slice(0, 6).map((project, index) => {
+//         const positions = [
+//           { top: "10%", left: "5%", size: "w-32 h-20" },
+//           { top: "20%", right: "8%", size: "w-28 h-18" },
+//           { top: "60%", left: "3%", size: "w-36 h-24" },
+//           { bottom: "25%", right: "5%", size: "w-30 h-20" },
+//           { top: "45%", left: "15%", size: "w-24 h-16" },
+//           { bottom: "10%", right: "20%", size: "w-32 h-20" },
+//         ];
 
-        const position = positions[index] || positions[0];
+//         const position = positions[index] || positions[0];
 
-        return (
-          <motion.div
-            key={project.id}
-            initial={{ opacity: 0, scale: 0, rotate: -10 }}
-            animate={{
-              opacity: 0.8,
-              scale: 1,
-              rotate: 0,
-              y: [0, -10, 0],
-            }}
-            transition={{
-              duration: 0.8,
-              delay: 1.5 + index * 0.2,
-              y: {
-                duration: 3 + index * 0.5,
-                repeat: Infinity,
-                ease: "easeInOut",
-              },
-            }}
-            className={`absolute ${position.size} pointer-events-auto`}
-            style={position}
-          >
-            <div className="relative w-full h-full group cursor-pointer">
-              <AnimatedHeroImage
-                src={getOptimizedImageUrl(project.imageUrl, {
-                  width: 200,
-                  height: 120,
-                })}
-                alt={project.title}
-                className="w-full h-full shadow-xl hover:shadow-2xl transition-shadow duration-300"
-                delay={0}
-              />
+//         return (
+//           <motion.div
+//             key={project.id}
+//             initial={{ opacity: 0, scale: 0, rotate: -10 }}
+//             animate={{
+//               opacity: 0.8,
+//               scale: 1,
+//               rotate: 0,
+//               y: [0, -10, 0],
+//             }}
+//             transition={{
+//               duration: 0.8,
+//               delay: 1.5 + index * 0.2,
+//               y: {
+//                 duration: 3 + index * 0.5,
+//                 repeat: Infinity,
+//                 ease: "easeInOut",
+//               },
+//             }}
+//             className={`absolute ${position.size} pointer-events-auto`}
+//             style={position}
+//           >
+//             <div className="relative w-full h-full group cursor-pointer">
+//               <AnimatedHeroImage
+//                 src={getOptimizedImageUrl(project.imageUrl, {
+//                   width: 200,
+//                   height: 120,
+//                 })}
+//                 alt={project.title}
+//                 className="w-full h-full shadow-xl hover:shadow-2xl transition-shadow duration-300"
+//                 delay={0}
+//               />
 
-              {/* Project info overlay */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                whileHover={{ opacity: 1, y: 0 }}
-                className="absolute inset-0 bg-black/70 rounded-2xl flex flex-col justify-center items-center text-white text-center p-2"
-              >
-                <h4 className="text-xs font-semibold mb-1 line-clamp-1">
-                  {project.title}
-                </h4>
-                <p className="text-xs opacity-80">{project.category}</p>
-                <Link
-                  to={`/portfolio/${project.id}`}
-                  className="mt-1 text-xs bg-primary-600 hover:bg-primary-700 px-2 py-1 rounded transition-colors"
-                >
-                  View
-                </Link>
-              </motion.div>
-            </div>
-          </motion.div>
-        );
-      })}
-    </div>
-  );
-};
+//               {/* Project info overlay */}
+//               <motion.div
+//                 initial={{ opacity: 0, y: 10 }}
+//                 whileHover={{ opacity: 1, y: 0 }}
+//                 className="absolute inset-0 bg-black/70 rounded-2xl flex flex-col justify-center items-center text-white text-center p-2"
+//               >
+//                 <h4 className="text-xs font-semibold mb-1 line-clamp-1">
+//                   {project.title}
+//                 </h4>
+//                 <p className="text-xs opacity-80">{project.category}</p>
+//                 <Link
+//                   to={`/portfolio/${project.id}`}
+//                   className="mt-1 text-xs bg-primary-600 hover:bg-primary-700 px-2 py-1 rounded transition-colors"
+//                 >
+//                   View
+//                 </Link>
+//               </motion.div>
+//             </div>
+//           </motion.div>
+//         );
+//       })}
+//     </div>
+//   );
+// };
 
 /**
  * Animated Background Shapes
  */
-const AnimatedBackgroundShapes = () => {
-  return (
-    <div className="absolute inset-0 overflow-hidden">
-      {/* Large floating shapes */}
-      <motion.div
-        animate={{
-          y: [0, -30, 0],
-          rotate: [0, 10, 0],
-          scale: [1, 1.1, 1],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="absolute top-20 left-20 w-64 h-64 bg-gradient-to-br from-primary-400/10 to-secondary-400/10 rounded-full blur-3xl"
-      />
+// const AnimatedBackgroundShapes = () => {
+//   return (
+//     <div className="absolute inset-0 overflow-hidden">
+//       {/* Large floating shapes */}
+//       <motion.div
+//         animate={{
+//           y: [0, -30, 0],
+//           rotate: [0, 10, 0],
+//           scale: [1, 1.1, 1],
+//         }}
+//         transition={{
+//           duration: 8,
+//           repeat: Infinity,
+//           ease: "easeInOut",
+//         }}
+//         className="absolute top-20 left-20 w-64 h-64 bg-gradient-to-br from-primary-400/10 to-secondary-400/10 rounded-full blur-3xl"
+//       />
 
-      <motion.div
-        animate={{
-          y: [0, 40, 0],
-          rotate: [0, -15, 0],
-          scale: [1, 0.9, 1],
-        }}
-        transition={{
-          duration: 10,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 1,
-        }}
-        className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-br from-secondary-400/10 to-primary-400/10 rounded-full blur-3xl"
-      />
+//       <motion.div
+//         animate={{
+//           y: [0, 40, 0],
+//           rotate: [0, -15, 0],
+//           scale: [1, 0.9, 1],
+//         }}
+//         transition={{
+//           duration: 10,
+//           repeat: Infinity,
+//           ease: "easeInOut",
+//           delay: 1,
+//         }}
+//         className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-br from-secondary-400/10 to-primary-400/10 rounded-full blur-3xl"
+//       />
 
-      <motion.div
-        animate={{
-          y: [0, -20, 0],
-          x: [0, 20, 0],
-          rotate: [0, 5, 0],
-        }}
-        transition={{
-          duration: 12,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 2,
-        }}
-        className="absolute top-1/2 left-10 w-48 h-48 bg-gradient-to-br from-yellow-400/10 to-orange-400/10 rounded-full blur-2xl"
-      />
+//       <motion.div
+//         animate={{
+//           y: [0, -20, 0],
+//           x: [0, 20, 0],
+//           rotate: [0, 5, 0],
+//         }}
+//         transition={{
+//           duration: 12,
+//           repeat: Infinity,
+//           ease: "easeInOut",
+//           delay: 2,
+//         }}
+//         className="absolute top-1/2 left-10 w-48 h-48 bg-gradient-to-br from-yellow-400/10 to-orange-400/10 rounded-full blur-2xl"
+//       />
 
-      {/* Smaller animated dots */}
-      {Array.from({ length: 20 }).map((_, i) => (
-        <motion.div
-          key={i}
-          animate={{
-            y: [0, -Math.random() * 50, 0],
-            x: [0, Math.random() * 30 - 15, 0],
-            opacity: [0.3, 0.8, 0.3],
-          }}
-          transition={{
-            duration: 4 + Math.random() * 4,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: Math.random() * 3,
-          }}
-          className="absolute w-2 h-2 bg-white/20 rounded-full"
-          style={{
-            top: `${Math.random() * 100}%`,
-            left: `${Math.random() * 100}%`,
-          }}
-        />
-      ))}
-    </div>
-  );
-};
+//       {/* Smaller animated dots */}
+//       {Array.from({ length: 20 }).map((_, i) => (
+//         <motion.div
+//           key={i}
+//           animate={{
+//             y: [0, -Math.random() * 50, 0],
+//             x: [0, Math.random() * 30 - 15, 0],
+//             opacity: [0.3, 0.8, 0.3],
+//           }}
+//           transition={{
+//             duration: 4 + Math.random() * 4,
+//             repeat: Infinity,
+//             ease: "easeInOut",
+//             delay: Math.random() * 3,
+//           }}
+//           className="absolute w-2 h-2 bg-white/20 rounded-full"
+//           style={{
+//             top: `${Math.random() * 100}%`,
+//             left: `${Math.random() * 100}%`,
+//           }}
+//         />
+//       ))}
+//     </div>
+//   );
+// };
 
 /**
  * Home page component with animated hero and modern carousel

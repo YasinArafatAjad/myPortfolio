@@ -329,14 +329,14 @@ const ProjectCard = ({ project, index = 0 }) => {
             </motion.h3>
 
             {/* Description */}
-            <motion.p
+            {/* <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.8 }}
               className="text-gray-600 mb-4 line-clamp-2 leading-relaxed"
             >
               {project.description}
-            </motion.p>
+            </motion.p> */}
 
             {/* Technologies */}
             {project.technologies && project.technologies.length > 0 ? (

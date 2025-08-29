@@ -355,7 +355,7 @@ const ProjectCard = ({ project, index = 0 }) => {
               transition={{ duration: 0.5, delay: 0.9 }}
               className="flex flex-wrap gap-2 mb-4"
             >
-              {project.technologies.slice(0, 3).map((tech, techIndex) => (
+              {project.technologies.slice(0, 2).map((tech, techIndex) => (
                 <motion.span
                   key={techIndex}
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -368,7 +368,7 @@ const ProjectCard = ({ project, index = 0 }) => {
               ))}
               {project.technologies.length > 3 && (
                 <span className="text-xs text-gray-500 flex items-center">
-                  +{project.technologies.length - 3} more
+                  +{project.technologies.length - 2} more
                 </span>
               )}
             </motion.div>

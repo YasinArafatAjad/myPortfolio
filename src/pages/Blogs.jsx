@@ -80,7 +80,7 @@ const Blogs = () => {
   return (
     <>
       <SEOHead
-        title="Blogs"
+        title="Blogs | Yasin Arafat Ajad"
         description="Read my latest blog posts and insights on web development and tech"
         keywords="blogs, web development, React, JavaScript"
       />

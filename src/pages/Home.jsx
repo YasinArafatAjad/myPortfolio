@@ -261,7 +261,7 @@ const Home = () => {
   return (
     <>
       <SEOHead
-        title="Home | YAsin Arafat Ajad"
+        title="Home | Yasin Arafat Ajad"
         description={settings.siteDescription}
         keywords={settings.siteKeywords}
       />

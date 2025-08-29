@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
 import "./BlogDetails.css";
+import Loader from "../components/Loader";
 
 const BlogDetails = () => {
   const { id } = useParams();
@@ -70,7 +71,7 @@ const BlogDetails = () => {
   }, [blog]);
 
   if (loading)
-    return <div className="p-6 text-center dark:text-white">Loading...</div>;
+    return <Loader />;
   if (!blog) return null;
 
   return (

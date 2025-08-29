@@ -257,7 +257,7 @@ const ProjectCard = ({ project, index = 0 }) => {
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
         {/* Project Image */}
-        <div className="relative overflow-hidden h-56 bg-gradient-to-br from-gray-100 to-gray-200">
+        <div className="relative overflow-hidden h-96 bg-gradient-to-br from-gray-100 to-gray-200">
           {/* Status badges */}
           <div className="absolute top-4 left-4 flex flex-col space-y-2">
             {project.underConstruction && (
@@ -295,7 +295,7 @@ const ProjectCard = ({ project, index = 0 }) => {
               <img
                 src={project.imageUrl}
                 alt={project.title}
-                className="w-full h-56 pointer-events-none"
+                className="w-full h-full object-cover object-top pointer-events-none"
               />
             </>
           )}

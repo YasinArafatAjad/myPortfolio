@@ -107,7 +107,7 @@ const Portfolio = () => {
   return (
     <>
       <SEOHead
-        title="Portfolio"
+        title="Portfolio | Yasin Arafat Ajad"
         description="Browse my portfolio of web development projects and creative work"
         keywords="portfolio, projects, web development, React, JavaScript"
       />

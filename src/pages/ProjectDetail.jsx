@@ -7,6 +7,7 @@ import { useBusinessNotifications } from "../hooks/useBusinessNotifications";
 import ReviewSystem from "../components/portfolio/ReviewSystem";
 import CallToAction from "../components/CallToAction/CallToAction";
 import SEOHead from "../components/SEOHead";
+import "./BlogDetails.css";
 import {
   FaArrowLeft,
   FaExternalLinkAlt,
@@ -74,6 +75,42 @@ const ProjectDetail = () => {
     }
   }, [id]);
 
+    // Syntax highlight code after article loads
+    useEffect(() => {
+      if (!project) return;
+  
+      // Select all pre blocks inside your article
+      const preElements = document.querySelectorAll(".blog-article pre");
+  
+      preElements.forEach((pre) => {
+        // Only add copy button if it doesn't exist yet
+        if (!pre.querySelector(".copy-btn")) {
+          const button = document.createElement("button");
+          button.textContent = "Copy"; // simpler than innerHTML
+          button.className =
+            "copy-btn  bg-orange-500 text-white px-2 py-1 rounded text-sm hover:bg-orange-600 transition";
+          button.onclick = () => {
+            navigator.clipboard.writeText(pre.innerText);
+            button.textContent = "Copied!";
+            setTimeout(() => (button.textContent = "Copy"), 3000);
+          };
+  
+          pre.classList.add(
+            "relative",
+            "group",
+            "overflow-auto",
+            "rounded-lg",
+            "bg-gray-900",
+            "p-4",
+            "text-sm",
+            "text-white"
+          );
+  
+          pre.appendChild(button);
+        }
+      });
+    }, [project]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-20">
@@ -93,7 +130,7 @@ const ProjectDetail = () => {
   return (
     <>
       <SEOHead
-        title={project.title}
+        title={`${project.title} | Yasin Arafat Ajad`}
         description={project.description}
         keywords={`${project.category}, ${
           project.technologies?.join(", ") || ""
@@ -155,7 +192,7 @@ const ProjectDetail = () => {
                   <FaEye className="w-4 h-4" />
                   <span className="text-sm">{project.views || 0} views</span>
                 </div>
-              </div>              
+              </div>
             </motion.div>
           </div>
         </section>
@@ -196,52 +233,11 @@ const ProjectDetail = () => {
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">
                     Project Overview
                   </h2>
-                  <div className="prose prose-lg max-w-none">
-                    <p className="text-gray-600 leading-relaxed whitespace-pre-line">
-                      {project.description}
-                    </p>
 
-                    {/* Development Process */}
-                    <div className="mt-8">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                        Development Process
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
-                          <h4 className="font-semibold text-gray-900 mb-2">
-                            Planning & Design
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            User research, wireframing, and creating detailed
-                            mockups
-                          </p>
-                        </div>
-                        <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
-                          <h4 className="font-semibold text-gray-900 mb-2">
-                            Development
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            Clean code implementation with modern technologies
-                          </p>
-                        </div>
-                        <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-lg border border-yellow-200">
-                          <h4 className="font-semibold text-gray-900 mb-2">
-                            Testing
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            Comprehensive testing across devices and browsers
-                          </p>
-                        </div>
-                        <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
-                          <h4 className="font-semibold text-gray-900 mb-2">
-                            Deployment
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            Optimized deployment with performance monitoring
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                  <div className="blog-article prose max-w-none dark:prose-invert prose-headings:text-primary-600 dark:prose-headings:text-primary-400 prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-a:text-blue-600 dark:prose-a:text-blue-400">
+                    <div
+                      dangerouslySetInnerHTML={{ __html: project.description }}
+                    />
                   </div>
                 </motion.div>
               </div>

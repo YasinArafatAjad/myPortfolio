@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Routes, Route, useNavigate, Link, useParams } from "react-router-dom";
 import {
@@ -30,6 +30,8 @@ import {
   FaTools,
 } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import Loader from "../Loader";
 
 /**
@@ -599,7 +601,7 @@ const ProjectsList = () => {
  * Project form component (for both new and edit)
  */
 const ProjectForm = ({ isEdit = false }) => {
-  const { id } = useParams(); // Get project ID from URL params for edit mode
+  const { id } = useParams();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -620,6 +622,7 @@ const ProjectForm = ({ isEdit = false }) => {
   const [categories, setCategories] = useState([]);
   const [newCategoryInput, setNewCategoryInput] = useState("");
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
+  const quillRef = useRef(null);
 
   const { showSuccess, showError } = useNotification();
   const { notifyProjectStatus } = useBusinessNotifications();
@@ -892,9 +895,7 @@ const ProjectForm = ({ isEdit = false }) => {
 
   // Show loading spinner while fetching project data
   if (fetchingProject) {
-    return (
-      <Loader />
-    );
+    return <Loader />;
   }
 
   return (
@@ -938,13 +939,32 @@ const ProjectForm = ({ isEdit = false }) => {
           {/* Description */}
           <div>
             <label className="form-label">Description *</label>
-            <textarea
+            {/* <textarea
               name="description"
               value={formData.description}
               onChange={handleInputChange}
               rows={4}
               className="form-input resize-none focus:outline-none focus:ring-0"
               required
+            /> */}
+            <ReactQuill
+              ref={quillRef}
+              value={formData.description}
+              onChange={(value) =>
+                setFormData((prev) => ({ ...prev, description: value }))
+              }
+              theme="snow"
+              modules={{
+                toolbar: [
+                  [{ header: [1, 2, 3, false] }],
+                  ["bold", "italic", "underline", "strike"],
+                  ["blockquote", "code-block"],
+                  [{ list: "ordered" }, { list: "bullet" }],
+                  ["link", "image", "video"],
+                ],
+              }}
+              className="dark:bg-gray-800 dark:text-white rounded-lg"
+              style={{ minHeight: "300px", height: "450px", overflowY: "auto" }}
             />
           </div>
 

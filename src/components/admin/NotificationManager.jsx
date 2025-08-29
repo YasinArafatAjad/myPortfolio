@@ -1,9 +1,25 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { collection, getDocs, query, orderBy, updateDoc, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../../config/firebase';
-import { useNotification } from '../../contexts/NotificationContext';
-import { FaBell, FaTrash, FaCheck, FaExclamationTriangle, FaInfo, FaTimes } from 'react-icons/fa';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import { db } from "../../config/firebase";
+import { useNotification } from "../../contexts/NotificationContext";
+import {
+  FaBell,
+  FaTrash,
+  FaCheck,
+  FaExclamationTriangle,
+  FaInfo,
+  FaTimes,
+} from "react-icons/fa";
+import Loader from "../Loader";
 
 /**
  * Notification manager component for admin dashboard
@@ -11,8 +27,8 @@ import { FaBell, FaTrash, FaCheck, FaExclamationTriangle, FaInfo, FaTimes } from
 const NotificationManager = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterType, setFilterType] = useState('all');
-  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterType, setFilterType] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
 
   // const { showSuccess, showError } = useNotification();
 
@@ -22,21 +38,24 @@ const NotificationManager = () => {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const q = query(collection(db, 'notifications'), orderBy('createdAt', 'desc'));
+      const q = query(
+        collection(db, "notifications"),
+        orderBy("createdAt", "desc")
+      );
       const querySnapshot = await getDocs(q);
-      const notificationsData = querySnapshot.docs.map(doc => {
+      const notificationsData = querySnapshot.docs.map((doc) => {
         const data = doc.data();
         // Exclude any numeric 'id' field from the document data and use the actual document ID
         const { id: _, ...cleanData } = data;
         return {
           id: doc.id, // Use the actual Firestore document ID
-          ...cleanData
+          ...cleanData,
         };
       });
       setNotifications(notificationsData);
     } catch (error) {
-      console.error('Error fetching notifications:', error);
-      showError('Failed to fetch notifications');
+      console.error("Error fetching notifications:", error);
+      showError("Failed to fetch notifications");
     } finally {
       setLoading(false);
     }
@@ -47,21 +66,25 @@ const NotificationManager = () => {
    */
   const toggleNotificationRead = async (notificationId, currentStatus) => {
     // Validate notificationId
-    if (!notificationId || typeof notificationId !== 'string' || notificationId.trim() === '') {
-      console.error('Invalid notification ID:', notificationId);
-      showError('Invalid notification ID');
+    if (
+      !notificationId ||
+      typeof notificationId !== "string" ||
+      notificationId.trim() === ""
+    ) {
+      console.error("Invalid notification ID:", notificationId);
+      showError("Invalid notification ID");
       return;
     }
 
     try {
-      await updateDoc(doc(db, 'notifications', notificationId), {
-        read: !currentStatus
+      await updateDoc(doc(db, "notifications", notificationId), {
+        read: !currentStatus,
       });
       // showSuccess(`Notification marked as ${!currentStatus ? 'read' : 'unread'}`);
       fetchNotifications();
     } catch (error) {
-      console.error('Error updating notification:', error);
-      showError('Failed to update notification');
+      console.error("Error updating notification:", error);
+      showError("Failed to update notification");
     }
   };
 
@@ -70,18 +93,22 @@ const NotificationManager = () => {
    */
   const deleteNotification = async (notificationId) => {
     // Validate notificationId
-    if (!notificationId || typeof notificationId !== 'string' || notificationId.trim() === '') {
-      console.error('Invalid notification ID:', notificationId);
-      showError('Invalid notification ID');
+    if (
+      !notificationId ||
+      typeof notificationId !== "string" ||
+      notificationId.trim() === ""
+    ) {
+      console.error("Invalid notification ID:", notificationId);
+      showError("Invalid notification ID");
       return;
     }
 
     try {
-      await deleteDoc(doc(db, 'notifications', notificationId));
+      await deleteDoc(doc(db, "notifications", notificationId));
       fetchNotifications();
     } catch (error) {
-      console.error('Error deleting notification:', error);
-      showError('Failed to delete notification');
+      console.error("Error deleting notification:", error);
+      showError("Failed to delete notification");
     }
   };
 
@@ -90,17 +117,17 @@ const NotificationManager = () => {
    */
   const markAllAsRead = async () => {
     try {
-      const unreadNotifications = notifications.filter(n => !n.read);
-      const updatePromises = unreadNotifications.map(notification =>
-        updateDoc(doc(db, 'notifications', notification.id), { read: true })
+      const unreadNotifications = notifications.filter((n) => !n.read);
+      const updatePromises = unreadNotifications.map((notification) =>
+        updateDoc(doc(db, "notifications", notification.id), { read: true })
       );
-      
+
       await Promise.all(updatePromises);
       // showSuccess('All notifications marked as read');
       fetchNotifications();
     } catch (error) {
-      console.error('Error marking all as read:', error);
-      showError('Failed to mark all notifications as read');
+      console.error("Error marking all as read:", error);
+      showError("Failed to mark all notifications as read");
     }
   };
 
@@ -109,13 +136,13 @@ const NotificationManager = () => {
    */
   const getNotificationIcon = (type) => {
     switch (type) {
-      case 'success':
+      case "success":
         return <FaCheck className="w-5 h-5 text-green-500" />;
-      case 'warning':
+      case "warning":
         return <FaExclamationTriangle className="w-5 h-5 text-yellow-500" />;
-      case 'error':
+      case "error":
         return <FaTimes className="w-5 h-5 text-red-500" />;
-      case 'info':
+      case "info":
       default:
         return <FaInfo className="w-5 h-5 text-blue-500" />;
     }
@@ -125,16 +152,16 @@ const NotificationManager = () => {
    * Format notification message for better display
    */
   const formatNotificationMessage = (message) => {
-    if (!message) return '';
-    
+    if (!message) return "";
+
     // Split by line breaks and filter out empty lines
-    const lines = message.split('\n').filter(line => line.trim() !== '');
-    
+    const lines = message.split("\n").filter((line) => line.trim() !== "");
+
     return lines.map((line, index) => {
       const trimmedLine = line.trim();
-      
+
       // Check if line starts with bullet point
-      if (trimmedLine.startsWith('•')) {
+      if (trimmedLine.startsWith("•")) {
         return (
           <div key={index} className="flex items-start space-x-2 ml-4">
             <span className="text-primary-500 font-bold mt-0.5">•</span>
@@ -142,19 +169,19 @@ const NotificationManager = () => {
           </div>
         );
       }
-      
+
       // Check if line contains a colon (like "Today's Summary:")
-      if (trimmedLine.includes(':') && index === 0) {
+      if (trimmedLine.includes(":") && index === 0) {
         return (
           <div key={index} className="font-semibold text-gray-900 mb-2">
             {trimmedLine}
           </div>
         );
       }
-      
+
       // Regular line
       return (
-        <div key={index} className={index > 0 ? 'mt-1' : ''}>
+        <div key={index} className={index > 0 ? "mt-1" : ""}>
           {trimmedLine}
         </div>
       );
@@ -168,14 +195,16 @@ const NotificationManager = () => {
     let filtered = [...notifications];
 
     // Apply type filter
-    if (filterType !== 'all') {
-      filtered = filtered.filter(notification => notification.type === filterType);
+    if (filterType !== "all") {
+      filtered = filtered.filter(
+        (notification) => notification.type === filterType
+      );
     }
 
     // Apply status filter
-    if (filterStatus !== 'all') {
-      filtered = filtered.filter(notification =>
-        filterStatus === 'read' ? notification.read : !notification.read
+    if (filterStatus !== "all") {
+      filtered = filtered.filter((notification) =>
+        filterStatus === "read" ? notification.read : !notification.read
       );
     }
 
@@ -186,9 +215,9 @@ const NotificationManager = () => {
    * Format date for display
    */
   const formatDate = (timestamp) => {
-    if (!timestamp) return 'Unknown';
+    if (!timestamp) return "Unknown";
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+    return date.toLocaleDateString() + " " + date.toLocaleTimeString();
   };
 
   useEffect(() => {
@@ -196,7 +225,7 @@ const NotificationManager = () => {
   }, []);
 
   const filteredNotifications = getFilteredNotifications();
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
     <div className="space-y-6">
@@ -214,10 +243,7 @@ const NotificationManager = () => {
           </p>
         </div>
         {unreadCount > 0 && (
-          <button
-            onClick={markAllAsRead}
-            className="btn-primary"
-          >
+          <button onClick={markAllAsRead} className="btn-primary">
             Mark All as Read
           </button>
         )}
@@ -258,17 +284,17 @@ const NotificationManager = () => {
       {/* Notifications List */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">
         {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="spinner"></div>
-          </div>
+          <Loader />
         ) : filteredNotifications.length === 0 ? (
           <div className="text-center py-12">
             <FaBell className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No notifications found</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No notifications found
+            </h3>
             <p className="text-gray-600">
-              {notifications.length === 0 
-                ? 'No notifications have been received yet.' 
-                : 'Try adjusting your filters.'}
+              {notifications.length === 0
+                ? "No notifications have been received yet."
+                : "Try adjusting your filters."}
             </p>
           </div>
         ) : (
@@ -279,7 +305,7 @@ const NotificationManager = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className={`p-6 hover:bg-gray-50 transition-colors ${
-                  !notification.read ? 'bg-blue-50' : ''
+                  !notification.read ? "bg-blue-50" : ""
                 }`}
               >
                 <div className="flex items-start justify-between">
@@ -289,9 +315,13 @@ const NotificationManager = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-2 mb-1">
-                        <h3 className={`text-sm font-medium ${
-                          !notification.read ? 'text-gray-900' : 'text-gray-700'
-                        }`}>
+                        <h3
+                          className={`text-sm font-medium ${
+                            !notification.read
+                              ? "text-gray-900"
+                              : "text-gray-700"
+                          }`}
+                        >
                           {notification.title}
                         </h3>
                         {!notification.read && (
@@ -308,13 +338,20 @@ const NotificationManager = () => {
                   </div>
                   <div className="flex items-center space-x-2 ml-4">
                     <button
-                      onClick={() => toggleNotificationRead(notification.id, notification.read)}
+                      onClick={() =>
+                        toggleNotificationRead(
+                          notification.id,
+                          notification.read
+                        )
+                      }
                       className={`p-2 rounded-lg transition-colors ${
                         notification.read
-                          ? 'text-gray-400 hover:bg-gray-100'
-                          : 'text-blue-600 hover:bg-blue-50'
+                          ? "text-gray-400 hover:bg-gray-100"
+                          : "text-blue-600 hover:bg-blue-50"
                       }`}
-                      title={notification.read ? 'Mark as unread' : 'Mark as read'}
+                      title={
+                        notification.read ? "Mark as unread" : "Mark as read"
+                      }
                     >
                       {notification.read ? (
                         <FaBell className="w-6 h-6" />

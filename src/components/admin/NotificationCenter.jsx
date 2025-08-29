@@ -23,8 +23,9 @@ import {
   FaProjectDiagram,
   FaTimes,
   FaCheck,
-  FaTrash
+  FaTrash,
 } from "react-icons/fa";
+import Loader from "../Loader";
 
 /**
  * Notification Center Component - Real-time notification display
@@ -219,9 +220,7 @@ const NotificationCenter = ({ isOpen, onClose, maxNotifications = 10 }) => {
           {/* Notifications List */}
           <div className="overflow-y-auto max-h-[calc(80vh-80px)]">
             {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="spinner"></div>
-              </div>
+              <Loader />
             ) : notifications.length === 0 ? (
               <div className="text-center py-8 px-6">
                 <FaBell className="w-12 h-12 text-gray-300 mx-auto mb-4" />
@@ -275,15 +274,19 @@ const NotificationCenter = ({ isOpen, onClose, maxNotifications = 10 }) => {
                               
                             )} */}
                             <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  markAsRead(notification.id);
-                                }}
-                                className={`${!notification.read ? 'text-blue-600' : 'text-gray-500' } bg-gray-300/30 p-2 rounded-full hover:bg-gray-300/50 transition-all ease-out duration-300`}
-                                title="Mark as read"
-                              >
-                                <FaCheck size={20} />
-                              </button>
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                markAsRead(notification.id);
+                              }}
+                              className={`${
+                                !notification.read
+                                  ? "text-blue-600"
+                                  : "text-gray-500"
+                              } bg-gray-300/30 p-2 rounded-full hover:bg-gray-300/50 transition-all ease-out duration-300`}
+                              title="Mark as read"
+                            >
+                              <FaCheck size={20} />
+                            </button>
 
                             <button
                               onClick={(e) => {

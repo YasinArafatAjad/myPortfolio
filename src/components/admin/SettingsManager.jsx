@@ -22,6 +22,7 @@ import {
   FaEyeSlash,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import Loader from "../Loader";
 
 /**
  * Settings manager component for website configuration
@@ -393,9 +394,7 @@ const SettingsManager = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="spinner"></div>
-      </div>
+      <Loader />
     );
   }
 

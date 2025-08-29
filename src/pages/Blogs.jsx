@@ -117,19 +117,19 @@ const Blogs = () => {
 
       {/* Filters */}
       <section className="container-cutom p-8 bg-white border-b shadow-sm flex items-center justify-between">
-          {/* Search */}
-          <div className="w-full lg:w-auto relative">
-            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <input
-              type="text"
-              placeholder="Search blogs..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="form-input pl-10 w-full lg:w-80"
-            />
-          </div>
-          {/* project number */}
-          <div className="text-center text-gray-600">
+        {/* Search */}
+        <div className="w-full lg:w-auto relative">
+          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            type="text"
+            placeholder="Search blogs..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="form-input pl-10 w-full lg:w-80"
+          />
+        </div>
+        {/* project number */}
+        <div className="text-center text-gray-600">
           {loading
             ? "Loading blogs..."
             : `Showing ${filteredBlogs.length} of ${blogs.length} blogs`}

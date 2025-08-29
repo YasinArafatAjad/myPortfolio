@@ -12,6 +12,7 @@ import {
 import { db } from "../../../config/firebase";
 import { Link } from "react-router-dom";
 import FeaturedProjectsCarousel from "./FeaturedProjectsCarousel";
+import Loader from "../../Loader";
 
 // Fetch featured projects on component mount
 
@@ -19,7 +20,6 @@ export const Featured = () => {
   const [featuredProjects, setFeaturedProjects] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
 
-  
   /**
    * Modern Carousel Component for Featured Projects
    */
@@ -227,7 +227,7 @@ export const Featured = () => {
           collection(db, "projects"),
           where("published", "==", true),
           where("featured", "==", true),
-          orderBy("createdAt", "desc"),
+          orderBy("createdAt", "desc")
           // limit(8) // Increased for floating cards
         );
 
@@ -309,9 +309,7 @@ export const Featured = () => {
             </motion.div>
 
             {loadingProjects ? (
-              <div className="flex justify-center items-center py-32 ">
-                <div className="spinner"></div>
-              </div>
+              <Loader />
             ) : (
               <motion.div
                 initial={{ opacity: 0, y: 50 }}

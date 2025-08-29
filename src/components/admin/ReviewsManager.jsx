@@ -4,6 +4,7 @@ import { collection, getDocs, updateDoc, deleteDoc, doc, query, orderBy } from '
 import { db } from '../../config/firebase';
 import { useNotification } from '../../contexts/NotificationContext';
 import { FaStar, FaCheck, FaTimes, FaEye, FaTrash, FaUser, FaTrophy, FaQuoteLeft, FaQuoteRight } from 'react-icons/fa';
+import Loader from '../Loader';
 
 // Star Rating Display Component
 
@@ -269,9 +270,7 @@ const ReviewsManager = () => {
       {/* Reviews List */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">
         {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="spinner"></div>
-          </div>
+          <Loader />
         ) : filteredReviews.length === 0 ? (
           <div className="text-center py-12">
             <FaStar className="mx-auto h-12 w-12 text-gray-400 mb-4" />

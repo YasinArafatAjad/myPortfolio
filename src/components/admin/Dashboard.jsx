@@ -16,6 +16,7 @@ import {
   FaChartLine,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import Loader from "../Loader";
 
 /**
  * Main dashboard component with overview statistics and recent activity
@@ -151,11 +152,7 @@ const Dashboard = () => {
   );
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="spinner"></div>
-      </div>
-    );
+    return <Loader />;
   }
 
   return (
@@ -323,44 +320,44 @@ const Dashboard = () => {
               </div>
             )}
           </div>
-        </motion.div>       
+        </motion.div>
       </div>
-       {/* Recent Blogs */}
-        <motion.section
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm"
-        >
-          <h2 className="text-xl font-semibold mb-4">Recent Blogs</h2>
-          <div className="space-y-4">
-            {recentBlogs.length > 0 ? (
-              recentBlogs.map((blog) => (
-                <div
-                  key={blog.id}
-                  className="border-b border-gray-100 dark:border-gray-700 pb-3 last:border-0"
-                >
-                  <h3 className="font-medium text-primary-700 dark:text-white">
-                    {blog.title}
-                  </h3>
-                  <p className="text-sm text-green-600 dark:text-gray-400">
-                    {blog.createdAt?.toDate?.().toLocaleDateString() ||
-                      "Unknown date"}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-300 line-clamp-2">
-                    {blog.article
-                      ?.replace(/<[^>]+>/g, "") // strip HTML
-                      .split(" ")
-                      .slice(0, 25) // first 10 words
-                      .join(" ") + "..."}
-                  </p>
-                </div>
-              ))
-            ) : (
-              <p className="text-gray-500">No blogs yet</p>
-            )}
-          </div>
-        </motion.section>
+      {/* Recent Blogs */}
+      <motion.section
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm"
+      >
+        <h2 className="text-xl font-semibold mb-4">Recent Blogs</h2>
+        <div className="space-y-4">
+          {recentBlogs.length > 0 ? (
+            recentBlogs.map((blog) => (
+              <div
+                key={blog.id}
+                className="border-b border-gray-100 dark:border-gray-700 pb-3 last:border-0"
+              >
+                <h3 className="font-medium text-primary-700 dark:text-white">
+                  {blog.title}
+                </h3>
+                <p className="text-sm text-green-600 dark:text-gray-400">
+                  {blog.createdAt?.toDate?.().toLocaleDateString() ||
+                    "Unknown date"}
+                </p>
+                <p className="text-gray-600 dark:text-gray-300 line-clamp-2">
+                  {blog.article
+                    ?.replace(/<[^>]+>/g, "") // strip HTML
+                    .split(" ")
+                    .slice(0, 25) // first 10 words
+                    .join(" ") + "..."}
+                </p>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-500">No blogs yet</p>
+          )}
+        </div>
+      </motion.section>
 
       {/* Quick Actions */}
       <motion.div

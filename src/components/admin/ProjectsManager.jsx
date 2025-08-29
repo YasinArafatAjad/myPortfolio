@@ -1,24 +1,36 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Routes, Route, useNavigate, Link, useParams } from 'react-router-dom';
-import { 
-  collection, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  doc, 
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Routes, Route, useNavigate, Link, useParams } from "react-router-dom";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
   getDoc,
   serverTimestamp,
   query,
-  orderBy 
-} from 'firebase/firestore';
-import { db } from '../../config/firebase';
-import { uploadToCloudinary } from '../../config/cloudinary';
-import { useNotification } from '../../contexts/NotificationContext';
-import { useBusinessNotifications } from '../../hooks/useBusinessNotifications';
-import { FaPlus, FaEdit, FaTrash, FaEye, FaEyeSlash, FaImage, FaExternalLinkAlt, FaArrowLeft, FaTimes, FaTools } from 'react-icons/fa';
-import { v4 as uuidv4 } from 'uuid';
+  orderBy,
+} from "firebase/firestore";
+import { db } from "../../config/firebase";
+import { uploadToCloudinary } from "../../config/cloudinary";
+import { useNotification } from "../../contexts/NotificationContext";
+import { useBusinessNotifications } from "../../hooks/useBusinessNotifications";
+import {
+  FaPlus,
+  FaEdit,
+  FaTrash,
+  FaEye,
+  FaEyeSlash,
+  FaImage,
+  FaExternalLinkAlt,
+  FaArrowLeft,
+  FaTimes,
+  FaTools,
+} from "react-icons/fa";
+import { v4 as uuidv4 } from "uuid";
+import Loader from "../Loader";
 
 /**
  * Projects list component
@@ -26,10 +38,10 @@ import { v4 as uuidv4 } from 'uuid';
 const ProjectsList = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterCategory, setFilterCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('newest');
-  
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterCategory, setFilterCategory] = useState("all");
+  const [sortBy, setSortBy] = useState("newest");
+
   const { showSuccess, showError } = useNotification();
   const { notifyProjectStatus } = useBusinessNotifications();
   const navigate = useNavigate();
@@ -40,16 +52,16 @@ const ProjectsList = () => {
   const fetchProjects = async () => {
     try {
       setLoading(true);
-      const q = query(collection(db, 'projects'), orderBy('createdAt', 'desc'));
+      const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
       const querySnapshot = await getDocs(q);
-      const projectsData = querySnapshot.docs.map(doc => ({
+      const projectsData = querySnapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
       setProjects(projectsData);
     } catch (error) {
-      console.error('Error fetching projects:', error);
-      showError('Failed to fetch projects');
+      console.error("Error fetching projects:", error);
+      showError("Failed to fetch projects");
     } finally {
       setLoading(false);
     }
@@ -59,17 +71,17 @@ const ProjectsList = () => {
    * Handle delete project
    */
   const handleDelete = async (projectId) => {
-    if (!window.confirm('Are you sure you want to delete this project?')) {
+    if (!window.confirm("Are you sure you want to delete this project?")) {
       return;
     }
 
     try {
-      await deleteDoc(doc(db, 'projects', projectId));
-      showSuccess('Project deleted successfully');
+      await deleteDoc(doc(db, "projects", projectId));
+      showSuccess("Project deleted successfully");
       fetchProjects();
     } catch (error) {
-      console.error('Error deleting project:', error);
-      showError('Failed to delete project');
+      console.error("Error deleting project:", error);
+      showError("Failed to delete project");
     }
   };
 
@@ -79,23 +91,25 @@ const ProjectsList = () => {
   const togglePublished = async (project) => {
     try {
       const newStatus = !project.published;
-      await updateDoc(doc(db, 'projects', project.id), {
+      await updateDoc(doc(db, "projects", project.id), {
         published: newStatus,
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       });
 
       // Create business notification for status change
       await notifyProjectStatus(
         project,
-        project.published ? 'published' : 'unpublished',
-        newStatus ? 'published' : 'unpublished'
+        project.published ? "published" : "unpublished",
+        newStatus ? "published" : "unpublished"
       );
 
-      showSuccess(`Project ${newStatus ? 'published' : 'unpublished'} successfully`);
+      showSuccess(
+        `Project ${newStatus ? "published" : "unpublished"} successfully`
+      );
       fetchProjects();
     } catch (error) {
-      console.error('Error updating project:', error);
-      showError('Failed to update project');
+      console.error("Error updating project:", error);
+      showError("Failed to update project");
     }
   };
 
@@ -105,23 +119,25 @@ const ProjectsList = () => {
   const toggleFeatured = async (project) => {
     try {
       const newFeaturedStatus = !project.featured;
-      await updateDoc(doc(db, 'projects', project.id), {
+      await updateDoc(doc(db, "projects", project.id), {
         featured: newFeaturedStatus,
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       });
 
       // Create business notification for featured status change
       await notifyProjectStatus(
         project,
-        project.featured ? 'featured' : 'unfeatured',
-        newFeaturedStatus ? 'featured' : 'unfeatured'
+        project.featured ? "featured" : "unfeatured",
+        newFeaturedStatus ? "featured" : "unfeatured"
       );
 
-      showSuccess(`Project ${newFeaturedStatus ? 'featured' : 'unfeatured'} successfully`);
+      showSuccess(
+        `Project ${newFeaturedStatus ? "featured" : "unfeatured"} successfully`
+      );
       fetchProjects();
     } catch (error) {
-      console.error('Error updating project:', error);
-      showError('Failed to update project');
+      console.error("Error updating project:", error);
+      showError("Failed to update project");
     }
   };
 
@@ -131,16 +147,20 @@ const ProjectsList = () => {
   const toggleUnderConstruction = async (project) => {
     try {
       const newConstructionStatus = !project.underConstruction;
-      await updateDoc(doc(db, 'projects', project.id), {
+      await updateDoc(doc(db, "projects", project.id), {
         underConstruction: newConstructionStatus,
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       });
 
-      showSuccess(`Project marked as ${newConstructionStatus ? 'under construction' : 'completed'}`);
+      showSuccess(
+        `Project marked as ${
+          newConstructionStatus ? "under construction" : "completed"
+        }`
+      );
       fetchProjects();
     } catch (error) {
-      console.error('Error updating project:', error);
-      showError('Failed to update project');
+      console.error("Error updating project:", error);
+      showError("Failed to update project");
     }
   };
 
@@ -152,28 +172,39 @@ const ProjectsList = () => {
 
     // Apply search filter
     if (searchTerm) {
-      filtered = filtered.filter(project =>
-        project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.category.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (project) =>
+          project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          project.description
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          project.category.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Apply category filter
-    if (filterCategory !== 'all') {
-      filtered = filtered.filter(project => project.category === filterCategory);
+    if (filterCategory !== "all") {
+      filtered = filtered.filter(
+        (project) => project.category === filterCategory
+      );
     }
 
     // Apply sorting
     filtered.sort((a, b) => {
       switch (sortBy) {
-        case 'newest':
-          return new Date(b.createdAt?.toDate?.() || b.createdAt) - new Date(a.createdAt?.toDate?.() || a.createdAt);
-        case 'oldest':
-          return new Date(a.createdAt?.toDate?.() || a.createdAt) - new Date(b.createdAt?.toDate?.() || b.createdAt);
-        case 'title':
+        case "newest":
+          return (
+            new Date(b.createdAt?.toDate?.() || b.createdAt) -
+            new Date(a.createdAt?.toDate?.() || a.createdAt)
+          );
+        case "oldest":
+          return (
+            new Date(a.createdAt?.toDate?.() || a.createdAt) -
+            new Date(b.createdAt?.toDate?.() || b.createdAt)
+          );
+        case "title":
           return a.title.localeCompare(b.title);
-        case 'category':
+        case "category":
           return a.category.localeCompare(b.category);
         default:
           return 0;
@@ -184,7 +215,7 @@ const ProjectsList = () => {
   };
 
   // Get unique categories
-  const categories = [...new Set(projects.map(p => p.category))];
+  const categories = [...new Set(projects.map((p) => p.category))];
 
   useEffect(() => {
     fetchProjects();
@@ -223,12 +254,14 @@ const ProjectsList = () => {
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
           {project.category}
         </span>
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          project.published 
-            ? 'bg-green-100 text-green-800' 
-            : 'bg-yellow-100 text-yellow-800'
-        }`}>
-          {project.published ? 'Published' : 'Draft'}
+        <span
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+            project.published
+              ? "bg-green-100 text-green-800"
+              : "bg-yellow-100 text-yellow-800"
+          }`}
+        >
+          {project.published ? "Published" : "Draft"}
         </span>
         {project.featured && (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
@@ -251,33 +284,41 @@ const ProjectsList = () => {
           <button
             onClick={() => togglePublished(project)}
             className={`p-2 rounded-lg transition-colors ${
-              project.published 
-                ? 'text-green-600 hover:bg-green-50' 
-                : 'text-gray-400 hover:bg-gray-50'
+              project.published
+                ? "text-green-600 hover:bg-green-50"
+                : "text-gray-400 hover:bg-gray-50"
             }`}
-            title={project.published ? 'Unpublish' : 'Publish'}
+            title={project.published ? "Unpublish" : "Publish"}
           >
-            {project.published ? <FaEye className="w-4 h-4" /> : <FaEyeSlash className="w-4 h-4" />}
+            {project.published ? (
+              <FaEye className="w-4 h-4" />
+            ) : (
+              <FaEyeSlash className="w-4 h-4" />
+            )}
           </button>
           <button
             onClick={() => toggleFeatured(project)}
             className={`p-2 rounded-lg transition-colors ${
-              project.featured 
-                ? 'text-purple-600 hover:bg-purple-50' 
-                : 'text-gray-400 hover:bg-gray-50'
+              project.featured
+                ? "text-purple-600 hover:bg-purple-50"
+                : "text-gray-400 hover:bg-gray-50"
             }`}
-            title={project.featured ? 'Unfeature' : 'Feature'}
+            title={project.featured ? "Unfeature" : "Feature"}
           >
             ⭐
           </button>
           <button
             onClick={() => toggleUnderConstruction(project)}
             className={`p-2 rounded-lg transition-colors ${
-              project.underConstruction 
-                ? 'text-orange-600 hover:bg-orange-50' 
-                : 'text-gray-400 hover:bg-gray-50'
+              project.underConstruction
+                ? "text-orange-600 hover:bg-orange-50"
+                : "text-gray-400 hover:bg-gray-50"
             }`}
-            title={project.underConstruction ? 'Mark as Complete' : 'Mark as Under Construction'}
+            title={
+              project.underConstruction
+                ? "Mark as Complete"
+                : "Mark as Under Construction"
+            }
           >
             <FaTools className="w-4 h-4" />
           </button>
@@ -349,8 +390,10 @@ const ProjectsList = () => {
               className="form-input focus:outline-none focus:ring-0"
             >
               <option value="all">All Categories</option>
-              {categories.map(category => (
-                <option key={category} value={category}>{category}</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
               ))}
             </select>
           </div>
@@ -373,15 +416,17 @@ const ProjectsList = () => {
       {/* Projects List */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">
         {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="spinner"></div>
-          </div>
+          <Loader />
         ) : getFilteredProjects().length === 0 ? (
           <div className="text-center py-12">
             <FaImage className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No projects found</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No projects found
+            </h3>
             <p className="text-gray-600">
-              {projects.length === 0 ? 'Get started by creating your first project.' : 'Try adjusting your search or filters.'}
+              {projects.length === 0
+                ? "Get started by creating your first project."
+                : "Try adjusting your search or filters."}
             </p>
           </div>
         ) : (
@@ -440,12 +485,14 @@ const ProjectsList = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-col justify-center items-center space-y-2">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            project.published 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}>
-                            {project.published ? 'Published' : 'Draft'}
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              project.published
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
+                            {project.published ? "Published" : "Draft"}
                           </span>
                           {project.featured && (
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
@@ -468,33 +515,37 @@ const ProjectsList = () => {
                           <button
                             onClick={() => togglePublished(project)}
                             className={`p-2 rounded-lg transition-colors ${
-                              project.published 
-                                ? 'text-green-600 hover:bg-green-50' 
-                                : 'text-gray-400 hover:bg-gray-50'
+                              project.published
+                                ? "text-green-600 hover:bg-green-50"
+                                : "text-gray-400 hover:bg-gray-50"
                             }`}
-                            title={project.published ? 'Unpublish' : 'Publish'}
+                            title={project.published ? "Unpublish" : "Publish"}
                           >
                             {project.published ? <FaEye /> : <FaEyeSlash />}
                           </button>
                           <button
                             onClick={() => toggleFeatured(project)}
                             className={`p-2 rounded-lg transition-colors ${
-                              project.featured 
-                                ? 'text-purple-600 hover:bg-purple-50' 
-                                : 'text-gray-400 hover:bg-gray-50'
+                              project.featured
+                                ? "text-purple-600 hover:bg-purple-50"
+                                : "text-gray-400 hover:bg-gray-50"
                             }`}
-                            title={project.featured ? 'Unfeature' : 'Feature'}
+                            title={project.featured ? "Unfeature" : "Feature"}
                           >
                             ⭐
                           </button>
                           <button
                             onClick={() => toggleUnderConstruction(project)}
                             className={`p-2 rounded-lg transition-colors ${
-                              project.underConstruction 
-                                ? 'text-orange-600 hover:bg-orange-50' 
-                                : 'text-gray-400 hover:bg-gray-50'
+                              project.underConstruction
+                                ? "text-orange-600 hover:bg-orange-50"
+                                : "text-gray-400 hover:bg-gray-50"
                             }`}
-                            title={project.underConstruction ? 'Mark as Complete' : 'Mark as Under Construction'}
+                            title={
+                              project.underConstruction
+                                ? "Mark as Complete"
+                                : "Mark as Under Construction"
+                            }
                           >
                             <FaTools />
                           </button>
@@ -550,26 +601,26 @@ const ProjectsList = () => {
 const ProjectForm = ({ isEdit = false }) => {
   const { id } = useParams(); // Get project ID from URL params for edit mode
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    category: '',
+    title: "",
+    description: "",
+    category: "",
     technologies: [],
-    imageUrl: '',
-    liveUrl: '',
-    githubUrl: '',
+    imageUrl: "",
+    liveUrl: "",
+    githubUrl: "",
     featured: false,
     published: false,
-    underConstruction: false
+    underConstruction: false,
   });
   const [imageFile, setImageFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fetchingProject, setFetchingProject] = useState(isEdit);
-  const [techInput, setTechInput] = useState('');
+  const [techInput, setTechInput] = useState("");
   const [categories, setCategories] = useState([]);
-  const [newCategoryInput, setNewCategoryInput] = useState('');
+  const [newCategoryInput, setNewCategoryInput] = useState("");
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
-  
+
   const { showSuccess, showError } = useNotification();
   const { notifyProjectStatus } = useBusinessNotifications();
   const navigate = useNavigate();
@@ -579,13 +630,15 @@ const ProjectForm = ({ isEdit = false }) => {
    */
   const fetchCategories = async () => {
     try {
-      const q = query(collection(db, 'projects'));
+      const q = query(collection(db, "projects"));
       const querySnapshot = await getDocs(q);
-      const projects = querySnapshot.docs.map(doc => doc.data());
-      const uniqueCategories = [...new Set(projects.map(p => p.category).filter(Boolean))];
+      const projects = querySnapshot.docs.map((doc) => doc.data());
+      const uniqueCategories = [
+        ...new Set(projects.map((p) => p.category).filter(Boolean)),
+      ];
       setCategories(uniqueCategories.sort());
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error("Error fetching categories:", error);
     }
   };
 
@@ -597,30 +650,30 @@ const ProjectForm = ({ isEdit = false }) => {
 
     try {
       setFetchingProject(true);
-      const projectDoc = await getDoc(doc(db, 'projects', id));
-      
+      const projectDoc = await getDoc(doc(db, "projects", id));
+
       if (projectDoc.exists()) {
         const projectData = projectDoc.data();
         setFormData({
-          title: projectData.title || '',
-          description: projectData.description || '',
-          category: projectData.category || '',
+          title: projectData.title || "",
+          description: projectData.description || "",
+          category: projectData.category || "",
           technologies: projectData.technologies || [],
-          imageUrl: projectData.imageUrl || '',
-          liveUrl: projectData.liveUrl || '',
-          githubUrl: projectData.githubUrl || '',
+          imageUrl: projectData.imageUrl || "",
+          liveUrl: projectData.liveUrl || "",
+          githubUrl: projectData.githubUrl || "",
           featured: projectData.featured || false,
           published: projectData.published || false,
-          underConstruction: projectData.underConstruction || false
+          underConstruction: projectData.underConstruction || false,
         });
       } else {
-        showError('Project not found');
-        navigate('/admin/dashboard/projects');
+        showError("Project not found");
+        navigate("/admin/dashboard/projects");
       }
     } catch (error) {
-      console.error('Error fetching project:', error);
-      showError('Failed to fetch project data');
-      navigate('/admin/dashboard/projects');
+      console.error("Error fetching project:", error);
+      showError("Failed to fetch project data");
+      navigate("/admin/dashboard/projects");
     } finally {
       setFetchingProject(false);
     }
@@ -630,11 +683,15 @@ const ProjectForm = ({ isEdit = false }) => {
    * Generate title-based UID
    */
   const generateTitleUID = (title) => {
-    return title
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, '')
-      .replace(/\s+/g, '-')
-      .substring(0, 50) + '-' + uuidv4().substring(0, 8);
+    return (
+      title
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, "")
+        .replace(/\s+/g, "-")
+        .substring(0, 50) +
+      "-" +
+      uuidv4().substring(0, 8)
+    );
   };
 
   /**
@@ -642,9 +699,9 @@ const ProjectForm = ({ isEdit = false }) => {
    */
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -653,12 +710,12 @@ const ProjectForm = ({ isEdit = false }) => {
    */
   const handleCategoryChange = (e) => {
     const value = e.target.value;
-    if (value === 'new') {
+    if (value === "new") {
       setShowNewCategoryInput(true);
-      setFormData(prev => ({ ...prev, category: '' }));
+      setFormData((prev) => ({ ...prev, category: "" }));
     } else {
       setShowNewCategoryInput(false);
-      setFormData(prev => ({ ...prev, category: value }));
+      setFormData((prev) => ({ ...prev, category: value }));
     }
   };
 
@@ -668,11 +725,11 @@ const ProjectForm = ({ isEdit = false }) => {
   const addNewCategory = () => {
     const trimmedCategory = newCategoryInput.trim();
     if (trimmedCategory && !categories.includes(trimmedCategory)) {
-      setCategories(prev => [...prev, trimmedCategory].sort());
-      setFormData(prev => ({ ...prev, category: trimmedCategory }));
-      setNewCategoryInput('');
+      setCategories((prev) => [...prev, trimmedCategory].sort());
+      setFormData((prev) => ({ ...prev, category: trimmedCategory }));
+      setNewCategoryInput("");
       setShowNewCategoryInput(false);
-      showSuccess('New category added successfully');
+      showSuccess("New category added successfully");
     }
   };
 
@@ -682,11 +739,11 @@ const ProjectForm = ({ isEdit = false }) => {
   const addTechnology = () => {
     const trimmedTech = techInput.trim();
     if (trimmedTech && !formData.technologies.includes(trimmedTech)) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        technologies: [...prev.technologies, trimmedTech]
+        technologies: [...prev.technologies, trimmedTech],
       }));
-      setTechInput('');
+      setTechInput("");
     }
   };
 
@@ -694,9 +751,9 @@ const ProjectForm = ({ isEdit = false }) => {
    * Remove technology from the list
    */
   const removeTechnology = (techToRemove) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      technologies: prev.technologies.filter(tech => tech !== techToRemove)
+      technologies: prev.technologies.filter((tech) => tech !== techToRemove),
     }));
   };
 
@@ -704,10 +761,10 @@ const ProjectForm = ({ isEdit = false }) => {
    * Handle technology input key press
    */
   const handleTechKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault();
       addTechnology();
-    } else if (e.key === ',' || e.key === 'Tab') {
+    } else if (e.key === "," || e.key === "Tab") {
       e.preventDefault();
       addTechnology();
     }
@@ -722,7 +779,7 @@ const ProjectForm = ({ isEdit = false }) => {
       setImageFile(file);
       // Create preview URL
       const previewUrl = URL.createObjectURL(file);
-      setFormData(prev => ({ ...prev, imageUrl: previewUrl }));
+      setFormData((prev) => ({ ...prev, imageUrl: previewUrl }));
     }
   };
 
@@ -731,14 +788,14 @@ const ProjectForm = ({ isEdit = false }) => {
    */
   const uploadImage = async () => {
     if (!imageFile) return formData.imageUrl;
-    
+
     try {
       setUploading(true);
-      const imageUrl = await uploadToCloudinary(imageFile, 'portfolio');
+      const imageUrl = await uploadToCloudinary(imageFile, "portfolio");
       return imageUrl;
     } catch (error) {
-      console.error('Error uploading image:', error);
-      throw new Error('Failed to upload image');
+      console.error("Error uploading image:", error);
+      throw new Error("Failed to upload image");
     } finally {
       setUploading(false);
     }
@@ -749,15 +806,15 @@ const ProjectForm = ({ isEdit = false }) => {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.title || !formData.description || !formData.category) {
-      showError('Please fill in all required fields');
+      showError("Please fill in all required fields");
       return;
     }
 
     try {
       setLoading(true);
-      
+
       // Upload image if new file selected
       let imageUrl = formData.imageUrl;
       if (imageFile) {
@@ -767,58 +824,61 @@ const ProjectForm = ({ isEdit = false }) => {
       const projectData = {
         ...formData,
         imageUrl,
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       };
 
       if (isEdit && id) {
         // Get old project data for comparison
-        const oldProjectDoc = await getDoc(doc(db, 'projects', id));
+        const oldProjectDoc = await getDoc(doc(db, "projects", id));
         const oldProjectData = oldProjectDoc.data();
 
         // Update existing project
-        await updateDoc(doc(db, 'projects', id), projectData);
+        await updateDoc(doc(db, "projects", id), projectData);
 
         // Check for status changes and create notifications
         if (oldProjectData.published !== formData.published) {
           await notifyProjectStatus(
             { id, title: formData.title },
-            oldProjectData.published ? 'published' : 'unpublished',
-            formData.published ? 'published' : 'unpublished'
+            oldProjectData.published ? "published" : "unpublished",
+            formData.published ? "published" : "unpublished"
           );
         }
 
         if (oldProjectData.featured !== formData.featured) {
           await notifyProjectStatus(
             { id, title: formData.title },
-            oldProjectData.featured ? 'featured' : 'unfeatured',
-            formData.featured ? 'featured' : 'unfeatured'
+            oldProjectData.featured ? "featured" : "unfeatured",
+            formData.featured ? "featured" : "unfeatured"
           );
         }
 
-        showSuccess('Project updated successfully');
+        showSuccess("Project updated successfully");
       } else {
         // Create new project
         projectData.titleUID = generateTitleUID(formData.title);
         projectData.createdAt = serverTimestamp();
         projectData.views = 0;
-        const newProjectRef = await addDoc(collection(db, 'projects'), projectData);
+        const newProjectRef = await addDoc(
+          collection(db, "projects"),
+          projectData
+        );
 
         // Create notification for new project
         if (formData.published) {
           await notifyProjectStatus(
             { id: newProjectRef.id, title: formData.title },
-            'draft',
-            'published'
+            "draft",
+            "published"
           );
         }
 
-        showSuccess('Project created successfully');
+        showSuccess("Project created successfully");
       }
 
-      navigate('/admin/dashboard/projects');
+      navigate("/admin/dashboard/projects");
     } catch (error) {
-      console.error('Error saving project:', error);
-      showError('Failed to save project');
+      console.error("Error saving project:", error);
+      showError("Failed to save project");
     } finally {
       setLoading(false);
     }
@@ -833,9 +893,7 @@ const ProjectForm = ({ isEdit = false }) => {
   // Show loading spinner while fetching project data
   if (fetchingProject) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="spinner"></div>
-      </div>
+      <Loader />
     );
   }
 
@@ -851,10 +909,12 @@ const ProjectForm = ({ isEdit = false }) => {
         </Link>
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
-            {isEdit ? 'Edit Project' : 'Add New Project'}
+            {isEdit ? "Edit Project" : "Add New Project"}
           </h1>
           <p className="text-gray-600 mt-1">
-            {isEdit ? 'Update project information' : 'Create a new portfolio project'}
+            {isEdit
+              ? "Update project information"
+              : "Create a new portfolio project"}
           </p>
         </div>
       </div>
@@ -893,18 +953,20 @@ const ProjectForm = ({ isEdit = false }) => {
             <label className="form-label">Category *</label>
             <div className="space-y-3">
               <select
-                value={showNewCategoryInput ? 'new' : formData.category}
+                value={showNewCategoryInput ? "new" : formData.category}
                 onChange={handleCategoryChange}
                 className="form-input focus:outline-none focus:ring-0"
                 required={!showNewCategoryInput}
               >
                 <option value="">Select a category</option>
-                {categories.map(category => (
-                  <option key={category} value={category}>{category}</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
                 ))}
                 <option value="new">+ Add New Category</option>
               </select>
-              
+
               {showNewCategoryInput && (
                 <div className="flex space-x-2">
                   <input
@@ -926,7 +988,7 @@ const ProjectForm = ({ isEdit = false }) => {
                     type="button"
                     onClick={() => {
                       setShowNewCategoryInput(false);
-                      setNewCategoryInput('');
+                      setNewCategoryInput("");
                     }}
                     className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
                   >
@@ -959,7 +1021,7 @@ const ProjectForm = ({ isEdit = false }) => {
                   Add
                 </button>
               </div>
-              
+
               {/* Technology Tags */}
               {formData.technologies.length > 0 && (
                 <div className="flex flex-wrap gap-2">
@@ -980,9 +1042,10 @@ const ProjectForm = ({ isEdit = false }) => {
                   ))}
                 </div>
               )}
-              
+
               <p className="text-sm text-gray-500">
-                Add technologies one by one. Press Enter, comma, or Tab to add each technology.
+                Add technologies one by one. Press Enter, comma, or Tab to add
+                each technology.
               </p>
             </div>
           </div>
@@ -1081,9 +1144,15 @@ const ProjectForm = ({ isEdit = false }) => {
             <button
               type="submit"
               disabled={loading || uploading}
-              className={`btn-primary ${(loading || uploading) ? 'opacity-75 cursor-not-allowed' : ''}`}
+              className={`btn-primary ${
+                loading || uploading ? "opacity-75 cursor-not-allowed" : ""
+              }`}
             >
-              {loading || uploading ? 'Saving...' : isEdit ? 'Update Project' : 'Create Project'}
+              {loading || uploading
+                ? "Saving..."
+                : isEdit
+                ? "Update Project"
+                : "Create Project"}
             </button>
           </div>
         </form>

@@ -1,27 +1,33 @@
 import React, { useState, useEffect } from "react";
-import { Link, replace, useNavigate } from "react-router-dom";
-import { FaPlus, FaEdit, FaTrash, FaSearch, FaEye } from "react-icons/fa";
-import { motion } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
+import { FaPlus, FaSearch } from "react-icons/fa";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import "react-quill/dist/quill.snow.css";
-
+import BlogCard from "../blog/BlogCard";
+import Loader from "../Loader";
 
 const BlogsManagement = () => {
   const [blogs, setBlogs] = useState([]);
   const [filter, setFilter] = useState("");
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBlogs = async () => {
       const querySnapshot = await getDocs(collection(db, "blogs"));
-      setBlogs(querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      setBlogs(
+        querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+      );
+      setLoading(false);
     };
     fetchBlogs();
   }, []);
 
   const handleDelete = async (id) => {
-    const confirmed = window.confirm("Are you sure you want to delete this blog?");
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this blog?"
+    );
     if (!confirmed) return;
     await deleteDoc(doc(db, "blogs", id));
     setBlogs(blogs.filter((blog) => blog.id !== id));
@@ -57,49 +63,15 @@ const BlogsManagement = () => {
         </div>
       </div>
 
-      {filteredBlogs.length === 0 ? (
+      {/* Loading State */}
+      {loading ? (
+        <Loader />
+      ) : filteredBlogs.length === 0 ? (
         <p className="text-center text-gray-500 mt-10">No blogs found.</p>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredBlogs.map((blog) => (
-            <motion.div
-              key={blog.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden flex flex-col"
-            >
-              <img
-                src={blog.banner}
-                alt={blog.title}
-                className="w-full h-44 object-cover"
-              />
-              <div className="p-4 flex-1 flex flex-col">
-                <h3 className="font-semibold text-lg">{blog.title || "Untitled"}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                  By {blog.author || "Unknown"}
-                </p>
-                <div className="mt-auto flex justify-between">
-                  <button
-                    onClick={() => navigate(`/admin/dashboard/blogs/edit/${blog.id}`)}
-                    className="flex items-center gap-1 text-yellow-600 hover:underline"
-                  >
-                    <FaEdit /> Edit
-                  </button>
-                  <button
-                    onClick={() => navigate(`/blog/${blog.id}`)}
-                    className="flex items-center gap-1 text-green-600 hover:underline"
-                  >
-                    <FaEye /> View
-                  </button>
-                  <button
-                    onClick={() => handleDelete(blog.id)}
-                    className="flex items-center gap-1 text-red-600 hover:underline"
-                  >
-                    <FaTrash /> Delete
-                  </button>
-                </div>
-              </div>
-            </motion.div>
+            <BlogCard key={blog.id} blog={blog} />
           ))}
         </div>
       )}

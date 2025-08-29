@@ -1,5 +1,6 @@
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import Loader from "./Loader";
 
 /**
  * Protected route component for admin access
@@ -10,11 +11,7 @@ const ProtectedRoute = ({ children }) => {
 
   // Show loading spinner while checking auth
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="spinner"></div>
-      </div>
-    );
+    return <Loader />;
   }
 
   // Redirect to login if not authenticated

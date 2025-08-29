@@ -16,25 +16,25 @@ const FeaturedProjectsCarousel = ({ projects }) => {
   const intervalRef = useRef(null);
 
   // Keep <br> but remove other HTML tags
-  const getFirstLinesHtml = (html, lines = 3) => {
-    if (!html) return "";
+  // const getFirstLinesHtml = (html, lines = 3) => {
+  //   if (!html) return "";
 
-    // Replace </p> and <br> with a newline marker
-    let temp = html.replace(/<\/p>/gi, "\n").replace(/<br\s*\/?>/gi, "\n");
+  //   // Replace </p> and <br> with a newline marker
+  //   let temp = html.replace(/<\/p>/gi, "\n").replace(/<br\s*\/?>/gi, "\n");
 
-    // Remove all remaining HTML tags
-    temp = temp.replace(/<[^>]+>/g, "");
+  //   // Remove all remaining HTML tags
+  //   temp = temp.replace(/<[^>]+>/g, "");
 
-    // Split by newline and take first N lines
-    const splitLines = temp
-      .split("\n")
-      .map((line) => line.trim())
-      .filter(Boolean);
+  //   // Split by newline and take first N lines
+  //   const splitLines = temp
+  //     .split("\n")
+  //     .map((line) => line.trim())
+  //     .filter(Boolean);
 
-    const firstLines = splitLines.slice(0, lines).join("<br>");
+  //   const firstLines = splitLines.slice(0, lines).join("<br>");
 
-    return firstLines;
-  };
+  //   return firstLines;
+  // };
 
   // Auto-play functionality
   useEffect(() => {
@@ -109,7 +109,7 @@ const FeaturedProjectsCarousel = ({ projects }) => {
                   </motion.h3>
 
                   {/* Description (first 3 lines) */}
-                  <motion.div
+                  {/* <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4 }}
@@ -120,7 +120,7 @@ const FeaturedProjectsCarousel = ({ projects }) => {
                         __html: getFirstLinesHtml(project.description, 3),
                       }}
                     />
-                  </motion.div>
+                  </motion.div> */}
 
                   {/* Technologies */}
                   {project.technologies?.length > 0 && (

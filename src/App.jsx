@@ -40,8 +40,7 @@ function App() {
   // Performance optimization: Preload critical resources
   useEffect(() => {
     // Preload critical images
-    // const criticalImages = ['/A.png'];
-    const criticalImages = ["/LogoBlack.png"];
+    const criticalImages = ["./assets/LogoBlack.png"];
     criticalImages.forEach((src) => {
       const img = new Image();
       img.src = src;

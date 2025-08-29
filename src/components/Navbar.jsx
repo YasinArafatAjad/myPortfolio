@@ -3,6 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSettings } from "../contexts/SettingsContext";
 import { useAuth } from "../contexts/AuthContext";
+import Logo from "../assets/LogoBlack.png";
+import Logo_BG from "../assets/logo-bg.svg";
 
 /**
  * Navigation bar component with responsive design and smooth animations
@@ -103,7 +105,7 @@ const Navbar = () => {
                   />
                 ) : (
                   <img
-                    src="../../public/LogoBlack.png"
+                    src={Logo}
                     alt="Yasin Arafat Ajad"
                     className="h-24 object-contain"
                     loading="eager"
@@ -119,7 +121,7 @@ const Navbar = () => {
               </Link>
               <img
                 className="pointer-events-none h-24 w-full absolute top-0 left-0 -z-10"
-                src="../../public/logo-bg.svg"
+                src={Logo_BG}
               />
             </div>
             {/* right navlinks */}
@@ -150,7 +152,7 @@ const Navbar = () => {
           {/* Mobile Logo */}
           <Link to={"/"}>
             <img
-              src="../../public/LogoBlack.png"
+              src={Logo}
               alt="Yasin Arafat Ajad"
               className=" md:hidden h-16"
             />

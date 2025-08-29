@@ -26,7 +26,7 @@ const defaultSettings = {
   siteDescription: 'Professional portfolio website showcasing my work and skills',
   siteKeywords: 'portfolio, web developer, designer, creative, Yasin , Arafat , Ajad , Azad , আজাদ , ইয়াসিন , আরাফাত, আরাফত , আজদ, ইসিন, araft arfat , arft, ajd',
   logo: '',
-  favicon: '/LogoBlack.png',
+  favicon: '../assets/LogoBlack.png',
   primaryColor: '#3b82f6',
   secondaryColor: '#06b6d4',
   contactEmail: 'yasinarafatazad173@gmail.com',

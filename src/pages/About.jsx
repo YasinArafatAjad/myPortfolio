@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import SEOHead from "../components/SEOHead";
-import { h1 } from "framer-motion/client";
 import CallToAction from "../components/CallToAction/CallToAction";
+import Logo from "../assets/LogoBlack.png";
 
 /**
  * About page component with personal information and skills
@@ -126,7 +126,7 @@ const About = () => {
                 <div className="aspect-square bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl pt-3 pr-3 lg:h-[70vh] w-full flex items-center justify-center">
                   <div className="w-full h-full bg-white rounded-xl backdrop-blur-sm flex items-center justify-center">
                     <img
-                      src="../../public/LogoBlack.png"
+                      src={Logo}
                       alt="Yasin Arafat Ajad"
                       className="w-[70%] h- 32 object-contain"
                     />

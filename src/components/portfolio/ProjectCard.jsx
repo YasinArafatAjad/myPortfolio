@@ -205,16 +205,6 @@ const ProjectCard = ({ project, index = 0 }) => {
     }
   };
 
-  const handleImageLoad = () => {
-    setImageError(false);
-    setImageLoaded(true);
-  };
-
-  const handleImageError = () => {
-    setImageError(true);
-    setImageLoaded(true);
-  };
-
   useEffect(() => {
     if (isHovered) {
       controls.start({
@@ -257,7 +247,7 @@ const ProjectCard = ({ project, index = 0 }) => {
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
         {/* Project Image */}
-        <div className="relative overflow-hidden h-96 bg-gradient-to-br from-gray-100 to-gray-200">
+        <div className="relative overflow-hidden h-72 bg-gradient-to-br from-gray-100 to-gray-200">
           {/* Status badges */}
           <div className="absolute top-4 left-4 flex flex-col space-y-2">
             {project.underConstruction && (
@@ -291,7 +281,7 @@ const ProjectCard = ({ project, index = 0 }) => {
               <h3 className="text-2xl font-bold mb-2">No Image Found</h3>
             </div>
           ) : (
-            <>              
+            <>
               <img
                 src={project.imageUrl}
                 alt={project.title}
@@ -302,79 +292,81 @@ const ProjectCard = ({ project, index = 0 }) => {
         </div>
 
         {/* Project Info */}
-        <div className="p-6 relative z-10">
-          {/* Category  */}
-          <div className="flex items-center justify-between min-h-[2.5rem] mb-3">
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-              className="text-sm text-primary-600 font-semibold uppercase tracking-wide"
-            >
-              Category: {project.category}
-            </motion.span>
-
-            {/* Featured Badge */}
-            {project.featured && (
+        <div className="p-6 relative z-10 ">
+          <div className="h-52">
+            {/* Category  */}
+            <div className="flex items-center justify-between min-h-[2.5rem] mb-3">
               <motion.span
-                initial={{ x: 40, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="flex gap-1 items-center bg-green-400 text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-lg"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+                className="text-sm text-primary-600 font-semibold uppercase tracking-wide"
               >
-                <GiEmptyHourglass size={20} /> <span>Featured</span>
+                Category: {project.category}
               </motion.span>
-            )}
-          </div>
 
-          {/* Title */}
-          <motion.h3
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.7 }}
-            className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors line-clamp-2"
-          >
-            <Link to={`/portfolio/${project.id}`}>{project.title}</Link>
-          </motion.h3>
+              {/* Featured Badge */}
+              {project.featured && (
+                <motion.span
+                  initial={{ x: 40, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="flex gap-1 items-center bg-green-400 text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-lg"
+                >
+                  <GiEmptyHourglass size={20} /> <span>Featured</span>
+                </motion.span>
+              )}
+            </div>
 
-          {/* Description */}
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.8 }}
-            className="text-gray-600 mb-4 line-clamp-2 leading-relaxed"
-          >
-            {project.description}
-          </motion.p>
-
-          {/* Technologies */}
-          {project.technologies && project.technologies.length > 0 ? (
-            <motion.div
+            {/* Title */}
+            <motion.h3
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.9 }}
-              className="flex flex-wrap gap-2 mb-4"
+              transition={{ duration: 0.5, delay: 0.7 }}
+              className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors line-clamp-2"
             >
-              {project.technologies.slice(0, 2).map((tech, techIndex) => (
-                <motion.span
-                  key={techIndex}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3, delay: 1 + techIndex * 0.1 }}
-                  className="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs font-medium hover:from-primary-100 hover:to-primary-200 hover:text-primary-700 transition-all duration-200"
-                >
-                  {tech}
-                </motion.span>
-              ))}
-              {project.technologies.length > 3 && (
-                <span className="text-xs text-gray-500 flex items-center">
-                  +{project.technologies.length - 2} more
-                </span>
-              )}
-            </motion.div>
-          ) : (
-            <div className="h-[1.6rem] mb-4" /> // to balance card height
-          )}
+              <Link to={`/portfolio/${project.id}`}>{project.title}</Link>
+            </motion.h3>
+
+            {/* Description */}
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.8 }}
+              className="text-gray-600 mb-4 line-clamp-2 leading-relaxed"
+            >
+              {project.description}
+            </motion.p>
+
+            {/* Technologies */}
+            {project.technologies && project.technologies.length > 0 ? (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.9 }}
+                className="flex flex-wrap gap-2 mb-4"
+              >
+                {project.technologies.slice(0, 2).map((tech, techIndex) => (
+                  <motion.span
+                    key={techIndex}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: 1 + techIndex * 0.1 }}
+                    className="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs font-medium hover:from-primary-100 hover:to-primary-200 hover:text-primary-700 transition-all duration-200"
+                  >
+                    {tech}
+                  </motion.span>
+                ))}
+                {project.technologies.length > 3 && (
+                  <span className="text-xs text-gray-500 flex items-center">
+                    +{project.technologies.length - 2} more
+                  </span>
+                )}
+              </motion.div>
+            ) : (
+              <div className="h-[1.6rem] mb-4" /> // to balance card height
+            )}
+          </div>
 
           {/* Reviews and Rating */}
           <motion.div
